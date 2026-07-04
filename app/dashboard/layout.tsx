@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { AlertCenter } from '@/components/AlertCenter';
+import { AssumptionsPanel } from '@/components/AssumptionsPanel';
 
 export default function DashboardLayout({
   children,
@@ -46,17 +47,6 @@ export default function DashboardLayout({
     } else {
       document.documentElement.classList.remove('light');
       localStorage.setItem('cemguard-theme', 'dark');
-    }
-  };
-
-  const handleDemoMode = () => {
-    const currentState = useStore.getState();
-    const nextState = !currentState.demoMode;
-    currentState.setDemoMode(nextState);
-    if (nextState) {
-      setSelectedPlant('Obajana Plant');
-      if (!presentationMode) togglePresentationMode();
-      router.push('/dashboard');
     }
   };
 
@@ -167,20 +157,29 @@ export default function DashboardLayout({
               {/* Bell / Alert Center */}
               <AlertCenter />
 
-              {/* Demo */}
-              <button
-                onClick={handleDemoMode}
-                title={useStore(s => s.demoMode) ? "Exit Demo Mode" : "Run known-good pitch demo"}
-                className={cn(
-                  "hidden md:flex items-center gap-1.5 px-3 py-1.5 border rounded-md transition-all text-xs font-bold",
-                  useStore(s => s.demoMode) 
-                    ? "bg-destructive text-white border-destructive hover:bg-destructive/90 animate-pulse" 
-                    : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                )}
-              >
-                <Play className={cn("h-3.5 w-3.5", useStore(s => s.demoMode) ? "fill-white" : "fill-primary")} />
-                {useStore(s => s.demoMode) ? "LIVE DEMO ACTIVE" : "Demo"}
-              </button>
+              <AssumptionsPanel />
+
+              {/* Scenario picker */}
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-primary/5 text-xs">
+                <select
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val) {
+                      useStore.getState().loadScenario(val as any);
+                      if (!useStore.getState().dtIsRunning) useStore.getState().dtStart();
+                    }
+                  }}
+                  className="bg-transparent font-bold text-primary focus:outline-none cursor-pointer"
+                  defaultValue=""
+                >
+                  <option value="" disabled>Scenario...</option>
+                  <option value="Healthy Plant">Healthy Plant</option>
+                  <option value="Progressive Wear">Progressive Wear</option>
+                  <option value="Imminent Failure">Imminent Failure</option>
+                  <option value="Emergency Shutdown">Emergency Shutdown</option>
+                </select>
+                <ChevronDown className="h-3 w-3 text-primary" />
+              </div>
 
               {/* Presentation */}
               <button

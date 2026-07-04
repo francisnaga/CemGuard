@@ -93,18 +93,16 @@ export default function DashboardPage() {
         } />
       )}
 
-      {currentView !== 'Executive' && (
-        <SectionG_Trends 
-          trendData={dtHistory.map(h => ({
-            day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
-            health: h.health,
-            prob: h.failureProb,
-            downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', 'Crusher').downtimeHours,
-            oee: h.oee
-          }))} 
-          presentationMode={presentationMode} 
-        />
-      )}
+      <SectionG_Trends 
+        trendData={dtHistory.map(h => ({
+          day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
+          health: h.health,
+          prob: h.failureProb,
+          downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', 'Crusher').downtimeHours,
+          oee: h.oee
+        }))} 
+        presentationMode={presentationMode} 
+      />
     </div>
   );
 }

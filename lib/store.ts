@@ -78,7 +78,6 @@ export const PLANT_PROFILES: PlantProfile[] = [
 
 interface DashboardState {
   currentView: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager';
-  demoMode: boolean;
   isAlertOpen: boolean;
   simulationDay: number;
   plantState: PlantState;
@@ -108,7 +107,7 @@ interface DashboardState {
   dtHistory: HistorySnapshot[];
 
   setCurrentView: (view: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager') => void;
-  setDemoMode: (enabled: boolean) => void;
+  loadScenario: (scenario: 'Healthy Plant' | 'Progressive Wear' | 'Imminent Failure' | 'Emergency Shutdown') => void;
   setAlertOpen: (isOpen: boolean) => void;
 
   setSimulationDay: (day: number) => void;
@@ -171,7 +170,6 @@ export const useStore = create<DashboardState>((set, get) => {
 
   return {
   currentView: 'Executive',
-  demoMode: false,
   isAlertOpen: false,
   simulationDay: 1,
   plantState: 'Normal Production',
@@ -203,36 +201,59 @@ export const useStore = create<DashboardState>((set, get) => {
   dtHistory: warmupHistory,
 
   setCurrentView: (view) => set({ currentView: view }),
-  setDemoMode: (enabled) => {
-    if (enabled) {
-      // Load known-good scenario (Crusher 67% Pf, Zone C)
-      const demoMachines = JSON.parse(JSON.stringify(initialMachines));
-      const crusher = demoMachines.find((m: any) => m.id === 'crusher');
-      crusher.failureProb = 67.4;
+  loadScenario: (scenario) => {
+    const newMachines = JSON.parse(JSON.stringify(initialMachines));
+    const crusher = newMachines.find((m: any) => m.id === 'crusher');
+    let newEvents = [...get().dtEvents];
+    let newClock = get().dtClock;
+    let newCrew = { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' } as any;
+    let newBottleneck = null;
+
+    if (scenario === 'Healthy Plant') {
+      newClock = 32;
+    } else if (scenario === 'Progressive Wear') {
+      newClock = 45;
+      crusher.wearAccumulation += 1.5;
+      crusher.vibrationZone = 'B';
+      crusher.vibrationRms = 3.5;
+      crusher.temperatureC = 75.0;
+      crusher.failureProb = 45.0;
+      crusher.health = 80;
+      crusher.risk = 'High';
+      newEvents.unshift({ id: 'scen1', time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Crusher showing progressive wear patterns.' });
+    } else if (scenario === 'Imminent Failure') {
+      newClock = 50;
+      crusher.wearAccumulation += 2.8;
       crusher.vibrationZone = 'C';
       crusher.vibrationRms = 5.2;
       crusher.temperatureC = 86.5;
+      crusher.failureProb = 67.4;
       crusher.health = 72;
       crusher.risk = 'High';
-      
-      set({ 
-        demoMode: true,
-        dtIsRunning: false,
-        dtClock: 45, // some time into the shift
-        dtMachines: demoMachines,
-        dtThroughputCurrent: 430,
-        dtThroughputEfficiency: 95,
-        dtBottleneck: null,
-        dtCrewStatus: { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' },
-        dtEvents: [
-          { id: 'demo1', time: '11:15', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (ISO 20816 Zone C)' },
-          { id: 'demo2', time: '11:15', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' }
-        ]
-      });
-      if (dtIntervalRef !== null) { window.clearInterval(dtIntervalRef); dtIntervalRef = null; }
-    } else {
-      set({ demoMode: false });
+      newEvents.unshift({ id: 'scen2', time: '12:30', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (Zone C)' });
+      newEvents.unshift({ id: 'scen3', time: '12:30', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' });
+    } else if (scenario === 'Emergency Shutdown') {
+      newClock = 52;
+      crusher.failureProb = 95.0;
+      crusher.vibrationZone = 'D';
+      crusher.vibrationRms = 8.1;
+      crusher.temperatureC = 110.0;
+      crusher.health = 20;
+      crusher.risk = 'Critical';
+      crusher.availability = 0;
+      crusher.utilization = 0;
+      crusher.loadFactor = 0;
+      newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
+      newEvents.unshift({ id: 'scen4', time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Bearing failure predicted.' });
     }
+
+    set({ 
+      dtClock: newClock,
+      dtMachines: newMachines,
+      dtEvents: newEvents,
+      dtCrewStatus: newCrew,
+      dtBottleneck: newBottleneck
+    });
   },
   setAlertOpen: (isOpen) => set({ isAlertOpen: isOpen }),
   setSimulationDay: (day) => set({ simulationDay: day }),
@@ -291,9 +312,8 @@ export const useStore = create<DashboardState>((set, get) => {
   },
 
   dtTick: () => {
-    const { dtClock, dtMachines, dtEvents, dtCrewStatus, dtHistory, demoMode } = get();
-    if (demoMode) return; // Freeze state if demo mode is active
-    
+    const { dtClock, dtMachines, dtEvents, dtCrewStatus, dtHistory } = get();
+    // Increment clock (simulating 15-minute intervals per tick)
     const newClock = dtClock + 1;
     
     const hours = Math.floor(newClock * 15 / 60).toString().padStart(2, '0');
