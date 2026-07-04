@@ -115,7 +115,9 @@ export function TabScenarioAnalysis() {
         <Star className="h-5 w-5 text-yellow-500 mt-0.5 fill-yellow-500 shrink-0" />
         <div>
           <p className="text-sm font-bold text-yellow-500 mb-1">Recommendation Basis</p>
-          <p className="text-sm text-muted-foreground">Scenario A (Immediate Maintenance) is recommended. While it requires 8 hours of planned downtime today, it mitigates a 65% chance of catastrophic failure over the next 14 days, saving an estimated ₦72.8M in emergency exposure and preventing 20 hours of additional unplanned downtime.</p>
+          <p className="text-sm text-muted-foreground">
+            {scenarios[0].name} ({scenarios[0].subtitle}) is recommended. While it requires {scenarios[0].downtime} hours of planned downtime today, it mitigates a {scenarios[2].risk}% chance of catastrophic failure over the next {scenarios[2].delay} days, saving an estimated ₦{(scenarios[2].cost - scenarios[0].cost).toFixed(1)}M in emergency exposure and preventing {scenarios[2].downtime - scenarios[0].downtime} hours of additional unplanned downtime.
+          </p>
         </div>
       </div>
     </div>
