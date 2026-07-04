@@ -131,7 +131,7 @@ export function TabScenarioAnalysis() {
         <div>
           <p className="text-sm font-bold text-yellow-500 mb-1">Recommendation Basis</p>
           <p className="text-sm text-muted-foreground">
-            {scenarios[0].name} ({scenarios[0].subtitle}) is recommended. While it requires {scenarios[0].downtime} hours of planned downtime today, it mitigates a {scenarios[2].risk}% chance of catastrophic failure over the next {scenarios[2].delay} days, saving an estimated ₦{(scenarios[2].cost - scenarios[0].cost).toFixed(1)}M in emergency exposure and preventing {scenarios[2].downtime - scenarios[0].downtime} hours of additional unplanned downtime.
+            {scenarios[0].name} ({scenarios[0].subtitle}) is recommended. While it requires {scenarios[0].downtime} hours of planned downtime today, it mitigates a {scenarios[2].risk}% chance of {scenarios[2].risk > 70 ? 'catastrophic failure' : 'accelerated degradation'} over the next {scenarios[2].delay} days, saving an estimated ₦{(scenarios[2].cost - scenarios[0].cost).toFixed(1)}M in {scenarios[2].risk > 70 ? 'emergency' : 'avoidable'} exposure and preventing {scenarios[2].downtime - scenarios[0].downtime} hours of additional downtime.
           </p>
         </div>
       </div>
