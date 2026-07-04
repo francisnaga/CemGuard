@@ -5,13 +5,15 @@ interface RankedEquipment {
   id: string;
   name: string;
   health: number;
-  riskValue: number;
+  expectedRisk: number;
+  exposureAmount: number;
   failureMode: string;
+  riskTier: string;
 }
 
 export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) {
-  // Sort by risk descending
-  const sorted = [...rankings].sort((a, b) => b.riskValue - a.riskValue);
+  // Sort by expected risk (probability * exposure) descending
+  const sorted = [...rankings].sort((a, b) => b.expectedRisk - a.expectedRisk);
 
   return (
     <div className="flex flex-col space-y-4 bg-card border border-border p-6 rounded-xl h-full">
@@ -39,14 +41,16 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
             <div>
               <p className="font-bold text-foreground">{item.name}</p>
               <div className="flex items-center text-xs text-muted-foreground mt-1">
-                {index === 0 && <AlertCircle className="h-3 w-3 mr-1 text-destructive" />}
+                {item.riskTier === 'Critical' || item.riskTier === 'High' ? (
+                  <AlertCircle className="h-3 w-3 mr-1 text-destructive" />
+                ) : null}
                 {item.failureMode}
               </div>
             </div>
             
             <div className="text-right">
-              <p className={cn("text-xl font-bold tracking-tight", index === 0 ? "text-destructive" : "text-foreground")}>
-                ₦{(item.riskValue / 1_000_000).toFixed(1)}M
+              <p className={cn("text-xl font-bold tracking-tight", (item.riskTier === 'Critical' || item.riskTier === 'High') ? "text-destructive" : "text-foreground")}>
+                ₦{(item.exposureAmount / 1_000_000).toFixed(1)}M
               </p>
               <p className="text-xs text-muted-foreground">Exposure</p>
             </div>

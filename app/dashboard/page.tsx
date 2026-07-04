@@ -85,13 +85,24 @@ export default function DashboardPage() {
             }))} />
           </div>
           <div className="lg:col-span-1">
-            <SectionD_Ranking rankings={dtMachines.map(m => ({
-              id: m.id,
-              name: m.name,
-              health: m.health,
-              riskValue: calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher').totalRiskExposure,
-              failureMode: `High Vibration (Zone ${m.vibrationZone})`
-            })).sort((a,b) => b.riskValue - a.riskValue).slice(0, 5)} />
+            <SectionD_Ranking rankings={dtMachines.map(m => {
+              const impact = calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher');
+              return {
+                id: m.id,
+                name: m.name,
+                health: m.health,
+                expectedRisk: impact.totalRiskExposure * (m.failureProb / 100),
+                exposureAmount: impact.totalRiskExposure,
+                riskTier: m.risk,
+                failureMode: m.vibrationZone === 'D' || m.vibrationZone === 'C' 
+                  ? `High Vibration (Zone ${m.vibrationZone})` 
+                  : m.temperatureC > 85 
+                    ? `Overheating (${m.temperatureC.toFixed(1)}°C)`
+                    : m.health < 80 
+                      ? 'Degraded Health'
+                      : 'Normal Operation'
+              };
+            }).sort((a,b) => b.expectedRisk - a.expectedRisk).slice(0, 5)} />
           </div>
         </div>
 
