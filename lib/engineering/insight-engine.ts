@@ -15,17 +15,17 @@ export function generateInsight(
   const { vibrationZone: zone, health, failureProb: pf, name } = machine;
   const formatCurrency = (val: number) => `₦${(val / 1000000).toFixed(1)}M`;
 
-  // Priority 2 - Rule-Based Severity Bands
-  if (zone === 'D' && pf > 70) {
+  // Priority 2 - Rule-Based Severity Bands (Cascading logic to prevent gaps)
+  if (pf >= 70 || zone === 'D') {
     return {
       situation: `${name} requires emergency intervention.`,
-      observation: `Weibull P(f) = ${pf.toFixed(1)}%. ISO Zone D. Temperature ${machine.temperatureC.toFixed(1)}°C.`,
+      observation: `Weibull P(f) = ${pf.toFixed(1)}%. ISO Zone ${zone}. Temperature ${machine.temperatureC.toFixed(1)}°C.`,
       recommendation: `Execute immediate shutdown. Dispatch maintenance crew immediately. Estimated avoided loss: ${formatCurrency(impact.totalRiskExposure)}.`,
       severity: 'Critical'
     };
   }
 
-  if ((zone === 'C' || zone === 'D') && health < 60 && pf > 50) {
+  if (pf >= 50 || zone === 'C' || health < 60) {
     return {
       situation: `${name} degradation is accelerating rapidly.`,
       observation: `Failure probability reached ${pf.toFixed(1)}%. Vibration in Zone ${zone}. Health Index ${health.toFixed(1)}.`,
@@ -34,11 +34,11 @@ export function generateInsight(
     };
   }
 
-  if ((zone === 'B' || zone === 'C') && health >= 60 && health <= 85 && pf >= 20 && pf <= 50) {
+  if (pf >= 20 || zone === 'B' || health < 85) {
     return {
-      situation: `${name} vibration has entered ISO Zone ${zone}.`,
+      situation: `${name} requires monitoring (Zone ${zone}).`,
       observation: `RMS velocity ${machine.vibrationRms.toFixed(1)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}°C. P(f) = ${pf.toFixed(1)}%.`,
-      recommendation: `Schedule inspection within 48 days; pre-stage spares if trend continues.`,
+      recommendation: `Schedule inspection within 48 hours; pre-stage spares if trend continues.`,
       severity: 'Warning'
     };
   }

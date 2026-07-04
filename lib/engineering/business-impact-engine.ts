@@ -9,7 +9,8 @@ const REPAIR_BASE_COST = 5_000_000;         // ₦ base parts + labour for stand
 
 export function calculateBusinessImpact(
   strategy: MaintenanceStrategy,
-  equipmentCategory: string
+  equipmentCategory: string,
+  sparesLeadTimeDays: number = 0
 ): BusinessImpact {
   
   let downtimeHours = 0;
@@ -34,12 +35,12 @@ export function calculateBusinessImpact(
       co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = 24; // Unplanned, waiting for parts
+      downtimeHours = 24 + (sparesLeadTimeDays * 24); // Unplanned, waiting for parts
       repairCostMultiplier = 3.0; // Overtime, expedited shipping
       co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = 72; // Catastrophic failure
+      downtimeHours = 72 + (sparesLeadTimeDays * 24); // Catastrophic failure + waiting for parts
       repairCostMultiplier = 10.0; // Massive collateral damage
       co2ImpactTons = 15; // Full cold restart
       break;

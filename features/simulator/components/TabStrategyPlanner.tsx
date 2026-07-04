@@ -11,6 +11,7 @@ export function TabStrategyPlanner() {
   const [delayDays, setDelayDays] = useState(14);
   const [priority, setPriority] = useState('Critical');
   const [targetId, setTargetId] = useState('crusher');
+  const [sparesLeadTime, setSparesLeadTime] = useState(3);
 
   const dtMachines = useStore(s => s.dtMachines);
   const targetMachine = dtMachines.find(m => m.id === targetId) || dtMachines[0];
@@ -29,10 +30,11 @@ export function TabStrategyPlanner() {
   // Use the exact same unified business impact function as the rest of the app
   const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
     delayDays === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
-    targetMachine.name
+    targetMachine.name,
+    sparesLeadTime
   );
   
-  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name).totalRiskExposure / 1_000_000;
+  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime).totalRiskExposure / 1_000_000;
   const emergencyCostM = totalRiskExposure / 1_000_000;
 
   const probColor = projectedProb > 70 ? 'text-destructive' : projectedProb > 40 ? 'text-orange-500' : 'text-success';
@@ -91,10 +93,14 @@ export function TabStrategyPlanner() {
           
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Spares Lead Time</label>
-            <select className="mt-1 w-full bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary">
-              <option>In Stock (0 Days)</option>
-              <option>Local (3 Days)</option>
-              <option>Imported (14 Days)</option>
+            <select 
+              value={sparesLeadTime}
+              onChange={(e) => setSparesLeadTime(parseInt(e.target.value))}
+              className="mt-1 w-full bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary"
+            >
+              <option value={0}>In Stock (0 Days)</option>
+              <option value={3}>Local (3 Days)</option>
+              <option value={14}>Imported (14 Days)</option>
             </select>
           </div>
         </div>
