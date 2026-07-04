@@ -26,13 +26,13 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
           key={item.id} 
           className={cn(
             "relative flex items-center p-4 rounded-lg border overflow-hidden",
-            index === 0 ? "border-destructive bg-destructive/5" : "border-border bg-background/50"
+            (item.riskTier === 'Critical' || item.riskTier === 'High') ? "border-destructive bg-destructive/5" : "border-border bg-background/50"
           )}
         >
           {/* F1 Style Position Marker */}
           <div className={cn(
             "absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center font-bold text-lg",
-            index === 0 ? "bg-destructive text-white" : "bg-muted text-muted-foreground"
+            (item.riskTier === 'Critical' || item.riskTier === 'High') ? "bg-destructive text-white" : "bg-muted text-muted-foreground"
           )}>
             #{index + 1}
           </div>
