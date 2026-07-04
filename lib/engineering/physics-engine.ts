@@ -29,7 +29,7 @@ export function calculateWearAccumulation(currentWear: number, loadFactor: numbe
 export function calculateVibration(params: PhysicsParams): { rms: number, zone: string } {
   const v0 = 1.2; // Baseline healthy vibration (mm/s)
   const kW = 0.8; // Wear coefficient
-  const kL = 2.5; // Load coefficient
+  const kL = 0.5; // Load coefficient
   
   const rms = v0 + (kW * params.wearAccumulation) + (kL * params.loadFactor);
   const roundedRms = Number(rms.toFixed(2));
