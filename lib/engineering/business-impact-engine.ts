@@ -10,39 +10,44 @@ const REPAIR_BASE_COST = 5_000_000;         // ₦ base parts + labour for stand
 export function calculateBusinessImpact(
   strategy: MaintenanceStrategy,
   equipmentCategory: string,
-  sparesLeadTimeDays: number = 0
+  sparesLeadTimeDays: number = 0,
+  plannedDelayDays: number = 0
 ): BusinessImpact {
   
   let downtimeHours = 0;
   let repairCostMultiplier = 1.0;
   let co2ImpactTons = 0;
 
+  const waitPenaltyDays = Math.max(0, sparesLeadTimeDays - plannedDelayDays);
+  const waitPenaltyHours = waitPenaltyDays * 24;
+
   // Impact varies heavily by strategy (RCM principle)
   switch (strategy) {
     case 'Preventive':
-      downtimeHours = 2; // Quick scheduled inspection
+      downtimeHours = 2 + waitPenaltyHours; // Quick scheduled inspection
       repairCostMultiplier = 0.5;
       co2ImpactTons = 0; // No cold restart needed
       break;
     case 'Condition-Based':
-      downtimeHours = 4;
+      downtimeHours = 4 + waitPenaltyHours;
       repairCostMultiplier = 0.8;
       co2ImpactTons = 2;
       break;
     case 'Predictive':
-      downtimeHours = 8; // Planned targeted repair
+      downtimeHours = 8 + waitPenaltyHours; // Planned targeted repair
       repairCostMultiplier = 1.2;
       co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = 24 + (sparesLeadTimeDays * 24); // Unplanned, waiting for parts
+      downtimeHours = 24 + waitPenaltyHours; // Unplanned, waiting for parts
       repairCostMultiplier = 3.0; // Overtime, expedited shipping
       co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = 72 + (sparesLeadTimeDays * 24); // Catastrophic failure + waiting for parts
+      downtimeHours = 72 + waitPenaltyHours; // Catastrophic failure + waiting for parts
       repairCostMultiplier = 10.0; // Massive collateral damage
       co2ImpactTons = 15; // Full cold restart
+
       break;
   }
 

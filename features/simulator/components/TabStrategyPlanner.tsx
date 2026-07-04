@@ -31,10 +31,11 @@ export function TabStrategyPlanner() {
   const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
     delayDays === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
     targetMachine.name,
-    sparesLeadTime
+    sparesLeadTime,
+    delayDays
   );
   
-  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime).totalRiskExposure / 1_000_000;
+  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
   const emergencyCostM = totalRiskExposure / 1_000_000;
 
   const probColor = projectedProb > 70 ? 'text-destructive' : projectedProb > 40 ? 'text-orange-500' : 'text-success';
