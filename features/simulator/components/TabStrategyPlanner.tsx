@@ -10,16 +10,17 @@ import { cn } from '@/lib/utils';
 export function TabStrategyPlanner() {
   const [delayDays, setDelayDays] = useState(14);
   const [priority, setPriority] = useState('Critical');
+  const [targetId, setTargetId] = useState('crusher');
 
-  // Pull live Crusher state from the physics engine (single source of truth)
-  const crusher = useStore(s => s.dtMachines.find(m => m.id === 'crusher'));
+  const dtMachines = useStore(s => s.dtMachines);
+  const targetMachine = dtMachines.find(m => m.id === targetId) || dtMachines[0];
 
   // Project failure probability forward using real Weibull equation
   // (non-linear — follows the curve, not a linear estimate)
-  const currentHours  = crusher?.operatingHours ?? 12400;
-  const baseEta       = crusher?.baseEta ?? 18000;
-  const beta          = crusher?.beta ?? 2.5;
-  const currentP      = crusher?.failureProb ?? 12.4;
+  const currentHours  = targetMachine.operatingHours;
+  const baseEta       = targetMachine.baseEta;
+  const beta          = targetMachine.beta;
+  const currentP      = targetMachine.failureProb;
 
   // Derive effectiveEta from current state (reverse from live P(f))
   const projectedHours = delayDays * 24;
@@ -28,10 +29,10 @@ export function TabStrategyPlanner() {
   // Use the exact same unified business impact function as the rest of the app
   const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
     delayDays === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
-    'Crusher'
+    targetMachine.name
   );
   
-  const plannedCost = calculateBusinessImpact('Preventive', 'Crusher').totalRiskExposure / 1_000_000;
+  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name).totalRiskExposure / 1_000_000;
   const emergencyCostM = totalRiskExposure / 1_000_000;
 
   const probColor = projectedProb > 70 ? 'text-destructive' : projectedProb > 40 ? 'text-orange-500' : 'text-success';
@@ -49,10 +50,14 @@ export function TabStrategyPlanner() {
         <div className="space-y-4">
           <div>
             <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Target Equipment</label>
-            <select className="mt-1 w-full bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary">
-              <option>Crusher</option>
-              <option>Raw Mill</option>
-              <option>Kiln</option>
+            <select 
+              value={targetId}
+              onChange={(e) => setTargetId(e.target.value)}
+              className="mt-1 w-full bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary"
+            >
+              {dtMachines.map(m => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
             </select>
           </div>
 
