@@ -46,7 +46,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
       <KPICard 
         title="Historical Fleet Health" 
-        value={`${kpiData.health}%`} 
+        value={`${Number(kpiData.health).toFixed(1)}%`} 
         trendDir={kpiData.healthTrend > 0 ? 'up' : 'down'} 
         trendValue={`${Math.abs(kpiData.healthTrend)}%`} 
         trendText={kpiData.healthTrend > 0 ? 'Improving' : 'Degrading'} 
@@ -57,7 +57,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="OEE (A×P×Q)"
-        value={`${kpiData.oee}%`} 
+        value={`${Number(kpiData.oee).toFixed(1)}%`} 
         trendDir="neutral"
         trendValue="0%" 
         trendText="Stable" 
@@ -88,7 +88,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="Production Availability" 
-        value={`${kpiData.availability}%`} 
+        value={`${Number(kpiData.availability).toFixed(1)}%`} 
         trendDir="down" 
         trendValue="1.2%" 
         trendText="Decrease" 
