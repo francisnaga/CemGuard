@@ -19,12 +19,12 @@ export function TabScenarioAnalysis() {
   const beta          = targetMachine.beta;
 
   const scenariosDef = [
-    { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false, isRecommended: true },
-    { name: 'Scenario B', subtitle: 'Current Baseline', delay: 14, isCurrent: true, isRecommended: false },
-    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false, isRecommended: false }
+    { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false },
+    { name: 'Scenario B', subtitle: 'Current Baseline', delay: Math.max(1, targetMachine.vibrationZone === 'C' ? 7 : 14), isCurrent: true },
+    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false }
   ];
 
-  const scenarios = scenariosDef.map(s => {
+  let rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, baseEta, beta);
     const impact = calculateBusinessImpact(
       s.delay === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
@@ -37,6 +37,14 @@ export function TabScenarioAnalysis() {
       cost: impact.totalRiskExposure / 1_000_000
     };
   });
+
+  const bestScenario = rawScenarios.reduce((prev, curr) => (prev.cost < curr.cost) ? prev : curr);
+  const currentBaseline = rawScenarios[1];
+
+  const scenarios = rawScenarios.map(s => ({
+    ...s,
+    isRecommended: s.name === bestScenario.name
+  }));
 
   return (
     <div className="bg-card border border-border p-6 rounded-xl animate-in fade-in duration-500">
@@ -131,7 +139,12 @@ export function TabScenarioAnalysis() {
         <div>
           <p className="text-sm font-bold text-yellow-500 mb-1">Recommendation Basis</p>
           <p className="text-sm text-muted-foreground">
-            {scenarios[0].name} ({scenarios[0].subtitle}) is recommended. While it requires {scenarios[0].downtime} hours of planned downtime today, it mitigates a {scenarios[2].risk}% chance of {scenarios[2].risk > 70 ? 'catastrophic failure' : 'accelerated degradation'} over the next {scenarios[2].delay} days, saving an estimated ₦{(scenarios[2].cost - scenarios[0].cost).toFixed(1)}M in {scenarios[2].risk > 70 ? 'emergency' : 'avoidable'} exposure and preventing {scenarios[2].downtime - scenarios[0].downtime} hours of additional downtime.
+            {bestScenario.name} ({bestScenario.subtitle}) is recommended. 
+            {bestScenario.name === currentBaseline.name ? (
+              <> The current operational baseline is the optimal strategy. Avoid unnecessary early maintenance or excessive delays to maximize financial efficiency.</>
+            ) : (
+              <> While it requires {bestScenario.downtime} hours of planned downtime {bestScenario.delay === 0 ? 'today' : `in ${bestScenario.delay} days`}, it mitigates a {Math.abs(currentBaseline.risk - bestScenario.risk)}% difference in failure probability compared to the baseline, saving an estimated ₦{Math.abs(currentBaseline.cost - bestScenario.cost).toFixed(1)}M in avoidable exposure and {currentBaseline.downtime > bestScenario.downtime ? `preventing ${currentBaseline.downtime - bestScenario.downtime} hours of additional downtime.` : `incurring ${bestScenario.downtime - currentBaseline.downtime} hours of extra downtime for a much safer operating margin.`} </>
+            )}
           </p>
         </div>
       </div>
