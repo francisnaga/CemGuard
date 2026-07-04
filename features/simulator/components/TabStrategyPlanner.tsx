@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Settings2, TrendingUp } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
+import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
 import { cn } from '@/lib/utils';
 
 export function TabStrategyPlanner() {
@@ -21,19 +22,17 @@ export function TabStrategyPlanner() {
   const currentP      = crusher?.failureProb ?? 12.4;
 
   // Derive effectiveEta from current state (reverse from live P(f))
-  // Use the stored failureProb directly as the current baseline and project forward
   const projectedHours = delayDays * 24;
   const projectedProb  = projectFailureProbability(currentHours, projectedHours, baseEta, beta);
 
-  // Business impact — defensible assumption documented in tooltip
-  // ₦25,000/hr (representative: ~450 t/h × ₦55/kg ÷ 1000)
-  const HOURLY_VALUE = 25000; // ₦/hr, representative assumption
-  const plannedDowntime = 8;  // hours — standard crusher bearing replacement
-  const plannedCost     = (plannedDowntime * HOURLY_VALUE + 5000000) / 1_000_000; // ₦M
-  const emergencyCostM  = delayDays === 0 ? plannedCost
-                        : ((projectedProb / 100) * 72 * HOURLY_VALUE * (1 + delayDays / 30) + 50000000) / 1_000_000;
-  const downtimeEst     = delayDays === 0 ? plannedDowntime
-                        : Math.round(8 + (projectedProb / 100) * 64);
+  // Use the exact same unified business impact function as the rest of the app
+  const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
+    delayDays === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
+    'Crusher'
+  );
+  
+  const plannedCost = calculateBusinessImpact('Preventive', 'Crusher').totalRiskExposure / 1_000_000;
+  const emergencyCostM = totalRiskExposure / 1_000_000;
 
   const probColor = projectedProb > 70 ? 'text-destructive' : projectedProb > 40 ? 'text-orange-500' : 'text-success';
 

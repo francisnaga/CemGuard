@@ -1,15 +1,22 @@
 'use client';
 
-import { useStore } from '@/lib/store';
-import { PLANT_PROFILES } from '@/lib/store';
+import { useStore, PLANT_PROFILES } from '@/lib/store';
 import { Factory, Activity, Clock, ShieldAlert, CheckCircle2, TrendingDown, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { generateInsight } from '@/lib/engineering/insight-engine';
 
 export default function ReportsPage() {
   const { selectedPlant, simulationDay, plantState, dtMachines, dtClock } = useStore();
   const plantProfile = PLANT_PROFILES.find(p => p.name === selectedPlant) || PLANT_PROFILES[0];
   
   const formattedDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const worstMachine = dtMachines.reduce((worst, m) => m.failureProb > worst.failureProb ? m : worst, dtMachines[0]);
+  const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
+  const impact = calculateBusinessImpact(strategy, worstMachine.name.includes('Kiln') ? 'Kiln' : 'Crusher');
+  const insight = generateInsight(worstMachine, impact);
+  const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.name.includes('Kiln') ? 'Kiln' : 'Crusher');
 
   return (
     <div className="max-w-4xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">
@@ -59,7 +66,7 @@ export default function ReportsPage() {
             </div>
             <div className="bg-gray-100 p-4 rounded border border-gray-200">
               <span className="text-[10px] font-bold uppercase text-gray-500 tracking-wider block mb-1">Risk Exposure</span>
-              <span className="text-2xl font-bold text-red-600">High</span>
+              <span className="text-2xl font-bold text-red-600">{insight.severity}</span>
             </div>
             <div className="bg-gray-100 p-4 rounded border border-gray-200">
               <span className="text-[10px] font-bold uppercase text-gray-500 tracking-wider block mb-1">Maint. Budget</span>
@@ -67,7 +74,7 @@ export default function ReportsPage() {
             </div>
           </div>
           <p className="text-gray-800 leading-relaxed text-sm text-justify">
-            This report details the current operational reliability of the {plantProfile.name}. Based on real-time telemetry and Weibull distribution modeling, the plant is operating under significant risk due to accelerated degradation in the Crusher bearing assembly. If preventative maintenance is not scheduled immediately, the cascading throughput loss will result in severe financial exposure.
+            This report details the current operational reliability of the {plantProfile.name}. {insight.situation} {insight.observation} If preventative maintenance is not scheduled, the cascading throughput loss will result in severe financial exposure.
           </p>
         </div>
 
@@ -116,18 +123,18 @@ export default function ReportsPage() {
             <span className="bg-black text-white px-2 py-0.5 mr-3 text-sm">03</span> Strategic Maintenance Recommendation
           </h2>
           <div className="border-l-4 border-black pl-6 py-2 mb-6">
-            <h3 className="text-lg font-bold text-black mb-1">Execute 8-Hour Planned Shutdown</h3>
+            <h3 className="text-lg font-bold text-black mb-1">Execute {plannedImpact.downtimeHours}-Hour Planned Shutdown</h3>
             <p className="text-gray-700 text-sm leading-relaxed mb-4">
-              Delaying maintenance on the Crusher increases the probability of catastrophic failure to 65% over the next 14 days. The recommended action is to dispatch Crew Alpha immediately for bearing replacement.
+              {insight.recommendation}
             </p>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-3 text-sm">
                 <CheckCircle2 className="h-5 w-5 text-black" />
-                <span className="font-semibold text-gray-900">Prevents 28 Hrs Unplanned Downtime</span>
+                <span className="font-semibold text-gray-900">Prevents {impact.downtimeHours - plannedImpact.downtimeHours} Hrs Unplanned Downtime</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <TrendingDown className="h-5 w-5 text-black" />
-                <span className="font-semibold text-gray-900">Mitigates ₦84.8M Revenue Exposure</span>
+                <span className="font-semibold text-gray-900">Mitigates ₦{(impact.totalRiskExposure / 1000000).toFixed(1)}M Revenue Exposure</span>
               </div>
             </div>
           </div>

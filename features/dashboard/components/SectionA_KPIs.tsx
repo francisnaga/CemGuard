@@ -1,5 +1,6 @@
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MetricExplainer } from "@/components/MetricExplainer";
 
 interface KPICardProps {
   title: string;
@@ -9,15 +10,19 @@ interface KPICardProps {
   trendText: string;
   isGood: boolean;
   highlighted?: boolean;
+  explainerBasis: string;
+  explainerFormula?: string;
 }
 
-function KPICard({ title, value, trendDir, trendValue, trendText, isGood, highlighted }: KPICardProps) {
+function KPICard({ title, value, trendDir, trendValue, trendText, isGood, highlighted, explainerBasis, explainerFormula }: KPICardProps) {
   return (
     <div className={cn(
       "flex flex-col p-6 bg-card rounded-xl border transition-all duration-300",
       highlighted ? "border-primary shadow-[0_0_15px_rgba(255,255,255,0.1)]" : "border-border"
     )}>
-      <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+      <MetricExplainer title={title} basis={explainerBasis} formula={explainerFormula}>
+        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+      </MetricExplainer>
       <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">{value}</p>
       
       <div className="mt-4 flex items-center space-x-2 text-sm">
@@ -47,6 +52,8 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendText={kpiData.healthTrend > 0 ? 'Improving' : 'Degrading'} 
         isGood={kpiData.healthTrend >= 0}
         highlighted={presentationMode}
+        explainerBasis="Composite index aggregating vibration, temperature, and wear state across all machines."
+        explainerFormula="Avg(Machine Health Index)"
       />
       <KPICard 
         title="OEE (A×P×Q)"
@@ -55,6 +62,8 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendValue="0%" 
         trendText="Stable" 
         isGood={true}
+        explainerBasis="Overall Equipment Effectiveness. Reflects true productive capacity."
+        explainerFormula="Availability × Performance × Quality"
       />
       <KPICard 
         title="Active Alerts" 
@@ -64,6 +73,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendText="Since yesterday" 
         isGood={kpiData.alerts === 0}
         highlighted={presentationMode && kpiData.alerts > 0}
+        explainerBasis="Current count of unresolved predictive warnings and critical alerts."
       />
       <KPICard 
         title="Risk Exposure" 
@@ -73,6 +83,8 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendText="Change" 
         isGood={kpiData.riskTrend <= 0}
         highlighted={presentationMode && kpiData.risk > 10}
+        explainerBasis="Total financial exposure due to potential impending equipment failures."
+        explainerFormula="P(failure) × (Repair Cost + Logistics + Production Loss)"
       />
       <KPICard 
         title="Production Availability" 
@@ -81,6 +93,8 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendValue="1.2%" 
         trendText="Decrease" 
         isGood={false}
+        explainerBasis="Percentage of time the plant is ready for normal production."
+        explainerFormula="(Operating Time / Planned Production Time) × 100"
       />
       <KPICard 
         title="Maint. Cost Avoided" 
@@ -89,6 +103,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         trendValue="15%" 
         trendText="Improving" 
         isGood={true}
+        explainerBasis="Estimated cost savings from proactive intervention vs catastrophic failure."
       />
     </div>
   );

@@ -54,8 +54,9 @@ export function calculateBusinessImpact(
   const repairCost = REPAIR_BASE_COST * repairCostMultiplier * categoryMultiplier;
   const productionLossValue = downtimeHours * HOURLY_PRODUCTION_VALUE;
   
+  // Priority 1 Fix: Waterfall components must sum exactly to total.
   const revenueLoss = productionLossValue + repairCost;
-  const totalRiskExposure = revenueLoss * (downtimeHours / 24); // Risk scales with downtime length
+  const totalRiskExposure = revenueLoss; 
 
   return {
     downtimeHours,

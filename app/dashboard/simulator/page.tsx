@@ -17,22 +17,22 @@ export default function FlagshipSimulatorPage() {
       {/* Tab Navigation */}
       <div className="bg-card border border-border rounded-xl p-2 flex space-x-2 overflow-x-auto">
         <button 
-          onClick={() => setActiveTab('strategy')}
-          className={cn(
-            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
-            activeTab === 'strategy' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
-          )}
-        >
-          <Activity className="h-4 w-4 mr-2" /> Strategy Planner
-        </button>
-        <button 
           onClick={() => setActiveTab('digital-twin')}
           className={cn(
             "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
             activeTab === 'digital-twin' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
           )}
         >
-          <Database className="h-4 w-4 mr-2" /> Digital Twin
+          <Database className="h-4 w-4 mr-2" /> Live Plant View
+        </button>
+        <button 
+          onClick={() => setActiveTab('strategy')}
+          className={cn(
+            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
+            activeTab === 'strategy' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
+          )}
+        >
+          <Activity className="h-4 w-4 mr-2" /> Timeline & Degradation
         </button>
         <button 
           onClick={() => setActiveTab('scenarios')}
@@ -41,7 +41,7 @@ export default function FlagshipSimulatorPage() {
             activeTab === 'scenarios' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
           )}
         >
-          <BarChart3 className="h-4 w-4 mr-2" /> Scenario Analysis
+          <BarChart3 className="h-4 w-4 mr-2" /> Decision Comparison
         </button>
         <button 
           onClick={() => setActiveTab('brief')}
@@ -50,7 +50,7 @@ export default function FlagshipSimulatorPage() {
             activeTab === 'brief' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
           )}
         >
-          <FileText className="h-4 w-4 mr-2" /> Executive Brief
+          <FileText className="h-4 w-4 mr-2" /> Printable Brief
         </button>
       </div>
 

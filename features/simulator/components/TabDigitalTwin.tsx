@@ -27,8 +27,52 @@ export function TabDigitalTwin() {
     }
   };
 
+  const getStateMachinePhase = () => {
+    if (dtClock === 32 && !dtIsRunning && dtCrewStatus.status === 'Available') return 0; // Idle
+    if (dtBottleneck || dtCrewStatus.status === 'Working') return 3; // Resolving
+    if (dtCrewStatus.status === 'Assigned') return 2; // Recommending
+    if (dtIsRunning) return 1; // Running
+    return 0; // Default
+  };
+
+  const currentPhase = getStateMachinePhase();
+
+  const phases = [
+    { name: 'Idle', desc: 'Baseline' },
+    { name: 'Running', desc: 'Deteriorating' },
+    { name: 'Recommending', desc: 'Action Required' },
+    { name: 'Resolving', desc: 'Maintenance Applied' }
+  ];
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+
+      {/* STATE MACHINE PROGRESS BAR */}
+      <div className="bg-card border border-border rounded-xl p-6 shadow-sm mb-6">
+        <div className="flex justify-between items-center relative">
+          <div className="absolute left-0 top-1/2 w-full h-1 bg-muted -translate-y-1/2 z-0"></div>
+          {phases.map((phase, idx) => {
+            const isActive = currentPhase === idx;
+            const isCompleted = currentPhase > idx;
+            return (
+              <div key={phase.name} className="relative z-10 flex flex-col items-center">
+                <div className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center border-4 font-bold text-xs transition-colors duration-500",
+                  isActive ? "bg-primary border-primary/20 text-primary-foreground ring-4 ring-primary/20" : 
+                  isCompleted ? "bg-success border-success text-success-foreground" : 
+                  "bg-card border-muted text-muted-foreground"
+                )}>
+                  {isCompleted ? <Info className="h-4 w-4" /> : idx + 1}
+                </div>
+                <div className="mt-3 text-center">
+                  <p className={cn("text-sm font-bold", isActive ? "text-primary" : isCompleted ? "text-foreground" : "text-muted-foreground")}>{phase.name}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{phase.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
       
       {/* HEADER: Control Bar */}
       <div className="flex items-center justify-between bg-card border border-border p-4 rounded-xl shadow-sm">
@@ -43,7 +87,7 @@ export function TabDigitalTwin() {
           <div className="flex flex-col">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider mb-1">Plant Status</span>
             <span className={cn(
-              "px-3 py-1 rounded-sm text-xs font-bold tracking-widest uppercase",
+              "px-3 py-1 rounded-sm text-xs font-bold tracking-widest uppercase transition-colors duration-500",
               dtBottleneck && dtBottleneck.loss === 100 ? "bg-destructive text-white animate-pulse" : 
               dtBottleneck ? "bg-yellow-500 text-black" : "bg-success text-white"
             )}>
@@ -54,7 +98,7 @@ export function TabDigitalTwin() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <button onClick={dtStart} disabled={dtIsRunning} className="p-3 bg-success/20 text-success hover:bg-success/30 rounded-lg transition-colors disabled:opacity-50">
+          <button onClick={dtStart} disabled={dtIsRunning || dtBottleneck !== null} className="p-3 bg-success/20 text-success hover:bg-success/30 rounded-lg transition-colors disabled:opacity-50">
             <Play className="h-5 w-5" />
           </button>
           <button onClick={dtPause} disabled={!dtIsRunning} className="p-3 bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 rounded-lg transition-colors disabled:opacity-50">

@@ -3,39 +3,36 @@
 import { Check, X, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { useStore } from '@/lib/store';
+import { projectFailureProbability } from '@/lib/engineering/physics-engine';
+import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+
 export function TabScenarioAnalysis() {
-  const scenarios = [
-    {
-      name: 'Scenario A',
-      subtitle: 'Immediate Maintenance',
-      delay: 0,
-      risk: 15,
-      downtime: 8,
-      cost: 12.0,
-      isCurrent: false,
-      isRecommended: true
-    },
-    {
-      name: 'Scenario B',
-      subtitle: 'Current Baseline',
-      delay: 7,
-      risk: 32,
-      downtime: 14,
-      cost: 41.4,
-      isCurrent: true,
-      isRecommended: false
-    },
-    {
-      name: 'Scenario C',
-      subtitle: 'Run to Failure',
-      delay: 14,
-      risk: 65,
-      downtime: 28,
-      cost: 84.8,
-      isCurrent: false,
-      isRecommended: false
-    }
+  const crusher = useStore(s => s.dtMachines.find(m => m.id === 'crusher'));
+
+  const currentHours  = crusher?.operatingHours ?? 12400;
+  const baseEta       = crusher?.baseEta ?? 18000;
+  const beta          = crusher?.beta ?? 2.5;
+
+  const scenariosDef = [
+    { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false, isRecommended: true },
+    { name: 'Scenario B', subtitle: 'Current Baseline', delay: 7, isCurrent: true, isRecommended: false },
+    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 14, isCurrent: false, isRecommended: false }
   ];
+
+  const scenarios = scenariosDef.map(s => {
+    const projectedProb = projectFailureProbability(currentHours, s.delay * 24, baseEta, beta);
+    const impact = calculateBusinessImpact(
+      s.delay === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
+      'Crusher'
+    );
+    return {
+      ...s,
+      risk: Math.round(projectedProb),
+      downtime: impact.downtimeHours,
+      cost: impact.totalRiskExposure / 1_000_000
+    };
+  });
 
   return (
     <div className="bg-card border border-border p-6 rounded-xl animate-in fade-in duration-500">

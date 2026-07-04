@@ -6,6 +6,7 @@ import { Bell, Play, PanelLeftOpen, Sun, Moon, ChevronDown } from 'lucide-react'
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { AlertCenter } from '@/components/AlertCenter';
 
 export default function DashboardLayout({
   children,
@@ -49,10 +50,14 @@ export default function DashboardLayout({
   };
 
   const handleDemoMode = () => {
-    setSelectedPlant('Obajana Plant');
-    startIncidentReplay();
-    if (!presentationMode) togglePresentationMode();
-    router.push('/dashboard');
+    const currentState = useStore.getState();
+    const nextState = !currentState.demoMode;
+    currentState.setDemoMode(nextState);
+    if (nextState) {
+      setSelectedPlant('Obajana Plant');
+      if (!presentationMode) togglePresentationMode();
+      router.push('/dashboard');
+    }
   };
 
   const alertCount = dtEvents.filter(
@@ -65,8 +70,8 @@ export default function DashboardLayout({
     : 'bg-success';
 
   const navLinks = [
-    { href: '/dashboard',           label: 'Dashboard' },
-    { href: '/dashboard/simulator', label: 'Simulator', pulse: true },
+    { href: '/dashboard',           label: 'Overview' },
+    { href: '/dashboard/simulator', label: 'Operations', pulse: true },
     { href: '/dashboard/reports',   label: 'Reports' },
     { href: '/dashboard/about',     label: 'About' },
   ];
@@ -116,6 +121,21 @@ export default function DashboardLayout({
             {/* Right: actions */}
             <div className="flex items-center gap-2 shrink-0">
 
+              {/* Role / Current View picker */}
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/20 text-xs">
+                <select
+                  value={useStore(s => s.currentView)}
+                  onChange={(e) => useStore.getState().setCurrentView(e.target.value as any)}
+                  className="bg-transparent font-semibold text-primary focus:outline-none cursor-pointer"
+                >
+                  <option value="Executive">Executive View</option>
+                  <option value="Plant Manager">Plant Manager View</option>
+                  <option value="Reliability Engineer">Reliability Engineer View</option>
+                  <option value="Maintenance Manager">Maintenance Manager View</option>
+                </select>
+                <ChevronDown className="h-3 w-3 text-muted-foreground" />
+              </div>
+
               {/* Plant picker + live status dot */}
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/20 text-xs">
                 <span className={cn('w-2 h-2 rounded-full shrink-0', statusColor)} />
@@ -144,24 +164,22 @@ export default function DashboardLayout({
                 {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </button>
 
-              {/* Bell */}
-              <button className="relative p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors">
-                <Bell className="h-4 w-4" />
-                {alertCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-[9px] font-bold text-white flex items-center justify-center leading-none">
-                    {Math.min(9, alertCount)}
-                  </span>
-                )}
-              </button>
+              {/* Bell / Alert Center */}
+              <AlertCenter />
 
               {/* Demo */}
               <button
                 onClick={handleDemoMode}
-                title="Run incident replay demo"
-                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-md hover:bg-primary/20 transition-all text-xs font-bold"
+                title={useStore(s => s.demoMode) ? "Exit Demo Mode" : "Run known-good pitch demo"}
+                className={cn(
+                  "hidden md:flex items-center gap-1.5 px-3 py-1.5 border rounded-md transition-all text-xs font-bold",
+                  useStore(s => s.demoMode) 
+                    ? "bg-destructive text-white border-destructive hover:bg-destructive/90 animate-pulse" 
+                    : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                )}
               >
-                <Play className="h-3.5 w-3.5 fill-primary" />
-                Demo
+                <Play className={cn("h-3.5 w-3.5", useStore(s => s.demoMode) ? "fill-white" : "fill-primary")} />
+                {useStore(s => s.demoMode) ? "LIVE DEMO ACTIVE" : "Demo"}
               </button>
 
               {/* Presentation */}

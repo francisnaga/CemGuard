@@ -1,30 +1,53 @@
-import { 
-  SimulationContext, 
-  BusinessImpact 
-} from './types';
-import { MaintenanceDecision } from './decision-engine';
+import { MachineState } from '../store';
+import { BusinessImpact } from './types';
 
-export function generateExecutiveInsight(
-  context: SimulationContext,
-  decision: MaintenanceDecision,
-  impact: BusinessImpact,
-  healthIndex: number
-): string {
-  
-  const { currentState, plantState, category, equipmentId } = context;
-  const { priority, predictedFailureMode, recommendedAction, strategy } = decision;
+export interface Insight {
+  situation: string;
+  observation: string;
+  recommendation: string;
+  severity: 'Healthy' | 'Warning' | 'Critical';
+}
 
-  // Format currency
+export function generateInsight(
+  machine: MachineState,
+  impact: BusinessImpact
+): Insight {
+  const { vibrationZone: zone, health, failureProb: pf, name } = machine;
   const formatCurrency = (val: number) => `₦${(val / 1000000).toFixed(1)}M`;
 
-  if (currentState === 'Healthy' || currentState === 'New') {
-    return `${category} (${equipmentId.substring(0,6)}) is operating optimally under ${plantState} conditions. Health index is strong at ${healthIndex}%. No immediate executive action required; continue ${strategy.toLowerCase()} maintenance schedules.`;
+  // Priority 2 - Rule-Based Severity Bands
+  if (zone === 'D' && pf > 70) {
+    return {
+      situation: `${name} requires emergency intervention.`,
+      observation: `Weibull P(f) = ${pf.toFixed(1)}%. ISO Zone D. Temperature ${machine.temperatureC.toFixed(1)}°C.`,
+      recommendation: `Execute immediate shutdown. Dispatch maintenance crew immediately. Estimated avoided loss: ${formatCurrency(impact.totalRiskExposure)}.`,
+      severity: 'Critical'
+    };
   }
 
-  if (currentState === 'Critical' || currentState === 'Failure') {
-    return `CRITICAL ALERT: ${category} (${equipmentId.substring(0,6)}) has reached a ${currentState.toLowerCase()} state due to ${predictedFailureMode.toLowerCase()}. Operating under ${plantState} conditions exacerbated the degradation. Immediate ${strategy.toLowerCase()} action is required. Estimated downtime is ${impact.downtimeHours} hours, resulting in a projected revenue loss of ${formatCurrency(impact.revenueLoss)} and an environmental impact of ${impact.co2ImpactTons} tons of CO2.`;
+  if ((zone === 'C' || zone === 'D') && health < 60 && pf > 50) {
+    return {
+      situation: `${name} degradation is accelerating rapidly.`,
+      observation: `Failure probability reached ${pf.toFixed(1)}%. Vibration in Zone ${zone}. Health Index ${health.toFixed(1)}.`,
+      recommendation: `Schedule planned shutdown and replacement within 24 hours. Pre-stage spares to avoid ${formatCurrency(impact.totalRiskExposure)} exposure.`,
+      severity: 'Critical'
+    };
   }
 
-  // Moderate to Severe Wear
-  return `Over the simulated operating period, ${category} (${equipmentId.substring(0,6)}) has shown accelerated degradation, currently at ${healthIndex}% health (${currentState}). Operating under ${plantState} conditions has increased wear rates. The current trend indicates a ${priority.toLowerCase()} probability of ${predictedFailureMode.toLowerCase()}. Scheduling ${strategy.toLowerCase()} maintenance is recommended. Executing this proactively can reduce unplanned downtime and avoid up to ${formatCurrency(impact.totalRiskExposure)} in risk exposure.`;
+  if ((zone === 'B' || zone === 'C') && health >= 60 && health <= 85 && pf >= 20 && pf <= 50) {
+    return {
+      situation: `${name} vibration has entered ISO Zone ${zone}.`,
+      observation: `RMS velocity ${machine.vibrationRms.toFixed(1)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}°C. P(f) = ${pf.toFixed(1)}%.`,
+      recommendation: `Schedule inspection within 48 days; pre-stage spares if trend continues.`,
+      severity: 'Warning'
+    };
+  }
+
+  // Default / Healthy Fallback (Zone A + Health > 85 + Pf < 20)
+  return {
+    situation: `Plant operating normally.`,
+    observation: `No anomalies detected across monitored assets. Highest P(f) is ${pf.toFixed(1)}%.`,
+    recommendation: `Continue routine monitoring and scheduled lubrication. Next scheduled inspection: 7 days.`,
+    severity: 'Healthy'
+  };
 }

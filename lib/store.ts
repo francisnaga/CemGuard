@@ -23,6 +23,15 @@ export interface EventLogItem {
   message: string;
 }
 
+export interface HistorySnapshot {
+  time: number; // dtClock
+  throughput: number;
+  oee: number;
+  health: number;
+  failureProb: number;
+}
+
+
 export interface MachineState {
   id: string;
   name: string;
@@ -68,6 +77,9 @@ export const PLANT_PROFILES: PlantProfile[] = [
 ];
 
 interface DashboardState {
+  currentView: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager';
+  demoMode: boolean;
+  isAlertOpen: boolean;
   simulationDay: number;
   plantState: PlantState;
   presentationMode: boolean;
@@ -93,6 +105,11 @@ interface DashboardState {
     priority: string;
   };
   dtBottleneck: { machine: string; reason: string; loss: number } | null;
+  dtHistory: HistorySnapshot[];
+
+  setCurrentView: (view: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager') => void;
+  setDemoMode: (enabled: boolean) => void;
+  setAlertOpen: (isOpen: boolean) => void;
 
   setSimulationDay: (day: number) => void;
   setPlantState: (state: PlantState) => void;
@@ -139,7 +156,23 @@ const initialMachines: MachineState[] = [
   },
 ];
 
-export const useStore = create<DashboardState>((set, get) => ({
+export const useStore = create<DashboardState>((set, get) => {
+  // Generate synthetic warm-up history for the last 30 ticks
+  const warmupHistory: HistorySnapshot[] = [];
+  for (let i = 0; i < 30; i++) {
+    warmupHistory.push({
+      time: 2 + i,
+      throughput: 440 + Math.random() * 15,
+      oee: 92 + Math.random() * 4,
+      health: 93 - (30 - i) * 0.05,
+      failureProb: 8 + (30 - i) * 0.1
+    });
+  }
+
+  return {
+  currentView: 'Executive',
+  demoMode: false,
+  isAlertOpen: false,
   simulationDay: 1,
   plantState: 'Normal Production',
   presentationMode: false,
@@ -167,7 +200,41 @@ export const useStore = create<DashboardState>((set, get) => ({
     priority: 'None'
   },
   dtBottleneck: null,
+  dtHistory: warmupHistory,
 
+  setCurrentView: (view) => set({ currentView: view }),
+  setDemoMode: (enabled) => {
+    if (enabled) {
+      // Load known-good scenario (Crusher 67% Pf, Zone C)
+      const demoMachines = JSON.parse(JSON.stringify(initialMachines));
+      const crusher = demoMachines.find((m: any) => m.id === 'crusher');
+      crusher.failureProb = 67.4;
+      crusher.vibrationZone = 'C';
+      crusher.vibrationRms = 5.2;
+      crusher.temperatureC = 86.5;
+      crusher.health = 72;
+      crusher.risk = 'High';
+      
+      set({ 
+        demoMode: true,
+        dtIsRunning: false,
+        dtClock: 45, // some time into the shift
+        dtMachines: demoMachines,
+        dtThroughputCurrent: 430,
+        dtThroughputEfficiency: 95,
+        dtBottleneck: null,
+        dtCrewStatus: { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' },
+        dtEvents: [
+          { id: 'demo1', time: '11:15', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (ISO 20816 Zone C)' },
+          { id: 'demo2', time: '11:15', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' }
+        ]
+      });
+      if (dtIntervalRef !== null) { window.clearInterval(dtIntervalRef); dtIntervalRef = null; }
+    } else {
+      set({ demoMode: false });
+    }
+  },
+  setAlertOpen: (isOpen) => set({ isAlertOpen: isOpen }),
   setSimulationDay: (day) => set({ simulationDay: day }),
   setPlantState: (state) => set({ plantState: state }),
   togglePresentationMode: () => set((state) => ({ presentationMode: !state.presentationMode })),
@@ -218,12 +285,15 @@ export const useStore = create<DashboardState>((set, get) => ({
       dtCO2Current: 815,
       dtEvents: [{ id: '1', time: '08:00', category: 'Information', code: 'OPS-087', message: 'Simulation reset. Baseline calculations initialized.' }],
       dtCrewStatus: { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' },
-      dtBottleneck: null
+      dtBottleneck: null,
+      dtHistory: warmupHistory
     });
   },
 
   dtTick: () => {
-    const { dtClock, dtMachines, dtEvents, dtCrewStatus } = get();
+    const { dtClock, dtMachines, dtEvents, dtCrewStatus, dtHistory, demoMode } = get();
+    if (demoMode) return; // Freeze state if demo mode is active
+    
     const newClock = dtClock + 1;
     
     const hours = Math.floor(newClock * 15 / 60).toString().padStart(2, '0');
@@ -366,6 +436,20 @@ export const useStore = create<DashboardState>((set, get) => ({
       newCO2 = 860;
     }
 
+    const currentFleetHealth = Math.round(updatedMachines.reduce((s, m) => s + m.health, 0) / updatedMachines.length);
+    const highestFailureProb = Math.max(...updatedMachines.map(m => m.failureProb));
+
+    const newSnapshot: HistorySnapshot = {
+      time: newClock,
+      throughput: newThroughput,
+      oee: newOEE,
+      health: currentFleetHealth,
+      failureProb: highestFailureProb
+    };
+
+    const newHistory = [...dtHistory, newSnapshot];
+    if (newHistory.length > 50) newHistory.shift();
+
     set({
       dtClock: newClock,
       dtMachines: updatedMachines,
@@ -375,8 +459,10 @@ export const useStore = create<DashboardState>((set, get) => ({
       dtThroughputCurrent: newThroughput,
       dtThroughputEfficiency: newEff,
       dtEnergyCurrent: newEnergy,
-      dtCO2Current: newCO2
+      dtCO2Current: newCO2,
+      dtHistory: newHistory
     });
   }
 
-}));
+};
+});
