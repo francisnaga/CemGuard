@@ -1,13 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Bell, X, AlertTriangle, Info, Wrench } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
 export function AlertCenter() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dtEvents = useStore(s => s.dtEvents);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const alertCount = dtEvents.filter(
     (e) => e.category === 'Warning' || e.category === 'Critical'
@@ -37,7 +43,7 @@ export function AlertCenter() {
         )}
       </button>
 
-      {isOpen && (
+      {mounted && isOpen && createPortal(
         <div className="fixed inset-0 z-[100] flex justify-end">
           {/* Backdrop */}
           <div 
@@ -76,7 +82,8 @@ export function AlertCenter() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
