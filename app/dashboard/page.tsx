@@ -2,6 +2,7 @@
 
 import { useStore } from '@/lib/store';
 import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
 import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
 import { generateInsight } from '@/lib/engineering/insight-engine';
 
