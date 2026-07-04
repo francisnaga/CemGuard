@@ -26,10 +26,15 @@ export function TabScenarioAnalysis() {
 
   let rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, baseEta, beta);
-    const impact = calculateBusinessImpact(
-      s.delay === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
-      targetMachine.name
-    );
+    
+    // Determine the modeled intervention strategy based on the scenario type and projected degradation
+    let strategy: 'Preventive' | 'Condition-Based' | 'Predictive' | 'Corrective' | 'Emergency' = 'Condition-Based';
+    if (s.delay === 0) strategy = 'Preventive';
+    else if (s.name === 'Scenario C') strategy = 'Corrective';
+    else if (projectedProb > 70) strategy = 'Emergency';
+    else if (projectedProb > 40) strategy = 'Predictive';
+
+    const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
       ...s,
       risk: Math.round(projectedProb),
