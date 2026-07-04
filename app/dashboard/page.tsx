@@ -21,13 +21,19 @@ export default function DashboardPage() {
   // Single Source of Truth: Read from dtMachines and dtHistory
   const fleetHealth = Math.round(dtMachines.reduce((sum, m) => sum + m.health, 0) / dtMachines.length);
   const fleetAvailability = dtMachines.reduce((sum, m) => sum + m.availability, 0) / dtMachines.length;
-  const worstMachine = dtMachines.reduce((worst, m) => m.failureProb > worst.failureProb ? m : worst);
+
+  const machinesWithImpact = dtMachines.map(m => {
+    const strategy = m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : m.failureProb > 20 ? 'Predictive' : 'Preventive';
+    const category = m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher';
+    const impact = calculateBusinessImpact(strategy, category);
+    const expectedRisk = impact.totalRiskExposure * (m.failureProb / 100);
+    return { ...m, expectedRisk, impact, strategy, category };
+  });
+
+  const worstMachine = machinesWithImpact.reduce((worst, m) => m.expectedRisk > worst.expectedRisk ? m : worst, machinesWithImpact[0]);
   
-  // Calculate impact for worst machine
-  const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
-  const category = worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
-  const impact = calculateBusinessImpact(strategy, category);
-  const emergencyImpact = calculateBusinessImpact('Emergency', category);
+  const impact = worstMachine.impact;
+  const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
   const savingsAmount = (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000;
 
   const insight = generateInsight(worstMachine, impact);
@@ -38,17 +44,17 @@ export default function DashboardPage() {
 
   const kpiData = {
     health: fleetHealth,
-    healthTrend: fleetHealth - prevHistory.health,
+    healthTrend: currHistory.health - prevHistory.health,
     oee: currHistory.oee,
     oeeTrend: currHistory.oee - prevHistory.oee,
     alerts: activeAlerts,
-    alertsTrend: activeAlerts > 0 ? 1 : 0, // simple heuristic
-    risk: impact.totalRiskExposure,
-    riskTrend: (currHistory.failureProb - prevHistory.failureProb) * 2, // simple proxy for risk growth
+    alertsTrend: 0, // Removed fake heuristic
+    risk: worstMachine.expectedRisk, // Use true expected risk instead of maximum theoretical exposure
+    riskTrend: (currHistory.failureProb - prevHistory.failureProb), // Use true prob delta without fake 2x multiplier
     availability: fleetAvailability,
-    availabilityTrend: fleetAvailability > 90 ? 0.1 : -1.2,
+    availabilityTrend: 0, // Removed fake logic
     savings: savingsAmount,
-    savingsTrend: savingsAmount > 0 ? 2.5 : 0
+    savingsTrend: 0 // Removed fake logic
   };
 
   return (
@@ -81,7 +87,8 @@ export default function DashboardPage() {
               context: { currentState: m.risk === 'Low' ? 'Healthy' : m.risk === 'Medium' ? 'Minor Wear' : m.risk === 'High' ? 'Severe Wear' : 'Critical', plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
               health: m.health,
               temperature: m.temperatureC,
-              isProcessTemp: m.id === 'kiln'
+              isProcessTemp: m.id === 'kiln',
+              riskTier: m.risk
             }))} />
           </div>
           <div className="lg:col-span-1">
@@ -117,10 +124,14 @@ export default function DashboardPage() {
             id: m.id,
             equipment: m.name,
             priority: m.risk,
-            strategy: m.failureProb > 70 ? 'Emergency' : 'Predictive',
-            failureMode: `High Temp (${m.temperatureC.toFixed(0)}°C) / Zone ${m.vibrationZone}`,
-            confidence: Math.round(m.failureProb + 10 > 100 ? 99 : m.failureProb + 10),
-            deadline: m.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, 14 - Math.floor(m.failureProb / 10))} Days`,
+            strategy: m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : 'Predictive',
+            failureMode: m.vibrationZone === 'D' || m.vibrationZone === 'C' 
+              ? `High Vibration (Zone ${m.vibrationZone})` 
+              : m.temperatureC > 85 
+                ? `Overheating (${m.temperatureC.toFixed(1)}°C)`
+                : 'Degraded Health',
+            confidence: Math.max(10, Math.round(100 - (m.failureProbUpper - m.failureProbLower))),
+            deadline: m.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - m.failureProb) / 2))} Days`,
             status: 'Pending'
           }))
         } />

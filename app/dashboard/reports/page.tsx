@@ -12,11 +12,19 @@ export default function ReportsPage() {
   
   const formattedDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-  const worstMachine = dtMachines.reduce((worst, m) => m.failureProb > worst.failureProb ? m : worst, dtMachines[0]);
-  const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
-  const impact = calculateBusinessImpact(strategy, worstMachine.name.includes('Kiln') ? 'Kiln' : 'Crusher');
+  const machinesWithImpact = dtMachines.map(m => {
+    const strategy = m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : m.failureProb > 20 ? 'Predictive' : 'Preventive';
+    const category = m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher';
+    const impact = calculateBusinessImpact(strategy, category);
+    const expectedRisk = impact.totalRiskExposure * (m.failureProb / 100);
+    return { ...m, expectedRisk, impact, strategy, category };
+  });
+
+  const worstMachine = machinesWithImpact.reduce((worst, m) => m.expectedRisk > worst.expectedRisk ? m : worst, machinesWithImpact[0]);
+  const strategy = worstMachine.strategy;
+  const impact = worstMachine.impact;
   const insight = generateInsight(worstMachine, impact);
-  const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.name.includes('Kiln') ? 'Kiln' : 'Crusher');
+  const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
 
   return (
     <div className="max-w-4xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">

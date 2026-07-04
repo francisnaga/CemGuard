@@ -11,6 +11,7 @@ interface PlantNodeProps {
   health: number;
   temperature: number;
   isProcessTemp?: boolean;
+  riskTier: string;
 }
 
 export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
@@ -82,8 +83,8 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Risk Level</p>
-            <p className={cn("font-bold", hoveredNode.health < 50 ? "text-destructive" : "text-success")}>
-              {hoveredNode.health < 30 ? 'High' : hoveredNode.health < 70 ? 'Medium' : 'Low'}
+            <p className={cn("font-bold", (hoveredNode.riskTier === 'High' || hoveredNode.riskTier === 'Critical') ? "text-destructive" : hoveredNode.riskTier === 'Medium' ? "text-yellow-500" : "text-success")}>
+              {hoveredNode.riskTier}
             </p>
           </div>
         </div>
