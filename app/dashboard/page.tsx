@@ -40,43 +40,52 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 pb-12 animate-in fade-in duration-500">
-      <SectionA_KPIs kpiData={kpiData} presentationMode={presentationMode} />
-      
-      <SectionB_Insight 
-        primaryInsight={insight.situation}
-        observation={insight.observation}
-        recommendedAction={insight.recommendation}
-        expectedImpact={`Avoids ₦${(impact.totalRiskExposure / 1000000).toFixed(1)}M in risk exposure and ${impact.downtimeHours} hours of downtime.`}
-        presentationMode={presentationMode}
-        severity={insight.severity}
-      />
+      {/* --- Section Reordering based on currentView --- */}
+      <div className={cn(
+        "flex flex-col gap-6",
+        // For engineering views, promote Plant, Maintenance, Trends. Demote KPIs, Insight, Business.
+        (currentView === 'Maintenance Manager' || currentView === 'Reliability Engineer') ? "[&>*:nth-child(1)]:order-4 [&>*:nth-child(2)]:order-5 [&>*:nth-child(3)]:order-1 [&>*:nth-child(4)]:order-6 [&>*:nth-child(5)]:order-2 [&>*:nth-child(6)]:order-3" : ""
+      )}>
+        {/* 1 */}
+        <SectionA_KPIs kpiData={kpiData} presentationMode={presentationMode} />
+        
+        {/* 2 */}
+        <SectionB_Insight 
+          primaryInsight={insight.situation}
+          observation={insight.observation}
+          recommendedAction={insight.recommendation}
+          expectedImpact={`Avoids ₦${(impact.totalRiskExposure / 1000000).toFixed(1)}M in risk exposure and ${impact.downtimeHours} hours of downtime.`}
+          presentationMode={presentationMode}
+          severity={insight.severity}
+        />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          {/* We map dtMachines to the SVG nodes so they update live */}
-          <SectionC_PlantSVG nodes={dtMachines.map(m => ({
-            id: m.id,
-            name: m.name,
-            context: { currentState: m.risk, plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
-            health: m.health,
-            temperature: m.temperatureC,
-            isProcessTemp: m.id === 'kiln'
-          }))} />
+        {/* 3 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <SectionC_PlantSVG nodes={dtMachines.map(m => ({
+              id: m.id,
+              name: m.name,
+              context: { currentState: m.risk, plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
+              health: m.health,
+              temperature: m.temperatureC,
+              isProcessTemp: m.id === 'kiln'
+            }))} />
+          </div>
+          <div className="lg:col-span-1">
+            <SectionD_Ranking rankings={dtMachines.map(m => ({
+              id: m.id,
+              name: m.name,
+              health: m.health,
+              riskValue: calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : 'Crusher').totalRiskExposure,
+              failureMode: 'Bearing wear'
+            })).sort((a,b) => b.riskValue - a.riskValue).slice(0, 5)} />
+          </div>
         </div>
-        <div className="lg:col-span-1">
-          <SectionD_Ranking rankings={dtMachines.map(m => ({
-            id: m.id,
-            name: m.name,
-            health: m.health,
-            riskValue: calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : 'Crusher').totalRiskExposure,
-            failureMode: 'Bearing wear'
-          })).sort((a,b) => b.riskValue - a.riskValue).slice(0, 5)} />
-        </div>
-      </div>
 
-      {currentView === 'Executive' && <SectionE_BusinessImpact impact={impact} />}
+        {/* 4 */}
+        <SectionE_BusinessImpact impact={impact} />
 
-      {(currentView === 'Maintenance Manager' || currentView === 'Reliability Engineer') && (
+        {/* 5 */}
         <SectionF_MaintenanceQueue items={dtMachines
           .filter(m => m.failureProb > 20)
           .sort((a, b) => b.failureProb - a.failureProb)
@@ -91,18 +100,19 @@ export default function DashboardPage() {
             status: 'Pending'
           }))
         } />
-      )}
 
-      <SectionG_Trends 
-        trendData={dtHistory.map(h => ({
-          day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
-          health: h.health,
-          prob: h.failureProb,
-          downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', 'Crusher').downtimeHours,
-          oee: h.oee
-        }))} 
-        presentationMode={presentationMode} 
-      />
+        {/* 6 */}
+        <SectionG_Trends 
+          trendData={dtHistory.map(h => ({
+            day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
+            health: h.health,
+            prob: h.failureProb,
+            downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', 'Crusher').downtimeHours,
+            oee: h.oee
+          }))} 
+          presentationMode={presentationMode} 
+        />
+      </div>
     </div>
   );
 }
