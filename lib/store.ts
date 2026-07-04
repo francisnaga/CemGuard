@@ -334,10 +334,6 @@ export const useStore = create<DashboardState>((set, get) => {
         machine.wearAccumulation = calculateWearAccumulation(machine.wearAccumulation, machine.loadFactor, machine.rpm);
       }
 
-      // Physics: Narrative override for Crusher to simulate degradation over 3 hours
-      if (machine.id === 'crusher' && newClock > 32 && newClock <= 42) {
-        machine.wearAccumulation += 0.8; // Accelerated wear to force presentation demo
-      }
 
       const params: PhysicsParams = {
         operatingHours: machine.operatingHours,
