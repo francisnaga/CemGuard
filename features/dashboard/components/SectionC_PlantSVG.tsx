@@ -36,10 +36,11 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
       </h3>
 
       {/* Simplified SVG / Block Flow Representation */}
-      <div className="flex items-center justify-between w-full h-full pt-8 relative z-10">
-        {nodes.map((node, index) => (
-          <div key={node.id} className="relative flex items-center group">
-            {/* The Machine Block */}
+      <div className="w-full h-full pt-8 relative z-10 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex items-center justify-start lg:justify-center min-w-max h-full px-2">
+          {nodes.map((node, index) => (
+            <div key={node.id} className="relative flex items-center group shrink-0">
+              {/* The Machine Block */}
             <div 
               onMouseEnter={() => setHoveredNode(node)}
               onMouseLeave={() => setHoveredNode(null)}
@@ -61,6 +62,7 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
             )}
           </div>
         ))}
+        </div>
       </div>
 
       {/* Hover Tooltip */}
