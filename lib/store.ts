@@ -220,7 +220,7 @@ export const useStore = create<DashboardState>((set, get) => {
       crusher.failureProb = 45.0;
       crusher.health = 80;
       crusher.risk = 'High';
-      newEvents.unshift({ id: 'scen1', time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Crusher showing progressive wear patterns.' });
+      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Crusher showing progressive wear patterns.' });
     } else if (scenario === 'Imminent Failure') {
       newClock = 50;
       crusher.wearAccumulation += 2.8;
@@ -230,8 +230,8 @@ export const useStore = create<DashboardState>((set, get) => {
       crusher.failureProb = 67.4;
       crusher.health = 72;
       crusher.risk = 'High';
-      newEvents.unshift({ id: 'scen2', time: '12:30', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (Zone C)' });
-      newEvents.unshift({ id: 'scen3', time: '12:30', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' });
+      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (Zone C)' });
+      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' });
     } else if (scenario === 'Emergency Shutdown') {
       newClock = 52;
       crusher.failureProb = 95.0;
@@ -244,7 +244,7 @@ export const useStore = create<DashboardState>((set, get) => {
       crusher.utilization = 0;
       crusher.loadFactor = 0;
       newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
-      newEvents.unshift({ id: 'scen4', time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Bearing failure predicted.' });
+      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Bearing failure predicted.' });
     }
 
     set({ 
