@@ -327,6 +327,17 @@ export const useStore = create<DashboardState>((set, get) => {
     const updatedMachines = dtMachines.map(m => {
       let machine = { ...m };
       
+      // If machine is offline due to failure, freeze its state so it doesn't "heal" itself
+      if (machine.availability === 0) {
+        machine.failureProb = 100;
+        machine.failureProbLower = 100;
+        machine.failureProbUpper = 100;
+        machine.health = 0;
+        machine.risk = 'Critical';
+        machine.vibrationZone = 'D';
+        return machine;
+      }
+      
       // Advance operating hours (0.25 hrs per tick)
       if (machine.utilization > 0) {
         machine.operatingHours += 0.25;

@@ -25,7 +25,7 @@ export function generateInsight(
     };
   }
 
-  if (pf >= 50 || zone === 'C' || health < 60) {
+  if (pf >= 50 || health < 60) {
     return {
       situation: `${name} degradation is accelerating rapidly.`,
       observation: `Failure probability reached ${pf.toFixed(1)}%. Vibration in Zone ${zone}. Health Index ${health.toFixed(1)}.`,
@@ -34,7 +34,7 @@ export function generateInsight(
     };
   }
 
-  if (pf >= 20 || zone === 'B' || health < 85) {
+  if (pf >= 15 || zone === 'C' || zone === 'B' || health < 75) {
     return {
       situation: `${name} requires monitoring (Zone ${zone}).`,
       observation: `RMS velocity ${machine.vibrationRms.toFixed(1)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}°C. P(f) = ${pf.toFixed(1)}%.`,
