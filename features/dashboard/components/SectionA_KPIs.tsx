@@ -48,7 +48,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
         title="Historical Fleet Health" 
         value={`${Number(kpiData.health).toFixed(1)}%`} 
         trendDir={kpiData.healthTrend > 0 ? 'up' : 'down'} 
-        trendValue={`${Math.abs(kpiData.healthTrend)}%`} 
+        trendValue={`${Math.abs(kpiData.healthTrend).toFixed(1)}%`} 
         trendText={kpiData.healthTrend > 0 ? 'Improving' : 'Degrading'} 
         isGood={kpiData.healthTrend >= 0}
         highlighted={presentationMode}
