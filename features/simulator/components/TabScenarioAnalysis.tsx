@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Check, X, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -8,23 +9,26 @@ import { projectFailureProbability } from '@/lib/engineering/physics-engine';
 import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
 
 export function TabScenarioAnalysis() {
-  const crusher = useStore(s => s.dtMachines.find(m => m.id === 'crusher'));
+  const dtMachines = useStore(s => s.dtMachines);
+  const [targetId, setTargetId] = useState('crusher');
+  
+  const targetMachine = dtMachines.find(m => m.id === targetId) || dtMachines[0];
 
-  const currentHours  = crusher?.operatingHours ?? 12400;
-  const baseEta       = crusher?.baseEta ?? 18000;
-  const beta          = crusher?.beta ?? 2.5;
+  const currentHours  = targetMachine.operatingHours;
+  const baseEta       = targetMachine.baseEta;
+  const beta          = targetMachine.beta;
 
   const scenariosDef = [
     { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false, isRecommended: true },
-    { name: 'Scenario B', subtitle: 'Current Baseline', delay: 7, isCurrent: true, isRecommended: false },
-    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 14, isCurrent: false, isRecommended: false }
+    { name: 'Scenario B', subtitle: 'Current Baseline', delay: 14, isCurrent: true, isRecommended: false },
+    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false, isRecommended: false }
   ];
 
   const scenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, baseEta, beta);
     const impact = calculateBusinessImpact(
       s.delay === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
-      'Crusher'
+      targetMachine.name
     );
     return {
       ...s,
@@ -41,9 +45,20 @@ export function TabScenarioAnalysis() {
           <h2 className="text-lg font-bold">Scenario Analysis</h2>
           <p className="text-sm text-muted-foreground">Compare strategic alternatives side-by-side.</p>
         </div>
-        <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg shadow hover:bg-primary/90">
-          Save Current as Scenario
-        </button>
+        <div className="flex items-center space-x-4">
+          <select 
+            value={targetId}
+            onChange={(e) => setTargetId(e.target.value)}
+            className="bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary"
+          >
+            {dtMachines.map(m => (
+              <option key={m.id} value={m.id}>{m.name}</option>
+            ))}
+          </select>
+          <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg shadow hover:bg-primary/90">
+            Save Current as Scenario
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto">
