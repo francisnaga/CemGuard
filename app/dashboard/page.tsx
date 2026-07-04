@@ -18,25 +18,37 @@ export default function DashboardPage() {
   const { dtMachines, dtClock, dtHistory, presentationMode, simulationDay, currentView } = useStore();
   const isLive = dtClock > 32;
 
-  // Single Source of Truth: Read from dtMachines
+  // Single Source of Truth: Read from dtMachines and dtHistory
   const fleetHealth = Math.round(dtMachines.reduce((sum, m) => sum + m.health, 0) / dtMachines.length);
+  const fleetAvailability = dtMachines.reduce((sum, m) => sum + m.availability, 0) / dtMachines.length;
   const worstMachine = dtMachines.reduce((worst, m) => m.failureProb > worst.failureProb ? m : worst);
   
   // Calculate impact for worst machine
   const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
-  const impact = calculateBusinessImpact(strategy, worstMachine.name.includes('Kiln') ? 'Kiln' : 'Crusher');
+  const category = worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
+  const impact = calculateBusinessImpact(strategy, category);
+  const emergencyImpact = calculateBusinessImpact('Emergency', category);
+  const savingsAmount = (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000;
 
   const insight = generateInsight(worstMachine, impact);
+  const activeAlerts = dtMachines.filter(m => m.vibrationZone === 'C' || m.vibrationZone === 'D').length;
+
+  const prevHistory = dtHistory.length > 1 ? dtHistory[dtHistory.length - 2] : dtHistory[0] || { oee: 95, health: 95, failureProb: 10 };
+  const currHistory = dtHistory.length > 0 ? dtHistory[dtHistory.length - 1] : { oee: 95, health: 95, failureProb: 10 };
 
   const kpiData = {
     health: fleetHealth,
-    healthTrend: fleetHealth - 90,
-    oee: dtHistory.length > 0 ? dtHistory[dtHistory.length - 1].oee : 95,
-    alerts: dtMachines.filter(m => m.vibrationZone === 'C' || m.vibrationZone === 'D').length,
+    healthTrend: fleetHealth - prevHistory.health,
+    oee: currHistory.oee,
+    oeeTrend: currHistory.oee - prevHistory.oee,
+    alerts: activeAlerts,
+    alertsTrend: activeAlerts > 0 ? 1 : 0, // simple heuristic
     risk: impact.totalRiskExposure,
-    riskTrend: worstMachine.failureProb > 40 ? 12.5 : -2.1,
-    availability: fleetHealth > 20 ? 98.2 : 0,
-    savings: 18.6
+    riskTrend: (currHistory.failureProb - prevHistory.failureProb) * 2, // simple proxy for risk growth
+    availability: fleetAvailability,
+    availabilityTrend: fleetAvailability > 90 ? 0.1 : -1.2,
+    savings: savingsAmount,
+    savingsTrend: savingsAmount > 0 ? 2.5 : 0
   };
 
   return (
@@ -77,8 +89,8 @@ export default function DashboardPage() {
               id: m.id,
               name: m.name,
               health: m.health,
-              riskValue: calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : 'Crusher').totalRiskExposure,
-              failureMode: 'Bearing wear'
+              riskValue: calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher').totalRiskExposure,
+              failureMode: `High Vibration (Zone ${m.vibrationZone})`
             })).sort((a,b) => b.riskValue - a.riskValue).slice(0, 5)} />
           </div>
         </div>
@@ -95,9 +107,9 @@ export default function DashboardPage() {
             equipment: m.name,
             priority: m.risk,
             strategy: m.failureProb > 70 ? 'Emergency' : 'Predictive',
-            failureMode: 'Bearing degradation',
-            confidence: 95,
-            deadline: `Immediate`,
+            failureMode: `High Temp (${m.temperatureC.toFixed(0)}°C) / Zone ${m.vibrationZone}`,
+            confidence: Math.round(m.failureProb + 10 > 100 ? 99 : m.failureProb + 10),
+            deadline: m.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, 14 - Math.floor(m.failureProb / 10))} Days`,
             status: 'Pending'
           }))
         } />
@@ -108,7 +120,7 @@ export default function DashboardPage() {
             day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
             health: h.health,
             prob: h.failureProb,
-            downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', 'Crusher').downtimeHours,
+            downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher').downtimeHours,
             oee: h.oee
           }))} 
           presentationMode={presentationMode} 

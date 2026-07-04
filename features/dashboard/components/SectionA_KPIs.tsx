@@ -58,51 +58,51 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       <KPICard 
         title="OEE (A×P×Q)"
         value={`${Number(kpiData.oee).toFixed(1)}%`} 
-        trendDir="neutral"
-        trendValue="0%" 
-        trendText="Stable" 
-        isGood={true}
+        trendDir={kpiData.oeeTrend > 0 ? 'up' : kpiData.oeeTrend < 0 ? 'down' : 'neutral'}
+        trendValue={`${Math.abs(kpiData.oeeTrend).toFixed(1)}%`} 
+        trendText={kpiData.oeeTrend > 0 ? 'Improving' : kpiData.oeeTrend < 0 ? 'Decreasing' : 'Stable'} 
+        isGood={kpiData.oeeTrend >= 0}
         explainerBasis="Overall Equipment Effectiveness. Reflects true productive capacity."
         explainerFormula="Availability × Performance × Quality"
       />
       <KPICard 
         title="Active Alerts" 
         value={kpiData.alerts.toString()} 
-        trendDir="up" 
-        trendValue="+2" 
+        trendDir={kpiData.alertsTrend > 0 ? 'up' : kpiData.alertsTrend < 0 ? 'down' : 'neutral'} 
+        trendValue={kpiData.alertsTrend !== 0 ? `${kpiData.alertsTrend > 0 ? '+' : ''}${kpiData.alertsTrend}` : '0'} 
         trendText="Since yesterday" 
-        isGood={kpiData.alerts === 0}
+        isGood={kpiData.alertsTrend <= 0}
         highlighted={presentationMode && kpiData.alerts > 0}
         explainerBasis="Current count of unresolved predictive warnings and critical alerts."
       />
       <KPICard 
         title="Risk Exposure" 
         value={`₦${(kpiData.risk / 1_000_000).toFixed(1)}M`} 
-        trendDir={kpiData.riskTrend > 0 ? 'up' : 'down'} 
+        trendDir={kpiData.riskTrend > 0 ? 'up' : kpiData.riskTrend < 0 ? 'down' : 'neutral'} 
         trendValue={`₦${Math.abs(kpiData.riskTrend).toFixed(1)}M`} 
         trendText="Change" 
         isGood={kpiData.riskTrend <= 0}
-        highlighted={presentationMode && kpiData.risk > 10}
+        highlighted={presentationMode && kpiData.risk > 10_000_000}
         explainerBasis="Total financial exposure due to potential impending equipment failures."
         explainerFormula="P(failure) × (Repair Cost + Logistics + Production Loss)"
       />
       <KPICard 
         title="Production Availability" 
         value={`${Number(kpiData.availability).toFixed(1)}%`} 
-        trendDir="down" 
-        trendValue="1.2%" 
-        trendText="Decrease" 
-        isGood={false}
+        trendDir={kpiData.availabilityTrend > 0 ? 'up' : kpiData.availabilityTrend < 0 ? 'down' : 'neutral'} 
+        trendValue={`${Math.abs(kpiData.availabilityTrend).toFixed(1)}%`} 
+        trendText={kpiData.availabilityTrend > 0 ? 'Increase' : kpiData.availabilityTrend < 0 ? 'Decrease' : 'Stable'} 
+        isGood={kpiData.availabilityTrend >= 0}
         explainerBasis="Percentage of time the plant is ready for normal production."
         explainerFormula="(Operating Time / Planned Production Time) × 100"
       />
       <KPICard 
         title="Maint. Cost Avoided" 
         value={`₦${kpiData.savings.toFixed(1)}M`} 
-        trendDir="up" 
-        trendValue="15%" 
-        trendText="Improving" 
-        isGood={true}
+        trendDir={kpiData.savingsTrend > 0 ? 'up' : kpiData.savingsTrend < 0 ? 'down' : 'neutral'} 
+        trendValue={`${Math.abs(kpiData.savingsTrend).toFixed(1)}%`} 
+        trendText={kpiData.savingsTrend > 0 ? 'Improving' : kpiData.savingsTrend < 0 ? 'Decreasing' : 'Stable'} 
+        isGood={kpiData.savingsTrend >= 0}
         explainerBasis="Estimated cost savings from proactive intervention vs catastrophic failure."
       />
     </div>

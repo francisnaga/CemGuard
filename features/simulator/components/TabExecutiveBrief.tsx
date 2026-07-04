@@ -7,13 +7,14 @@ import { generateInsight } from '@/lib/engineering/insight-engine';
 
 export function TabExecutiveBrief() {
   const store = useStore();
-  const crusher = store.dtMachines.find(m => m.id === 'crusher');
+  const worstMachine = store.dtMachines.reduce((worst, m) => m.failureProb > worst.failureProb ? m : worst);
 
-  if (!crusher) return null;
+  if (!worstMachine) return null;
 
-  const strategy = crusher.failureProb > 70 ? 'Emergency' : crusher.failureProb > 50 ? 'Corrective' : crusher.failureProb > 20 ? 'Predictive' : 'Preventive';
-  const impact = calculateBusinessImpact(strategy, 'Crusher');
-  const insight = generateInsight(crusher, impact);
+  const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
+  const category = worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
+  const impact = calculateBusinessImpact(strategy, category);
+  const insight = generateInsight(worstMachine, impact);
 
   return (
     <div className="max-w-4xl mx-auto bg-card border border-border p-8 md:p-12 rounded-xl animate-in fade-in duration-500 relative">
@@ -71,15 +72,15 @@ export function TabExecutiveBrief() {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-background border border-border p-4 rounded-lg">
                 <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">Failure Probability</span>
-                <span className="text-lg font-bold text-destructive">{crusher.failureProb.toFixed(1)}%</span>
+                <span className="text-lg font-bold text-destructive">{worstMachine.failureProb.toFixed(1)}%</span>
               </div>
               <div className="bg-background border border-border p-4 rounded-lg">
                 <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">Confidence Interval</span>
-                <span className="text-sm font-bold text-orange-500 mt-1 block">[{crusher.failureProbLower.toFixed(1)}% - {crusher.failureProbUpper.toFixed(1)}%]</span>
+                <span className="text-sm font-bold text-orange-500 mt-1 block">[{worstMachine.failureProbLower.toFixed(1)}% - {worstMachine.failureProbUpper.toFixed(1)}%]</span>
               </div>
               <div className="bg-background border border-border p-4 rounded-lg col-span-2">
                 <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">ISO 20816 Zone</span>
-                <span className="text-lg font-bold text-destructive">Zone {crusher.vibrationZone}</span>
+                <span className="text-lg font-bold text-destructive">Zone {worstMachine.vibrationZone}</span>
               </div>
             </div>
 
@@ -87,7 +88,7 @@ export function TabExecutiveBrief() {
             <div className="bg-background border border-border p-5 rounded-lg flex flex-col justify-between">
               <div>
                 <span className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">Health Index</span>
-                <span className="text-3xl font-bold text-orange-500">{crusher.health.toFixed(1)}</span>
+                <span className="text-3xl font-bold text-orange-500">{worstMachine.health.toFixed(1)}</span>
                 <span className="text-[10px] uppercase font-bold text-muted-foreground mt-4 block border-b border-border pb-1">Derived From</span>
               </div>
               <ul className="text-[11px] text-muted-foreground space-y-1.5 mt-3">
