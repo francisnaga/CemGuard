@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  /* ── DARK THEME (default) ─────────────────────────────────────── */
+  :root {
+    --background:             #0D1117;
+    --foreground:             #F0F6FC;
+    --card:                   #161B22;
+    --card-foreground:        #F0F6FC;
+    --popover:                #161B22;
+    --popover-foreground:     #F0F6FC;
+
+    --primary:                #F0F6FC;
+    --primary-foreground:     #0D1117;
+    --secondary:              #21262D;
+    --secondary-foreground:   #F0F6FC;
+    --muted:                  #21262D;
+    --muted-foreground:       #8B949E;
+    --accent:                 #21262D;
+    --accent-foreground:      #F0F6FC;
+
+    --destructive:            #F85149;
+    --destructive-foreground: #F0F6FC;
+
+    --success:                #3FB950;
+    --success-foreground:     #0D1117;
+
+    --warning:                #D29922;
+    --warning-foreground:     #0D1117;
+
+    --border:                 #30363D;
+    --input:                  #21262D;
+    --ring:                   #388BFD;
+    --radius:                 0.125rem;
+  }
+
+  /* ── LIGHT THEME ──────────────────────────────────────────────── */
+  .light {
+    --background:             #F4F6F9;
+    --foreground:             #1A2332;
+    --card:                   #FFFFFF;
+    --card-foreground:        #1A2332;
+    --popover:                #FFFFFF;
+    --popover-foreground:     #1A2332;
+
+    --primary:                #1A3557;
+    --primary-foreground:     #FFFFFF;
+    --secondary:              #E8EDF3;
+    --secondary-foreground:   #1A2332;
+    --muted:                  #E8EDF3;
+    --muted-foreground:       #5C6B7A;
+    --accent:                 #E8EDF3;
+    --accent-foreground:      #1A2332;
+
+    --destructive:            #D73A49;
+    --destructive-foreground: #FFFFFF;
+
+    --success:                #28A745;
+    --success-foreground:     #FFFFFF;
+
+    --warning:                #B08800;
+    --warning-foreground:     #FFFFFF;
+
+    --border:                 #D0D7DE;
+    --input:                  #E8EDF3;
+    --ring:                   #0969DA;
+    --radius:                 0.125rem;
+  }
+}
+
+@theme {
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --color-card:                 var(--card);
+  --color-card-foreground:      var(--card-foreground);
+  --color-popover:              var(--popover);
+  --color-popover-foreground:   var(--popover-foreground);
+  --color-primary:              var(--primary);
+  --color-primary-foreground:   var(--primary-foreground);
+  --color-secondary:            var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted:                var(--muted);
+  --color-muted-foreground:     var(--muted-foreground);
+  --color-accent:               var(--accent);
+  --color-accent-foreground:    var(--accent-foreground);
+  --color-destructive:          var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success:              var(--success);
+  --color-success-foreground:   var(--success-foreground);
+  --color-border:               var(--border);
+  --color-input:                var(--input);
+  --color-ring:                 var(--ring);
+  --color-chart-1:              var(--primary);
+  --color-chart-2:              var(--success);
+  --color-chart-3:              var(--warning);
+  --color-chart-4:              var(--destructive);
+  --color-chart-5:              #58A6FF;
+  --radius-sm:  calc(var(--radius) - 2px);
+  --radius-md:  calc(var(--radius) - 1px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 2px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    color-scheme: dark;
+    transition: background-color 0.3s ease, color 0.2s ease;
+  }
+  .light body {
+    color-scheme: light;
+  }
+}

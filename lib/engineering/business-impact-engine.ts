@@ -1,0 +1,68 @@
+import { BusinessImpact, MaintenanceStrategy } from './types';
+
+// Cost assumptions (representative, documented)
+// Cement production: ~450 t/h, wholesale price ~₦5,500/ton → ₦2,475,000/hr ≈ ₦2.5M/hr
+// Source: Representative industry benchmark (calibrate with actual historian data)
+const HOURLY_PRODUCTION_VALUE = 2_500_000; // ₦/hr
+const CO2_EMISSION_PER_RESTART = 15;        // tons CO₂ per cold restart
+const REPAIR_BASE_COST = 5_000_000;         // ₦ base parts + labour for standard repair
+
+export function calculateBusinessImpact(
+  strategy: MaintenanceStrategy,
+  equipmentCategory: string
+): BusinessImpact {
+  
+  let downtimeHours = 0;
+  let repairCostMultiplier = 1.0;
+  let co2ImpactTons = 0;
+
+  // Impact varies heavily by strategy (RCM principle)
+  switch (strategy) {
+    case 'Preventive':
+      downtimeHours = 2; // Quick scheduled inspection
+      repairCostMultiplier = 0.5;
+      co2ImpactTons = 0; // No cold restart needed
+      break;
+    case 'Condition-Based':
+      downtimeHours = 4;
+      repairCostMultiplier = 0.8;
+      co2ImpactTons = 2;
+      break;
+    case 'Predictive':
+      downtimeHours = 8; // Planned targeted repair
+      repairCostMultiplier = 1.2;
+      co2ImpactTons = 5;
+      break;
+    case 'Corrective':
+      downtimeHours = 24; // Unplanned, waiting for parts
+      repairCostMultiplier = 3.0; // Overtime, expedited shipping
+      co2ImpactTons = 10;
+      break;
+    case 'Emergency':
+      downtimeHours = 72; // Catastrophic failure
+      repairCostMultiplier = 10.0; // Massive collateral damage
+      co2ImpactTons = 15; // Full cold restart
+      break;
+  }
+
+  // Multiply by equipment criticality (Kiln takes longer than Conveyor)
+  let categoryMultiplier = 1.0;
+  if (equipmentCategory === 'Kiln') categoryMultiplier = 5.0;
+  if (equipmentCategory === 'Mill') categoryMultiplier = 3.0;
+
+  downtimeHours *= categoryMultiplier;
+  const repairCost = REPAIR_BASE_COST * repairCostMultiplier * categoryMultiplier;
+  const productionLossValue = downtimeHours * HOURLY_PRODUCTION_VALUE;
+  
+  const revenueLoss = productionLossValue + repairCost;
+  const totalRiskExposure = revenueLoss * (downtimeHours / 24); // Risk scales with downtime length
+
+  return {
+    downtimeHours,
+    productionLossValue,
+    revenueLoss,
+    co2ImpactTons: co2ImpactTons * categoryMultiplier,
+    repairCost,
+    totalRiskExposure
+  };
+}
