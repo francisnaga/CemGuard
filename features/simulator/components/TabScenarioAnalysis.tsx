@@ -17,6 +17,12 @@ export function TabScenarioAnalysis() {
   const currentHours  = targetMachine.operatingHours;
   const baseEta       = targetMachine.baseEta;
   const beta          = targetMachine.beta;
+  const currentP      = targetMachine.failureProb;
+
+  const currentProbFraction = Math.max(0.0001, Math.min(0.9999, currentP / 100));
+  const effectiveEta = currentHours > 0 
+    ? currentHours / Math.pow(-Math.log(1 - currentProbFraction), 1 / beta) 
+    : baseEta;
 
   const scenariosDef = [
     { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false },
@@ -25,7 +31,7 @@ export function TabScenarioAnalysis() {
   ];
 
   let rawScenarios = scenariosDef.map(s => {
-    const projectedProb = projectFailureProbability(currentHours, s.delay * 24, baseEta, beta);
+    const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
     // Determine the modeled intervention strategy based on the scenario type and projected degradation
     let strategy: 'Preventive' | 'Condition-Based' | 'Predictive' | 'Corrective' | 'Emergency' = 'Condition-Based';

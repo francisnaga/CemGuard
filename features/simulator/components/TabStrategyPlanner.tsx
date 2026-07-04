@@ -24,8 +24,18 @@ export function TabStrategyPlanner() {
   const currentP      = targetMachine.failureProb;
 
   // Derive effectiveEta from current state (reverse from live P(f))
+  const currentProbFraction = Math.max(0.0001, Math.min(0.9999, currentP / 100));
+  const effectiveEta = currentHours > 0 
+    ? currentHours / Math.pow(-Math.log(1 - currentProbFraction), 1 / beta) 
+    : baseEta;
+
   const projectedHours = delayDays * 24;
-  const projectedProb  = projectFailureProbability(currentHours, projectedHours, baseEta, beta);
+  const projectedProb  = projectFailureProbability(currentHours, projectedHours, effectiveEta, beta);
+
+  // Real math: time to 80% failure probability = eta * (-ln(0.2))^(1/beta)
+  const t80 = effectiveEta * Math.pow(-Math.log(1 - 0.8), 1 / beta);
+  const remainingLifeHours = Math.max(0, t80 - (currentHours + projectedHours));
+  const remainingLifeDays = Math.round(remainingLifeHours / 24);
 
   // Use the exact same unified business impact function as the rest of the app
   const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
@@ -130,7 +140,9 @@ export function TabStrategyPlanner() {
             </div>
             <div className="p-4 bg-background border border-border rounded-lg">
               <p className="text-sm font-semibold mb-2">Est. Remaining Useful Life</p>
-              <span className="text-xl font-bold text-orange-500">{Math.max(0, 30 - delayDays)} Days</span>
+              <span className={cn("text-xl font-bold", remainingLifeDays < 5 ? "text-destructive" : remainingLifeDays < 14 ? "text-orange-500" : "text-success")}>
+                {remainingLifeDays} Days
+              </span>
             </div>
           </div>
 
