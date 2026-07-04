@@ -66,7 +66,7 @@ export default function DashboardPage() {
             <SectionC_PlantSVG nodes={dtMachines.map(m => ({
               id: m.id,
               name: m.name,
-              context: { currentState: m.risk, plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
+              context: { currentState: m.risk === 'Low' ? 'Healthy' : m.risk === 'Medium' ? 'Minor Wear' : m.risk === 'High' ? 'Severe Wear' : 'Critical', plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
               health: m.health,
               temperature: m.temperatureC,
               isProcessTemp: m.id === 'kiln'
