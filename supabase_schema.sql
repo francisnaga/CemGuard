@@ -163,9 +163,23 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE machine_timelines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE plant_kpis ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Enable ALL for authenticated users" ON profiles FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Enable ALL for authenticated users" ON machine_timelines FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Enable ALL for authenticated users" ON plant_kpis FOR ALL TO authenticated USING (true) WITH CHECK (true);
+-- RLS POLICIES (PROTOTYPE/COMPETITION MODE)
+-- NOTE: For this competition prototype, we are granting wide access to any authenticated user.
+-- In a production environment, policies would be strictly scoped to `auth.uid() = user_id` 
+-- or restricted by RBAC (Role-Based Access Control) using the `profiles.role` column.
+
+-- Prevent destructive operations (DELETE) by omitting it.
+CREATE POLICY "Enable SELECT for authenticated users" ON profiles FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Enable INSERT for authenticated users" ON profiles FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Enable UPDATE for authenticated users" ON profiles FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable SELECT for authenticated users" ON machine_timelines FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Enable INSERT for authenticated users" ON machine_timelines FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Enable UPDATE for authenticated users" ON machine_timelines FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Enable SELECT for authenticated users" ON plant_kpis FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Enable INSERT for authenticated users" ON plant_kpis FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Enable UPDATE for authenticated users" ON plant_kpis FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
 
 -- Create a trigger to automatically create a profile when a new user signs up
 CREATE OR REPLACE FUNCTION public.handle_new_user() 

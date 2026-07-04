@@ -12,6 +12,7 @@ export function AlertCenter() {
   const dtEvents = useStore(s => s.dtEvents);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 

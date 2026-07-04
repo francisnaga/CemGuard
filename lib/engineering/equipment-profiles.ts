@@ -7,7 +7,7 @@ export const EQUIPMENT_PROFILES: Record<string, EquipmentProfile> = {
     expectedLifeSpanYears: 15,
     baseFailureRate: 0.005,
     sensors: {
-      temperature: { min: 60, max: 85, unit: '°C' },
+      temperature: { min: 60, max: 85, unit: 'degC' },
       vibration: { min: 1, max: 4, unit: 'mm/s' },
       power: { min: 75, max: 90, unit: '%' }
     },
@@ -19,7 +19,7 @@ export const EQUIPMENT_PROFILES: Record<string, EquipmentProfile> = {
     expectedLifeSpanYears: 25,
     baseFailureRate: 0.003,
     sensors: {
-      temperature: { min: 250, max: 1400, unit: '°C' },
+      temperature: { min: 250, max: 1400, unit: 'degC' },
       current: { min: 450, max: 800, unit: 'A' },
       power: { min: 80, max: 95, unit: '%' }
     },
@@ -31,7 +31,7 @@ export const EQUIPMENT_PROFILES: Record<string, EquipmentProfile> = {
     expectedLifeSpanYears: 20,
     baseFailureRate: 0.004,
     sensors: {
-      temperature: { min: 70, max: 110, unit: '°C' },
+      temperature: { min: 70, max: 110, unit: 'degC' },
       vibration: { min: 2, max: 6, unit: 'mm/s' },
       power: { min: 85, max: 100, unit: '%' }
     },
@@ -54,7 +54,7 @@ export const EQUIPMENT_PROFILES: Record<string, EquipmentProfile> = {
     expectedLifeSpanYears: 12,
     baseFailureRate: 0.006,
     sensors: {
-      temperature: { min: 40, max: 65, unit: '°C' },
+      temperature: { min: 40, max: 65, unit: 'degC' },
       power: { min: 60, max: 80, unit: '%' }
     },
     possibleFailureModes: ['Air leakage', 'Valve failure']

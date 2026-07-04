@@ -199,7 +199,7 @@ export function TabDigitalTwin() {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Bearing Temp</span>
                     <span className={cn("font-mono font-semibold", m.temperatureC > 85 ? "text-destructive" : "text-foreground")}>
-                      {m.temperatureC.toFixed(1)} <span className="text-[9px] text-muted-foreground">°C</span>
+                      {m.temperatureC.toFixed(1)} <span className="text-[9px] text-muted-foreground">degC</span>
                     </span>
                   </div>
                   <div className="flex justify-between items-center">

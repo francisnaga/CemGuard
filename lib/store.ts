@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
 import { PlantState } from './engineering/types';
 import { 
@@ -70,10 +71,10 @@ export interface PlantProfile {
 }
 
 export const PLANT_PROFILES: PlantProfile[] = [
-  { id: 'obajana', name: 'Obajana Plant', capacity: 13250, budget: '₦850M', energyBaseline: 12.4 },
-  { id: 'ibese', name: 'Ibese Plant', capacity: 12000, budget: '₦780M', energyBaseline: 11.2 },
-  { id: 'gboko', name: 'Gboko Plant', capacity: 4000, budget: '₦320M', energyBaseline: 4.1 },
-  { id: 'okpella', name: 'Okpella Plant', capacity: 3000, budget: '₦210M', energyBaseline: 3.2 },
+  { id: 'obajana', name: 'Obajana Plant', capacity: 13250, budget: 'NGN 850M', energyBaseline: 12.4 },
+  { id: 'ibese', name: 'Ibese Plant', capacity: 12000, budget: 'NGN 780M', energyBaseline: 11.2 },
+  { id: 'gboko', name: 'Gboko Plant', capacity: 4000, budget: 'NGN 320M', energyBaseline: 4.1 },
+  { id: 'okpella', name: 'Okpella Plant', capacity: 3000, budget: 'NGN 210M', energyBaseline: 3.2 },
 ];
 
 interface DashboardState {
@@ -159,10 +160,13 @@ export const useStore = create<DashboardState>((set, get) => {
   // Generate synthetic warm-up history for the last 30 ticks
   const warmupHistory: HistorySnapshot[] = [];
   for (let i = 0; i < 30; i++) {
+    // Generate deterministic baseline history based on initial state
+    const t = 2 + i;
+    const sineVariation = Math.sin(t * 0.5) * 2; // Deterministic small fluctuation
     warmupHistory.push({
-      time: 2 + i,
-      throughput: 440 + Math.random() * 15,
-      oee: 92 + Math.random() * 4,
+      time: t,
+      throughput: 440 + sineVariation * 3, // ~434 to 446
+      oee: 92 + sineVariation, // ~90 to 94
       health: 93 - (30 - i) * 0.05,
       failureProb: 8 + (30 - i) * 0.1
     });
@@ -204,42 +208,26 @@ export const useStore = create<DashboardState>((set, get) => {
   loadScenario: (scenario) => {
     const newMachines = JSON.parse(JSON.stringify(initialMachines));
     const crusher = newMachines.find((m: any) => m.id === 'crusher');
-    let newEvents = [...get().dtEvents];
+    const newEvents = [...get().dtEvents];
     let newClock = get().dtClock;
-    let newCrew = { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' } as any;
+    const newCrew = { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' } as any;
     let newBottleneck = null;
 
     if (scenario === 'Healthy Plant') {
       newClock = 32;
     } else if (scenario === 'Progressive Wear') {
       newClock = 45;
-      crusher.wearAccumulation += 1.5;
-      crusher.vibrationZone = 'B';
-      crusher.vibrationRms = 3.5;
-      crusher.temperatureC = 75.0;
-      crusher.failureProb = 45.0;
-      crusher.health = 80;
-      crusher.risk = 'High';
+      crusher.wearAccumulation += 3.5;
+      crusher.operatingHours += 2500;
       newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Crusher showing progressive wear patterns.' });
     } else if (scenario === 'Imminent Failure') {
       newClock = 50;
-      crusher.wearAccumulation += 2.8;
-      crusher.vibrationZone = 'C';
-      crusher.vibrationRms = 5.2;
-      crusher.temperatureC = 86.5;
-      crusher.failureProb = 67.4;
-      crusher.health = 72;
-      crusher.risk = 'High';
-      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Warning', code: 'VIB-101', message: 'Crusher RMS Vibration reached 5.2 mm/s (Zone C)' });
-      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Warning', code: 'TMP-045', message: 'Crusher Bearing Temperature exceeded 85°C.' });
+      crusher.wearAccumulation += 5.5;
+      crusher.operatingHours += 4000;
+      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Critical', code: 'VIB-101', message: 'Crusher RMS Vibration rapidly increasing.' });
     } else if (scenario === 'Emergency Shutdown') {
       newClock = 52;
-      crusher.failureProb = 95.0;
-      crusher.vibrationZone = 'D';
-      crusher.vibrationRms = 8.1;
-      crusher.temperatureC = 110.0;
-      crusher.health = 20;
-      crusher.risk = 'Critical';
+      crusher.wearAccumulation += 8.0;
       crusher.availability = 0;
       crusher.utilization = 0;
       crusher.loadFactor = 0;
@@ -320,12 +308,12 @@ export const useStore = create<DashboardState>((set, get) => {
     const mins = ((newClock * 15) % 60).toString().padStart(2, '0');
     const timeStr = `${hours}:${mins}`;
 
-    let newEvents = [...dtEvents];
+    const newEvents = [...dtEvents];
     let newCrew = { ...dtCrewStatus };
     
     // 1. Process individual machines via Physics Engine
     const updatedMachines = dtMachines.map(m => {
-      let machine = { ...m };
+      const machine = { ...m };
       
       // If machine is offline due to failure, freeze its state so it doesn't "heal" itself
       if (machine.availability === 0) {
@@ -382,7 +370,7 @@ export const useStore = create<DashboardState>((set, get) => {
       machine.temperatureC = calculateBearingTemperature(params, machine.vibrationRms);
       
       if (machine.temperatureC > 85 && m.temperatureC <= 85) {
-        newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: timeStr, category: 'Warning', code: 'TMP-045', message: `${machine.name} Bearing Temperature exceeded 85°C.` });
+        newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: timeStr, category: 'Warning', code: 'TMP-045', message: `${machine.name} Bearing Temperature exceeded 85degC.` });
       }
 
       // Weibull
@@ -403,9 +391,9 @@ export const useStore = create<DashboardState>((set, get) => {
     });
 
     // 2. Cascading Plant Physics & Logic
-    let crusher = updatedMachines.find(m => m.id === 'crusher')!;
-    let rawmill = updatedMachines.find(m => m.id === 'rawmill')!;
-    let kiln = updatedMachines.find(m => m.id === 'kiln')!;
+    const crusher = updatedMachines.find(m => m.id === 'crusher')!;
+    const rawmill = updatedMachines.find(m => m.id === 'rawmill')!;
+    const kiln = updatedMachines.find(m => m.id === 'kiln')!;
     let newBottleneck = null;
 
     if (crusher.failureProb > 65 && newCrew.status === 'Available') {

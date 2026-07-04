@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useStore } from '@/lib/store';
@@ -22,6 +24,7 @@ export default function DashboardLayout({
     togglePresentationMode,
     startIncidentReplay,
     dtEvents,
+    currentView,
   } = useStore();
 
   const router = useRouter();
@@ -33,6 +36,7 @@ export default function DashboardLayout({
   useEffect(() => {
     const stored = localStorage.getItem('cemguard-theme');
     if (stored === 'light') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLight(true);
       document.documentElement.classList.add('light');
     }
@@ -115,7 +119,7 @@ export default function DashboardLayout({
             {/* Role / Current View picker */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/20 text-xs">
               <select
-                value={useStore(s => s.currentView)}
+                value={currentView}
                 onChange={(e) => useStore.getState().setCurrentView(e.target.value as any)}
                 className="bg-transparent font-semibold text-primary focus:outline-none cursor-pointer max-w-[140px] truncate"
               >

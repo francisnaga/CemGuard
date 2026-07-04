@@ -1,4 +1,6 @@
-type LogLevel = "info" | "warn" | "error";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+type LogLevel = "info" | "warn" | "error" | "debug";
 
 export const logger = {
   info: (message: string, data?: any) => {

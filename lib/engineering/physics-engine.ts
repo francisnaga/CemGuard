@@ -67,7 +67,7 @@ export function calculatePower(params: PhysicsParams): number {
 }
 
 // 5. Dynamic Weibull Reliability
-// F(t) = 1 - exp(-(t/η_eff)^β)
+// F(t) = 1 - exp(-(t/η_eff)^beta)
 // η_eff degrades via Arrhenius-inspired exponential stress multipliers:
 // η_eff = η₀ / (exp(k_t*(T-T_ref)) × exp(k_v*(V-V_ref)))
 export function calculateFailureProbability(
@@ -75,7 +75,7 @@ export function calculateFailureProbability(
   vibrationRms: number,
   tempC: number
 ): { prob: number, lowerCI: number, upperCI: number } {
-  const tempStress = Math.max(1, Math.exp(0.02 * (tempC - 65))); // T_ref = 65°C
+  const tempStress = Math.max(1, Math.exp(0.02 * (tempC - 65))); // T_ref = 65degC
   const vibStress  = Math.max(1, Math.exp(0.3  * (vibrationRms - 2.8))); // V_ref = Zone A/B boundary
   
   const effectiveEta = params.baseEta / (tempStress * vibStress);

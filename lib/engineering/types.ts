@@ -84,7 +84,7 @@ export interface SimulationContext {
 export interface BusinessImpact {
   downtimeHours: number;
   productionLossValue: number; // e.g. tons lost * value
-  revenueLoss: number; // in Naira (₦) or USD
+  revenueLoss: number; // in Naira (NGN ) or USD
   co2ImpactTons: number; // Emissions from restart/inefficiency
   repairCost: number;
   totalRiskExposure: number;

@@ -38,12 +38,12 @@ export default function AboutPage() {
               The core simulation engine utilizes the Weibull distribution, the standard methodology for reliability engineering and life data analysis.
             </p>
             <div className="bg-muted/30 border border-border p-5 rounded-xl font-mono text-xs text-muted-foreground space-y-2">
-              <p>Failure Probability: F(t) = 1 - e^-(t/η)^β</p>
+              <p>Failure Probability: F(t) = 1 - e^-(t/η)^beta</p>
               <p>Where:</p>
               <ul className="list-disc list-inside ml-4 space-y-1">
                 <li><strong className="text-foreground">t</strong> = operating time</li>
                 <li><strong className="text-foreground">η (eta)</strong> = characteristic life (time at which 63.2% will fail)</li>
-                <li><strong className="text-foreground">β (beta)</strong> = shape parameter (β &gt; 1 indicates wear-out failure)</li>
+                <li><strong className="text-foreground">beta (beta)</strong> = shape parameter (beta &gt; 1 indicates wear-out failure)</li>
               </ul>
             </div>
           </section>
@@ -54,7 +54,7 @@ export default function AboutPage() {
               <h2 className="text-xl font-bold">Cost-of-Failure & ROI Engine</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed text-sm mb-8">
-              The Decision Engine calculates exposure continuously. If the Crusher's nominal throughput is 5,000 tpd and clinker margin is ₦14,200/ton, an unexpected 28-hour downtime event generates a direct revenue exposure of ₦82.8M. The engine compares this against the cost of an 8-hour planned shutdown (₦12.0M) to generate the deterministic "⭐ Recommended" flag.
+              The Decision Engine calculates exposure continuously. If the Crusher&apos;s nominal throughput is 5,000 tpd and clinker margin is NGN 14,200/ton, an unexpected 28-hour downtime event generates a direct revenue exposure of NGN 82.8M. The engine compares this against the cost of an 8-hour planned shutdown (NGN 12.0M) to generate the deterministic &quot;&#11088; Recommended&quot; flag.
             </p>
           </section>
 

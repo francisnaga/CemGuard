@@ -30,7 +30,7 @@ export function TabScenarioAnalysis() {
     { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false }
   ];
 
-  let rawScenarios = scenariosDef.map(s => {
+  const rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
     // Determine the modeled intervention strategy based on the scenario type and projected degradation
@@ -135,7 +135,7 @@ export function TabScenarioAnalysis() {
               {scenarios.map(s => (
                 <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>
                   <div className="flex items-center space-x-2">
-                    <span className={s.cost > 50 ? "text-destructive" : s.cost > 20 ? "text-orange-500" : "text-success"}>₦{s.cost.toFixed(1)}M</span>
+                    <span className={s.cost > 50 ? "text-destructive" : s.cost > 20 ? "text-orange-500" : "text-success"}>NGN {s.cost.toFixed(1)}M</span>
                     {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.cost > scenarios[1].cost ? '+' : ''}{(s.cost - scenarios[1].cost).toFixed(1)}M)</span>}
                   </div>
                 </td>
@@ -154,7 +154,7 @@ export function TabScenarioAnalysis() {
             {bestScenario.name === currentBaseline.name ? (
               <> The current operational baseline is the optimal strategy. Avoid unnecessary early maintenance or excessive delays to maximize financial efficiency.</>
             ) : (
-              <> While it requires {bestScenario.downtime} hours of planned downtime {bestScenario.delay === 0 ? 'today' : `in ${bestScenario.delay} days`}, it mitigates a {Math.abs(currentBaseline.risk - bestScenario.risk)}% difference in failure probability compared to the baseline, saving an estimated ₦{Math.abs(currentBaseline.cost - bestScenario.cost).toFixed(1)}M in avoidable exposure and {currentBaseline.downtime > bestScenario.downtime ? `preventing ${currentBaseline.downtime - bestScenario.downtime} hours of additional downtime.` : `incurring ${bestScenario.downtime - currentBaseline.downtime} hours of extra downtime for a much safer operating margin.`} </>
+              <> While it requires {bestScenario.downtime} hours of planned downtime {bestScenario.delay === 0 ? 'today' : `in ${bestScenario.delay} days`}, it mitigates a {Math.abs(currentBaseline.risk - bestScenario.risk)}% difference in failure probability compared to the baseline, saving an estimated NGN {Math.abs(currentBaseline.cost - bestScenario.cost).toFixed(1)}M in avoidable exposure and {currentBaseline.downtime > bestScenario.downtime ? `preventing ${currentBaseline.downtime - bestScenario.downtime} hours of additional downtime.` : `incurring ${bestScenario.downtime - currentBaseline.downtime} hours of extra downtime for a much safer operating margin.`} </>
             )}
           </p>
         </div>

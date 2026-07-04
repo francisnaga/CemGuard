@@ -50,7 +50,7 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
             
             <div className="text-right">
               <p className={cn("text-xl font-bold tracking-tight", (item.riskTier === 'Critical' || item.riskTier === 'High') ? "text-destructive" : "text-foreground")}>
-                ₦{(item.exposureAmount / 1_000_000).toFixed(1)}M
+                NGN {(item.exposureAmount / 1_000_000).toFixed(1)}M
               </p>
               <p className="text-xs text-muted-foreground">Exposure</p>
             </div>

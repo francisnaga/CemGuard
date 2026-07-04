@@ -79,7 +79,7 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{hoveredNode.isProcessTemp ? 'Process Temp' : 'Bearing Temp'}</p>
-            <p className="font-bold text-foreground">{hoveredNode.temperature.toFixed(hoveredNode.isProcessTemp ? 0 : 1)}°C</p>
+            <p className="font-bold text-foreground">{hoveredNode.temperature.toFixed(hoveredNode.isProcessTemp ? 0 : 1)}degC</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Risk Level</p>

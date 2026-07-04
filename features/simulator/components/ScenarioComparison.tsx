@@ -84,14 +84,14 @@ export function ScenarioComparison({
             {/* Revenue Loss */}
             <tr className="hover:bg-muted/10 transition-colors">
               <td className="px-4 py-3 font-medium text-muted-foreground">Revenue Loss</td>
-              <td className="px-4 py-3 border-l border-border bg-primary/5 font-bold text-destructive">₦{currentScenario.revenueLoss.toFixed(1)}M</td>
+              <td className="px-4 py-3 border-l border-border bg-primary/5 font-bold text-destructive">NGN {currentScenario.revenueLoss.toFixed(1)}M</td>
               {savedScenarios.map(s => {
                 const diff = s.revenueLoss - currentScenario.revenueLoss;
                 return (
                   <td key={s.id} className="px-4 py-3 border-l border-border">
-                    <span className="font-bold text-destructive">₦{s.revenueLoss.toFixed(1)}M</span>
+                    <span className="font-bold text-destructive">NGN {s.revenueLoss.toFixed(1)}M</span>
                     <span className={cn("ml-2 text-xs", diff > 0 ? "text-destructive" : "text-success")}>
-                      ({diff > 0 ? '+' : ''}₦{diff.toFixed(1)}M)
+                      ({diff > 0 ? '+' : ''}NGN {diff.toFixed(1)}M)
                     </span>
                   </td>
                 );

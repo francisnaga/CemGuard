@@ -73,7 +73,7 @@ export default function DashboardPage() {
           primaryInsight={insight.situation}
           observation={insight.observation}
           recommendedAction={insight.recommendation}
-          expectedImpact={`Avoids ₦${(impact.totalRiskExposure / 1000000).toFixed(1)}M in risk exposure and ${impact.downtimeHours} hours of downtime.`}
+          expectedImpact={`Avoids NGN ${(impact.totalRiskExposure / 1000000).toFixed(1)}M in risk exposure and ${impact.downtimeHours} hours of downtime.`}
           presentationMode={presentationMode}
           severity={insight.severity}
         />
@@ -104,7 +104,7 @@ export default function DashboardPage() {
                 failureMode: m.vibrationZone === 'D' || m.vibrationZone === 'C' 
                   ? `High Vibration (Zone ${m.vibrationZone})` 
                   : m.temperatureC > 85 
-                    ? `Overheating (${m.temperatureC.toFixed(1)}°C)`
+                    ? `Overheating (${m.temperatureC.toFixed(1)}degC)`
                     : m.health < 80 
                       ? 'Degraded Health'
                       : 'Normal Operation'
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             failureMode: m.vibrationZone === 'D' || m.vibrationZone === 'C' 
               ? `High Vibration (Zone ${m.vibrationZone})` 
               : m.temperatureC > 85 
-                ? `Overheating (${m.temperatureC.toFixed(1)}°C)`
+                ? `Overheating (${m.temperatureC.toFixed(1)}degC)`
                 : 'Degraded Health',
             confidence: Math.max(10, Math.round(100 - (m.failureProbUpper - m.failureProbLower))),
             deadline: m.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - m.failureProb) / 2))} Days`,

@@ -1,5 +1,5 @@
 /**
- * Format a number as Currency (Nigerian Naira ₦)
+ * Format a number as Currency (Nigerian Naira NGN )
  */
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-NG', {

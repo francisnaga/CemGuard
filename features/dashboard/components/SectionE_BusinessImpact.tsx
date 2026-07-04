@@ -2,7 +2,7 @@ import { ArrowRight, Activity, Clock, TrendingDown, DollarSign, CloudRain, Shiel
 import { BusinessImpact } from "@/lib/engineering/types";
 
 export function SectionE_BusinessImpact({ impact }: { impact: BusinessImpact }) {
-  const formatCur = (val: number) => `₦${(val / 1000000).toFixed(1)}M`;
+  const formatCur = (val: number) => `NGN ${(val / 1000000).toFixed(1)}M`;
 
   const steps = [
     { label: 'Failure', value: 'Trigger', icon: Activity, color: 'text-destructive' },

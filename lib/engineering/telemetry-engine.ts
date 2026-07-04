@@ -41,7 +41,7 @@ export function generateTelemetry(
     const baseValue = min + (range * 0.3); // Sitting at 30% of healthy range normally
 
     // Apply multipliers: age, degradation severity, plant stress
-    let targetValue = baseValue * ageMultiplier * degradation.valueMultiplier * typeMultiplier;
+    const targetValue = baseValue * ageMultiplier * degradation.valueMultiplier * typeMultiplier;
 
     // Add noise to make charts look real
     // Use the context's currentDate's time for deterministic noise instead of Math.random()

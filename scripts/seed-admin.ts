@@ -17,10 +17,18 @@ const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 async function seedAdmin() {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.error('❌ Missing ADMIN_EMAIL or ADMIN_PASSWORD in environment variables.');
+    process.exit(1);
+  }
+
   console.log("Seeding admin user...");
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
-    email: 'admin@cemguard.demo',
-    password: '32888012Ba#',
+    email: adminEmail,
+    password: adminPassword,
     email_confirm: true,
     user_metadata: {
       full_name: 'System Admin'

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MetricExplainer } from "@/components/MetricExplainer";
@@ -77,9 +78,9 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="Risk Exposure" 
-        value={`₦${(kpiData.risk / 1_000_000).toFixed(1)}M`} 
+        value={`NGN ${(kpiData.risk / 1_000_000).toFixed(1)}M`} 
         trendDir={kpiData.riskTrend > 0 ? 'up' : kpiData.riskTrend < 0 ? 'down' : 'neutral'} 
-        trendValue={`₦${Math.abs(kpiData.riskTrend).toFixed(1)}M`} 
+        trendValue={`NGN ${Math.abs(kpiData.riskTrend).toFixed(1)}M`} 
         trendText="Change" 
         isGood={kpiData.riskTrend <= 0}
         highlighted={presentationMode && kpiData.risk > 10_000_000}
@@ -98,7 +99,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="Maint. Cost Avoided" 
-        value={`₦${kpiData.savings.toFixed(1)}M`} 
+        value={`NGN ${kpiData.savings.toFixed(1)}M`} 
         trendDir={kpiData.savingsTrend > 0 ? 'up' : kpiData.savingsTrend < 0 ? 'down' : 'neutral'} 
         trendValue={`${Math.abs(kpiData.savingsTrend).toFixed(1)}%`} 
         trendText={kpiData.savingsTrend > 0 ? 'Improving' : kpiData.savingsTrend < 0 ? 'Decreasing' : 'Stable'} 
