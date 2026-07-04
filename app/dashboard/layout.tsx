@@ -111,21 +111,6 @@ export default function DashboardLayout({
           {/* Right: actions */}
           <div className="flex items-center gap-2 shrink-0">
 
-            {/* Plant picker */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/20 text-xs">
-              <span className={cn('w-2 h-2 rounded-full shrink-0', statusColor)} />
-              <select
-                value={selectedPlant}
-                onChange={(e) => setSelectedPlant(e.target.value)}
-                className="bg-transparent font-semibold text-foreground focus:outline-none cursor-pointer"
-              >
-                <option value="Obajana Plant">Obajana</option>
-                <option value="Ibese Plant">Ibese</option>
-                <option value="Gboko Plant">Gboko</option>
-                <option value="Okpella Plant">Okpella</option>
-              </select>
-              <ChevronDown className="h-3 w-3 text-muted-foreground" />
-            </div>
 
             {/* Role / Current View picker */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md border border-border bg-muted/20 text-xs">
