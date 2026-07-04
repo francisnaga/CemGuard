@@ -95,26 +95,6 @@ export default function DashboardLayout({
                     className={cn(
                       'relative px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
                       pathname === link.href
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md">
-        <div className="max-w-[1600px] mx-auto px-6 h-14 flex items-center justify-between gap-4">
-
-          {/* Left: wordmark + nav */}
-          <div className="flex items-center gap-6 min-w-0">
-            <Link
-              href="/dashboard"
-              className="font-black tracking-[0.18em] text-sm text-foreground shrink-0"
-            >
-              CEMGUARD
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-0.5">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    'relative px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
-                    pathname === link.href
                       ? 'bg-primary/10 text-foreground'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
                   )}
