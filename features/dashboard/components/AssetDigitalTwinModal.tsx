@@ -80,7 +80,7 @@ export function AssetDigitalTwinModal() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-muted/5">
+        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-muted/5">
           
           {/* Left Column: Visualizer & Live Gauges (4 cols) */}
           <div className="lg:col-span-4 flex flex-col gap-4">
@@ -147,10 +147,10 @@ export function AssetDigitalTwinModal() {
           </div>
 
           {/* Right Column: Graphs (8 cols) */}
-          <div className="lg:col-span-8 flex flex-col gap-4">
+          <div className="lg:col-span-8 flex flex-col gap-4 h-full min-h-0">
             
             {/* Weibull Failure Probability Curve */}
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm h-[220px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 min-h-[150px] flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Weibull Failure Probability</h3>
@@ -194,7 +194,7 @@ export function AssetDigitalTwinModal() {
             </div>
 
             {/* Sensor Telemetry Trends */}
-            <div className="bg-card border border-border rounded-xl p-4 shadow-sm h-[220px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm flex-1 min-h-[150px] flex flex-col">
               <div className="mb-2">
                 <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Sensor Telemetry Trends</h3>
                 <p className="text-[10px] text-muted-foreground mt-0.5">Vibration RMS and Bearing Temperature over time</p>
