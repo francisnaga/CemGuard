@@ -158,6 +158,19 @@ const initialMachines: MachineState[] = [
   },
 ];
 
+export const initialTickets: import('@/lib/engineering/types').QueueItem[] = [
+  {
+    id: 'old-1',
+    equipment: 'Conveyor B',
+    priority: 'Low',
+    strategy: 'Preventive',
+    failureMode: 'Roller Inspection',
+    confidence: 95,
+    deadline: 'Past',
+    status: 'Ended'
+  }
+];
+
 export const useStore = create<DashboardState>((set, get) => {
   // Generate synthetic warm-up history for the last 30 ticks
   const warmupHistory: HistorySnapshot[] = [];
@@ -205,18 +218,7 @@ export const useStore = create<DashboardState>((set, get) => {
   },
   dtBottleneck: null,
   dtHistory: warmupHistory,
-  dtTickets: [
-    {
-      id: 'old-1',
-      equipment: 'Conveyor B',
-      priority: 'Low',
-      strategy: 'Preventive',
-      failureMode: 'Roller Inspection',
-      confidence: 95,
-      deadline: 'Past',
-      status: 'Ended'
-    }
-  ],
+  dtTickets: initialTickets,
 
   setCurrentView: (view) => set({ currentView: view }),
   loadScenario: (scenario) => {
@@ -254,7 +256,8 @@ export const useStore = create<DashboardState>((set, get) => {
       dtMachines: newMachines,
       dtEvents: newEvents,
       dtCrewStatus: newCrew,
-      dtBottleneck: newBottleneck
+      dtBottleneck: newBottleneck,
+      dtTickets: initialTickets
     });
   },
   resolveTicket: (ticketId) => {
@@ -343,7 +346,8 @@ export const useStore = create<DashboardState>((set, get) => {
       dtEvents: [{ id: '1', time: '08:00', category: 'Information', code: 'OPS-087', message: 'Simulation reset. Baseline calculations initialized.' }],
       dtCrewStatus: { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' },
       dtBottleneck: null,
-      dtHistory: warmupHistory
+      dtHistory: warmupHistory,
+      dtTickets: initialTickets
     });
   },
 
