@@ -272,7 +272,8 @@ export const useStore = create<DashboardState>((set, get) => {
       dtEvents: newEvents,
       dtCrewStatus: newCrew,
       dtBottleneck: newBottleneck,
-      dtTickets: initialTickets
+      dtTickets: initialTickets,
+      dtHistory: JSON.parse(JSON.stringify(warmupHistory)) // Deep copy so we don't mutate the original warmup
     });
   },
   resolveTicket: (ticketId) => {

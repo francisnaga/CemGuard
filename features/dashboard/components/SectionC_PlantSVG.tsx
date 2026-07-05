@@ -47,8 +47,8 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
                 onMouseLeave={() => setHoveredNode(null)}
                 className={cn(
                   "relative w-32 h-32 rounded-md border flex flex-col items-center justify-center transition-colors cursor-pointer",
-                  node.context.currentState === 'Healthy' || node.context.currentState === 'New' ? "bg-card border-success" :
-                  node.context.currentState === 'Minor Wear' || node.context.currentState === 'Moderate Wear' ? "bg-card border-warning" :
+                  node.riskTier === 'Low' ? "bg-card border-success" :
+                  node.riskTier === 'Medium' ? "bg-card border-warning" :
                   node.context.currentState === 'Idle' || node.context.currentState === 'Offline' ? "bg-card border-muted opacity-60" :
                   "bg-card border-destructive"
                 )}
@@ -56,14 +56,14 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
                 {/* Top border indicator for status */}
                 <div className={cn(
                   "absolute top-0 left-0 right-0 h-1.5 rounded-t-md",
-                   node.context.currentState === 'Healthy' || node.context.currentState === 'New' ? "bg-success" :
-                   node.context.currentState === 'Minor Wear' || node.context.currentState === 'Moderate Wear' ? "bg-warning" :
+                   node.riskTier === 'Low' ? "bg-success" :
+                   node.riskTier === 'Medium' ? "bg-warning" :
                    node.context.currentState === 'Idle' || node.context.currentState === 'Offline' ? "bg-muted" :
                    "bg-destructive"
                 )} />
               
               <span className="font-semibold text-foreground text-center px-2 text-sm">{node.name}</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{node.context.currentState}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{node.riskTier} Risk</span>
             </div>
 
             {/* Connecting Line (except last) */}
