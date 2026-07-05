@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
-import { PlantState } from './engineering/types';
+import { PlantState, QueueItem } from './engineering/types';
 import { 
   calculateVibration, 
   calculateBearingTemperature, 
@@ -158,7 +158,7 @@ const initialMachines: MachineState[] = [
   },
 ];
 
-export const initialTickets: import('@/lib/engineering/types').QueueItem[] = [
+export const initialTickets: QueueItem[] = [
   {
     id: 'old-1',
     equipment: 'Conveyor B',
