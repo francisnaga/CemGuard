@@ -237,7 +237,9 @@ export const useStore = create<DashboardState>((set, get) => {
   loadScenario: (scenario) => {
     const newMachines = JSON.parse(JSON.stringify(initialMachines));
     const crusher = newMachines.find((m: any) => m.id === 'crusher');
-    const newEvents = [...get().dtEvents];
+    const newEvents: EventLogItem[] = [
+      { id: '1', time: '08:00', category: 'Information', code: 'OPS-087', message: 'Production day started. Baseline calculations initialized.' }
+    ];
     let newClock = get().dtClock;
     const newCrew = { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' } as any;
     let newBottleneck = null;
@@ -484,13 +486,13 @@ export const useStore = create<DashboardState>((set, get) => {
       machine.failureProbLower = probResult.lowerCI;
       machine.failureProbUpper = probResult.upperCI;
 
-      if (machine.failureProb > 60) machine.risk = 'Critical';
-      else if (machine.failureProb > 40) machine.risk = 'High';
-      else if (machine.failureProb > 20) machine.risk = 'Medium';
-      else machine.risk = 'Low';
-
       // Composite Health
       machine.health = calculateHealthIndex(params, machine.vibrationRms, machine.temperatureC);
+
+      if (machine.failureProb > 60 || machine.health < 60) machine.risk = 'Critical';
+      else if (machine.failureProb > 40 || machine.health < 75) machine.risk = 'High';
+      else if (machine.failureProb > 20 || machine.health < 90) machine.risk = 'Medium';
+      else machine.risk = 'Low';
 
       generateTicket();
 

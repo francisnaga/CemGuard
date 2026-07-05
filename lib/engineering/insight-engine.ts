@@ -37,7 +37,7 @@ export function generateInsight(
   if (pf >= 15 || zone === 'C' || zone === 'B' || health < 75) {
     return {
       situation: `${name} requires monitoring (Zone ${zone}).`,
-      observation: `RMS velocity ${machine.vibrationRms.toFixed(1)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}degC. P(f) = ${pf.toFixed(1)}%.`,
+      observation: `RMS velocity ${machine.vibrationRms.toFixed(2)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}degC. P(f) = ${pf.toFixed(1)}%.`,
       recommendation: `Schedule inspection within 48 hours; pre-stage spares if trend continues.`,
       severity: 'Warning'
     };

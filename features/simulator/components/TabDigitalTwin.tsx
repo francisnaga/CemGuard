@@ -193,7 +193,7 @@ export function TabDigitalTwin() {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">RMS Vib.</span>
                     <span className={cn("font-mono font-semibold", m.vibrationZone === 'D' ? "text-destructive" : m.vibrationZone === 'C' ? "text-orange-500" : "text-foreground")}>
-                      {m.vibrationRms.toFixed(1)} <span className="text-[9px] text-muted-foreground">mm/s (Z-{m.vibrationZone})</span>
+                      {m.vibrationRms.toFixed(2)} <span className="text-[9px] text-muted-foreground">mm/s (Z-{m.vibrationZone})</span>
                     </span>
                   </div>
                   <div className="flex justify-between items-center">

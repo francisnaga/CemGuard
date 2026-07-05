@@ -131,7 +131,11 @@ export default function ReportsPage() {
             <span className="bg-foreground text-background px-2 py-0.5 mr-3 text-sm">03</span> Strategic Maintenance Recommendation
           </h2>
           <div className="border-l-4 border-foreground pl-6 py-2 mb-6">
-            <h3 className="text-lg font-bold text-foreground mb-1">Execute <span className="font-mono">{plannedImpact.downtimeHours}</span>-Hour Planned Shutdown</h3>
+            <h3 className="text-lg font-bold text-foreground mb-1">
+              {strategy === 'Preventive' 
+                ? "Schedule Routine Preventive Maintenance" 
+                : `Execute ${plannedImpact.downtimeHours}-Hour Planned Shutdown`}
+            </h3>
             <p className="text-foreground/80 text-sm leading-relaxed mb-4">
               {insight.recommendation}
             </p>

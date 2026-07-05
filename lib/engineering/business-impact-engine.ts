@@ -25,17 +25,17 @@ export function calculateBusinessImpact(
   switch (strategy) {
     case 'Preventive':
       downtimeHours = 2 + waitPenaltyHours; // Quick scheduled inspection
-      repairCostMultiplier = 0.5;
+      repairCostMultiplier = 1.0;
       co2ImpactTons = 0; // No cold restart needed
       break;
     case 'Condition-Based':
       downtimeHours = 4 + waitPenaltyHours;
-      repairCostMultiplier = 0.8;
+      repairCostMultiplier = 1.2;
       co2ImpactTons = 2;
       break;
     case 'Predictive':
       downtimeHours = 8 + waitPenaltyHours; // Planned targeted repair
-      repairCostMultiplier = 1.2;
+      repairCostMultiplier = 1.5;
       co2ImpactTons = 5;
       break;
     case 'Corrective':
