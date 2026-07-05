@@ -249,19 +249,27 @@ export const useStore = create<DashboardState>((set, get) => {
     } else if (scenario === 'Progressive Wear') {
       newClock = 45;
       const rawmill = newMachines.find((m: any) => m.id === 'rawmill');
+      const kiln = newMachines.find((m: any) => m.id === 'kiln');
       if (rawmill) {
         rawmill.wearAccumulation += 3.5;
         rawmill.operatingHours += 2500;
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Raw Mill showing progressive wear patterns in main drive.' });
       }
+      if (kiln) {
+        kiln.loadFactor = 0.9; // Slightly starved due to raw mill wear
+      }
     } else if (scenario === 'Imminent Failure') {
       newClock = 50;
       const kiln = newMachines.find((m: any) => m.id === 'kiln');
+      const cooler = newMachines.find((m: any) => m.id === 'cooler');
+      const rawmill = newMachines.find((m: any) => m.id === 'rawmill');
       if (kiln) {
         kiln.wearAccumulation += 5.5;
         kiln.operatingHours += 4000;
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Critical', code: 'VIB-101', message: 'Kiln support roller RMS Vibration rapidly increasing.' });
       }
+      if (cooler) cooler.loadFactor = 0.8; // Unstable clinker flow
+      if (rawmill) rawmill.loadFactor = 0.8; // Silo backing up
     } else if (scenario === 'Emergency Shutdown') {
       newClock = 52;
       const cementmill = newMachines.find((m: any) => m.id === 'cementmill');
@@ -273,6 +281,16 @@ export const useStore = create<DashboardState>((set, get) => {
         newBottleneck = { machine: 'Cement Mill', reason: 'Gearbox failure & Emergency Shutdown', loss: 100 };
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Cement Mill gearbox failure predicted.' });
       }
+      // Cascading plant failure:
+      newMachines.forEach((m: any) => {
+        if (m.id === 'packing') {
+          m.utilization = 0; // Starved of cement
+          m.loadFactor = 0;
+        } else if (m.id !== 'cementmill') {
+          m.loadFactor = 0.5; // Plant throttles back to 50% due to dispatch bottleneck
+          m.utilization = 50;
+        }
+      });
     }
 
     set({ 
