@@ -118,7 +118,7 @@ export default function DashboardPage() {
         <SectionE_BusinessImpact impact={impact} />
 
         {/* 5 */}
-        <SectionF_MaintenanceQueue items={[...dtTickets].sort((a, b) => b.priority === 'Critical' ? 1 : -1)} />
+        <SectionF_MaintenanceQueue items={[...dtTickets].sort((a, b) => b.createdAt - a.createdAt)} />
 
         {/* 6 */}
         <SectionG_Trends 

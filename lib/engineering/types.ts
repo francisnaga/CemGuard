@@ -101,4 +101,6 @@ export interface QueueItem {
   confidence: number;
   deadline: string;
   status: 'Pending' | 'Scheduled' | 'In Progress' | 'Ended';
+  createdAt: number;
+  day: number;
 }

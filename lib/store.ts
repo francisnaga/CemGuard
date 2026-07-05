@@ -167,7 +167,9 @@ export const initialTickets: import('@/lib/engineering/types').QueueItem[] = [
     failureMode: 'Roller Inspection',
     confidence: 95,
     deadline: 'Past',
-    status: 'Ended'
+    status: 'Ended',
+    createdAt: 28, // Sometime before start
+    day: 1
   }
 ];
 
@@ -383,7 +385,9 @@ export const useStore = create<DashboardState>((set, get) => {
                   : 'Degraded Health',
               confidence: Math.max(10, Math.round(100 - (machine.failureProbUpper - machine.failureProbLower))),
               deadline: machine.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - machine.failureProb) / 2))} Days`,
-              status: 'Pending'
+              status: 'Pending',
+              createdAt: dtClock,
+              day: get().simulationDay
             };
             // Schedule state update to add ticket
             setTimeout(() => {
@@ -422,7 +426,7 @@ export const useStore = create<DashboardState>((set, get) => {
       }
 
 
-      const params: import('@/lib/engineering/types').PhysicsParams = {
+      const params: import('@/lib/engineering/physics-engine').PhysicsParams = {
         operatingHours: machine.operatingHours,
         rpm: machine.rpm,
         torqueNm: machine.torqueNm,
