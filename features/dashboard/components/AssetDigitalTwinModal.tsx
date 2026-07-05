@@ -80,51 +80,51 @@ export function AssetDigitalTwinModal() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 bg-muted/5">
+        <div className="flex-1 overflow-hidden p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 bg-muted/5">
           
           {/* Left Column: Visualizer & Live Gauges (4 cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
+          <div className="lg:col-span-4 flex flex-col gap-4">
             
             {/* 3D Visualizer Mock */}
-            <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-inner min-h-[300px]">
-              <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                <span className="relative flex h-3 w-3">
+            <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden shadow-inner h-[200px]">
+              <div className="absolute top-2 left-3 flex items-center gap-2 z-10">
+                <span className="relative flex h-2 w-2">
                   <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", isHealthy ? "bg-success" : isWarning ? "bg-warning" : "bg-destructive")}></span>
-                  <span className={cn("relative inline-flex rounded-full h-3 w-3", isHealthy ? "bg-success" : isWarning ? "bg-warning" : "bg-destructive")}></span>
+                  <span className={cn("relative inline-flex rounded-full h-2 w-2", isHealthy ? "bg-success" : isWarning ? "bg-warning" : "bg-destructive")}></span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-black drop-shadow-md">Live Telemetry Linked</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground shadow-black drop-shadow-md">Live Telemetry Linked</span>
               </div>
               
-              <div className="relative w-full aspect-square max-h-[250px] flex items-center justify-center p-4">
+              <div className="relative w-full aspect-square max-h-[140px] flex items-center justify-center p-2">
                 <AnimatedAssetSVG machine={machine} />
               </div>
               
-              <div className="absolute bottom-4 left-0 right-0 text-center z-10">
-                <span className="bg-background/80 backdrop-blur text-foreground px-3 py-1 rounded-full text-xs font-mono border border-border inline-flex items-center gap-2 shadow-lg">
-                  <PlayCircle className="w-3 h-3 animate-spin" style={{ animationDuration: '3s' }} /> 
+              <div className="absolute bottom-2 left-0 right-0 text-center z-10">
+                <span className="bg-background/80 backdrop-blur text-foreground px-2 py-0.5 rounded-full text-[10px] font-mono border border-border inline-flex items-center gap-1 shadow-lg">
+                  <PlayCircle className="w-2.5 h-2.5 animate-spin" style={{ animationDuration: '3s' }} /> 
                   RPM: {Math.round(machine.rpm || 0)}
                 </span>
               </div>
             </div>
 
             {/* Live Gauges */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
-                <Thermometer className={cn("w-8 h-8 mb-2", isCritical ? "text-destructive" : "text-muted-foreground")} />
-                <span className="text-3xl font-bold font-mono">{machine.temperatureC.toFixed(1)}°C</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Bearing Temp</span>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-card border border-border rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                <Thermometer className={cn("w-6 h-6 mb-1", isCritical ? "text-destructive" : "text-muted-foreground")} />
+                <span className="text-2xl font-bold font-mono">{machine.temperatureC.toFixed(1)}°C</span>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">Bearing Temp</span>
               </div>
-              <div className="bg-card border border-border rounded-xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
-                <Activity className={cn("w-8 h-8 mb-2", isCritical ? "text-destructive" : "text-muted-foreground")} />
-                <span className="text-3xl font-bold font-mono">{machine.vibrationRms.toFixed(2)}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">Vibration (mm/s)</span>
+              <div className="bg-card border border-border rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                <Activity className={cn("w-6 h-6 mb-1", isCritical ? "text-destructive" : "text-muted-foreground")} />
+                <span className="text-2xl font-bold font-mono">{machine.vibrationRms.toFixed(2)}</span>
+                <span className="text-[9px] uppercase tracking-widest text-muted-foreground mt-1">Vibration (mm/s)</span>
               </div>
             </div>
             
             {/* Analytics Summary */}
-            <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Physics Engine Analytics</h3>
-              <div className="space-y-3 font-mono text-sm">
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Physics Engine Analytics</h3>
+              <div className="space-y-2 font-mono text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Load Factor</span>
                   <span className="font-bold">{(machine.loadFactor * 100).toFixed(0)}%</span>
@@ -137,9 +137,9 @@ export function AssetDigitalTwinModal() {
                   <span className="text-muted-foreground">Base Lifetime (η)</span>
                   <span className="font-bold">{machine.baseEta} hrs</span>
                 </div>
-                <div className="flex justify-between pt-3 border-t border-border">
+                <div className="flex justify-between pt-2 border-t border-border mt-2">
                   <span className="text-muted-foreground">Current Health Index</span>
-                  <span className={cn("font-bold text-xl", isHealthy ? "text-primary" : isWarning ? "text-warning" : "text-destructive")}>{machine.health.toFixed(1)}%</span>
+                  <span className={cn("font-bold text-lg", isHealthy ? "text-primary" : isWarning ? "text-warning" : "text-destructive")}>{machine.health.toFixed(1)}%</span>
                 </div>
               </div>
             </div>
@@ -147,10 +147,10 @@ export function AssetDigitalTwinModal() {
           </div>
 
           {/* Right Column: Graphs (8 cols) */}
-          <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="lg:col-span-8 flex flex-col gap-4">
             
             {/* Weibull Failure Probability Curve */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm min-h-[280px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm h-[220px] flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Weibull Failure Probability</h3>
@@ -194,10 +194,10 @@ export function AssetDigitalTwinModal() {
             </div>
 
             {/* Sensor Telemetry Trends */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm min-h-[280px] flex flex-col">
-              <div className="mb-4">
-                <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Sensor Telemetry Trends</h3>
-                <p className="text-xs text-muted-foreground mt-1">Vibration RMS and Bearing Temperature over time</p>
+            <div className="bg-card border border-border rounded-xl p-4 shadow-sm h-[220px] flex flex-col">
+              <div className="mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Sensor Telemetry Trends</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Vibration RMS and Bearing Temperature over time</p>
               </div>
               <div className="flex-1 w-full mt-2">
                 <ResponsiveContainer width="100%" height="100%">
