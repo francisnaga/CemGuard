@@ -30,6 +30,7 @@ export interface HistorySnapshot {
   oee: number;
   health: number;
   failureProb: number;
+  machines: { id: string; vibrationRms: number; temperatureC: number; failureProb: number }[];
 }
 
 
@@ -561,7 +562,13 @@ export const useStore = create<DashboardState>((set, get) => {
       throughput: newThroughput,
       oee: newOEE,
       health: currentFleetHealth,
-      failureProb: highestFailureProb
+      failureProb: highestFailureProb,
+      machines: updatedMachines.map(m => ({
+        id: m.id,
+        vibrationRms: m.vibrationRms,
+        temperatureC: m.temperatureC,
+        failureProb: m.failureProb
+      }))
     };
 
     const newHistory = [...dtHistory, newSnapshot];

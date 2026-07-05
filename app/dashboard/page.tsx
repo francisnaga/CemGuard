@@ -41,8 +41,8 @@ export default function DashboardPage() {
   const insight = generateInsight(worstMachine, impact);
   const activeAlerts = dtMachines.filter(m => m.vibrationZone === 'C' || m.vibrationZone === 'D').length;
 
-  const prevHistory = dtHistory.length > 1 ? dtHistory[dtHistory.length - 2] : dtHistory[0] || { oee: 95, health: 95, failureProb: 10 };
-  const currHistory = dtHistory.length > 0 ? dtHistory[dtHistory.length - 1] : { oee: 95, health: 95, failureProb: 10 };
+  const prevHistory = dtHistory.length > 1 ? dtHistory[dtHistory.length - 2] : dtHistory[0] || { oee: 95, health: 95, failureProb: 10, time: 0, throughput: 450, machines: [] };
+  const currHistory = dtHistory.length > 0 ? dtHistory[dtHistory.length - 1] : { oee: 95, health: 95, failureProb: 10, time: 0, throughput: 450, machines: [] };
 
   const kpiData = {
     health: fleetHealth,

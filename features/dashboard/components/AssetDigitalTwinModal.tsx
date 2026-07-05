@@ -22,7 +22,7 @@ export function AssetDigitalTwinModal() {
   const chartData = dtHistory.map(h => {
     const mHistory = h.machines.find(m => m.id === machine.id);
     return {
-      day: h.day,
+      day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
       vibration: mHistory?.vibrationRms || 0,
       temperature: mHistory?.temperatureC || 0,
       failureProb: mHistory?.failureProb || 0,
