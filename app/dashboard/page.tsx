@@ -14,6 +14,7 @@ import { SectionD_Ranking } from '@/features/dashboard/components/SectionD_Ranki
 import { SectionE_BusinessImpact } from '@/features/dashboard/components/SectionE_BusinessImpact';
 import { SectionF_MaintenanceQueue } from '@/features/dashboard/components/SectionF_MaintenanceQueue';
 import { SectionG_Trends } from '@/features/dashboard/components/SectionG_Trends';
+import { AssetDigitalTwinModal } from '@/features/dashboard/components/AssetDigitalTwinModal';
 
 export default function DashboardPage() {
   const { dtMachines, dtClock, dtHistory, dtTickets, presentationMode, simulationDay, currentView } = useStore();
@@ -132,6 +133,8 @@ export default function DashboardPage() {
           presentationMode={presentationMode} 
         />
       </div>
+
+      <AssetDigitalTwinModal />
     </div>
   );
 }

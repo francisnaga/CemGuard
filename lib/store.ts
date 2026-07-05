@@ -107,6 +107,7 @@ interface DashboardState {
   dtBottleneck: { machine: string; reason: string; loss: number } | null;
   dtHistory: HistorySnapshot[];
   dtTickets: import('@/lib/engineering/types').QueueItem[];
+  selectedMachineIdForTwin: string | null;
 
   setCurrentView: (view: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager') => void;
   loadScenario: (scenario: 'Healthy Plant' | 'Progressive Wear' | 'Imminent Failure' | 'Emergency Shutdown') => void;
@@ -123,6 +124,8 @@ interface DashboardState {
   dtReset: () => void;
   dtTick: () => void;
   resolveTicket: (ticketId: string) => void;
+  openDigitalTwin: (machineId: string) => void;
+  closeDigitalTwin: () => void;
 }
 
 const initialMachines: MachineState[] = [
@@ -296,6 +299,8 @@ export const useStore = create<DashboardState>((set, get) => {
       };
     });
   },
+  openDigitalTwin: (machineId) => set({ selectedMachineIdForTwin: machineId }),
+  closeDigitalTwin: () => set({ selectedMachineIdForTwin: null }),
   setAlertOpen: (isOpen) => set({ isAlertOpen: isOpen }),
   setSimulationDay: (day) => set({ simulationDay: day }),
   setPlantState: (state) => set({ plantState: state }),
