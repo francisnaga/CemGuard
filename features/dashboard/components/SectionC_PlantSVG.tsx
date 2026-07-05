@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { SimulationContext } from '@/lib/engineering/types';
+import { useStore } from '@/lib/store';
 
 interface PlantNodeProps {
   id: string;
@@ -16,6 +17,7 @@ interface PlantNodeProps {
 
 export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
   const [hoveredNode, setHoveredNode] = useState<PlantNodeProps | null>(null);
+  const openDigitalTwin = useStore((state) => state.openDigitalTwin);
 
   const getColorClass = (state: string) => {
     switch (state) {
@@ -45,8 +47,9 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
               <div 
                 onMouseEnter={() => setHoveredNode(node)}
                 onMouseLeave={() => setHoveredNode(null)}
+                onClick={() => openDigitalTwin(node.id)}
                 className={cn(
-                  "relative w-32 h-32 rounded-md border flex flex-col items-center justify-center transition-colors cursor-pointer",
+                  "relative w-32 h-32 rounded-md border flex flex-col items-center justify-center transition-colors cursor-pointer hover:ring-2 hover:ring-primary/50",
                   node.riskTier === 'Low' ? "bg-card border-success" :
                   node.riskTier === 'Medium' ? "bg-card border-warning" :
                   node.context.currentState === 'Idle' || node.context.currentState === 'Offline' ? "bg-card border-muted opacity-60" :
