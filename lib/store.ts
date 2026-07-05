@@ -363,6 +363,41 @@ export const useStore = create<DashboardState>((set, get) => {
     const updatedMachines = dtMachines.map(m => {
       const machine = { ...m };
       
+      const generateTicket = () => {
+        if (machine.failureProb > 20) {
+          const existingTicket = get().dtTickets.find(t => t.equipment === machine.name && (t.status === 'Pending' || t.status === 'Scheduled' || t.status === 'In Progress'));
+          if (!existingTicket) {
+            const newTicket: import('@/lib/engineering/types').QueueItem = {
+              id: `tkt-${Math.random().toString(36).substring(2, 8)}`,
+              equipment: machine.name,
+              priority: machine.risk,
+              strategy: machine.failureProb > 70 ? 'Emergency' : machine.failureProb > 50 ? 'Corrective' : 'Predictive',
+              failureMode: machine.vibrationZone === 'D' || machine.vibrationZone === 'C' 
+                ? `High Vibration (Zone ${machine.vibrationZone})` 
+                : machine.temperatureC > 85 
+                  ? `Overheating (${machine.temperatureC.toFixed(1)}degC)`
+                  : 'Degraded Health',
+              confidence: Math.max(10, Math.round(100 - (machine.failureProbUpper - machine.failureProbLower))),
+              deadline: machine.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - machine.failureProb) / 2))} Days`,
+              status: 'Pending'
+            };
+            // Schedule state update to add ticket
+            setTimeout(() => {
+              set((state) => ({ dtTickets: [...state.dtTickets, newTicket] }));
+            }, 0);
+          } else {
+              // update existing ticket priority if it worsens
+              if (machine.risk === 'Critical' && existingTicket.priority !== 'Critical') {
+                  setTimeout(() => {
+                      set((state) => ({
+                          dtTickets: state.dtTickets.map(t => t.id === existingTicket.id ? { ...t, priority: 'Critical', strategy: 'Emergency', deadline: 'Immediate' } : t)
+                      }));
+                  }, 0);
+              }
+          }
+        }
+      };
+
       // If machine is offline due to failure, freeze its state so it doesn't "heal" itself
       if (machine.availability === 0) {
         machine.failureProb = 100;
@@ -371,6 +406,7 @@ export const useStore = create<DashboardState>((set, get) => {
         machine.health = 0;
         machine.risk = 'Critical';
         machine.vibrationZone = 'D';
+        generateTicket();
         return machine;
       }
       
@@ -382,7 +418,7 @@ export const useStore = create<DashboardState>((set, get) => {
       }
 
 
-      const params: PhysicsParams = {
+      const params: import('@/lib/engineering/types').PhysicsParams = {
         operatingHours: machine.operatingHours,
         rpm: machine.rpm,
         torqueNm: machine.torqueNm,
@@ -435,39 +471,7 @@ export const useStore = create<DashboardState>((set, get) => {
       // Composite Health
       machine.health = calculateHealthIndex(params, machine.vibrationRms, machine.temperatureC);
 
-      // Auto-generate Ticket if needed
-      if (machine.failureProb > 20) {
-        const existingTicket = get().dtTickets.find(t => t.equipment === machine.name && (t.status === 'Pending' || t.status === 'Scheduled' || t.status === 'In Progress'));
-        if (!existingTicket) {
-          const newTicket: import('@/lib/engineering/types').QueueItem = {
-            id: `tkt-${Math.random().toString(36).substring(2, 8)}`,
-            equipment: machine.name,
-            priority: machine.risk,
-            strategy: machine.failureProb > 70 ? 'Emergency' : machine.failureProb > 50 ? 'Corrective' : 'Predictive',
-            failureMode: machine.vibrationZone === 'D' || machine.vibrationZone === 'C' 
-              ? `High Vibration (Zone ${machine.vibrationZone})` 
-              : machine.temperatureC > 85 
-                ? `Overheating (${machine.temperatureC.toFixed(1)}degC)`
-                : 'Degraded Health',
-            confidence: Math.max(10, Math.round(100 - (machine.failureProbUpper - machine.failureProbLower))),
-            deadline: machine.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - machine.failureProb) / 2))} Days`,
-            status: 'Pending'
-          };
-          // Schedule state update to add ticket
-          setTimeout(() => {
-            set((state) => ({ dtTickets: [...state.dtTickets, newTicket] }));
-          }, 0);
-        } else {
-            // update existing ticket priority if it worsens
-            if (machine.risk === 'Critical' && existingTicket.priority !== 'Critical') {
-                setTimeout(() => {
-                    set((state) => ({
-                        dtTickets: state.dtTickets.map(t => t.id === existingTicket.id ? { ...t, priority: 'Critical', strategy: 'Emergency', deadline: 'Immediate' } : t)
-                    }));
-                }, 0);
-            }
-        }
-      }
+      generateTicket();
 
       return machine;
     });
