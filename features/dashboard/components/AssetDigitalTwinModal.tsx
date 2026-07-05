@@ -3,7 +3,7 @@
 import { useStore } from "@/lib/store";
 import { X, Activity, Thermometer, AlertTriangle, PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AssetSVG } from "./AssetSVG";
+import Image from "next/image";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area } from "recharts";
 
 export function AssetDigitalTwinModal() {
@@ -87,18 +87,29 @@ export function AssetDigitalTwinModal() {
             
             {/* 3D Visualizer Mock */}
             <div className="bg-card border border-border rounded-xl p-6 flex flex-col items-center justify-center relative overflow-hidden shadow-inner min-h-[300px]">
-              <div className="absolute top-4 left-4 flex items-center gap-2">
+              <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
                 <span className="relative flex h-3 w-3">
                   <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", isHealthy ? "bg-success" : isWarning ? "bg-warning" : "bg-destructive")}></span>
                   <span className={cn("relative inline-flex rounded-full h-3 w-3", isHealthy ? "bg-success" : isWarning ? "bg-warning" : "bg-destructive")}></span>
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Live Telemetry Linked</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-black drop-shadow-md">Live Telemetry Linked</span>
               </div>
               
-              <AssetSVG machine={machine} className="w-48 h-48 mt-4" />
+              <div className="relative w-full aspect-square max-h-[250px] flex items-center justify-center">
+                <Image 
+                  src={
+                    machine.id === 'crusher' ? '/assets/crusher_3d.png' :
+                    machine.id === 'kiln' || machine.id === 'cooler' ? '/assets/kiln_3d.png' :
+                    '/assets/mill_3d.png'
+                  }
+                  alt={machine.name}
+                  fill
+                  className={cn("object-contain transition-all duration-500", isCritical && "animate-pulse")}
+                />
+              </div>
               
-              <div className="absolute bottom-4 left-0 right-0 text-center">
-                <span className="bg-background/80 backdrop-blur text-foreground px-3 py-1 rounded-full text-xs font-mono border border-border inline-flex items-center gap-2">
+              <div className="absolute bottom-4 left-0 right-0 text-center z-10">
+                <span className="bg-background/80 backdrop-blur text-foreground px-3 py-1 rounded-full text-xs font-mono border border-border inline-flex items-center gap-2 shadow-lg">
                   <PlayCircle className="w-3 h-3 animate-spin" style={{ animationDuration: '3s' }} /> 
                   RPM: {Math.round(machine.rpm || 0)}
                 </span>
@@ -148,7 +159,7 @@ export function AssetDigitalTwinModal() {
           <div className="lg:col-span-8 flex flex-col gap-6">
             
             {/* Weibull Failure Probability Curve */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 min-h-[250px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 min-h-[200px] flex flex-col">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Weibull Failure Probability</h3>
@@ -192,7 +203,7 @@ export function AssetDigitalTwinModal() {
             </div>
 
             {/* Sensor Telemetry Trends */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 min-h-[250px] flex flex-col">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex-1 min-h-[200px] flex flex-col">
               <div className="mb-4">
                 <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Sensor Telemetry Trends</h3>
                 <p className="text-xs text-muted-foreground mt-1">Vibration RMS and Bearing Temperature over time</p>
