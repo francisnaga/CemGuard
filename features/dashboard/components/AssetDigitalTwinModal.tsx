@@ -137,7 +137,7 @@ export function AssetDigitalTwinModal() {
                 </div>
                 <div className="flex justify-between pt-3 border-t border-border">
                   <span className="text-muted-foreground">Current Health Index</span>
-                  <span className={cn("font-bold text-xl", colorClass)}>{machine.health.toFixed(1)}%</span>
+                  <span className={cn("font-bold text-xl", isHealthy ? "text-primary" : isWarning ? "text-warning" : "text-destructive")}>{machine.health.toFixed(1)}%</span>
                 </div>
               </div>
             </div>

@@ -189,7 +189,13 @@ export const useStore = create<DashboardState>((set, get) => {
       throughput: 440 + sineVariation * 3, // ~434 to 446
       oee: 92 + sineVariation, // ~90 to 94
       health: 93 - (30 - i) * 0.05,
-      failureProb: 8 + (30 - i) * 0.1
+      failureProb: 8 + (30 - i) * 0.1,
+      machines: initialMachines.map(m => ({
+        id: m.id,
+        vibrationRms: m.vibrationRms + sineVariation * 0.2,
+        temperatureC: m.temperatureC + sineVariation,
+        failureProb: m.failureProb + sineVariation
+      }))
     });
   }
 
@@ -201,6 +207,7 @@ export const useStore = create<DashboardState>((set, get) => {
   presentationMode: false,
   selectedPlant: 'Obajana Plant',
   isReplayingIncident: false,
+  selectedMachineIdForTwin: null,
 
   dtClock: 32, // Start at 08:00 (32 * 15m)
   dtIsRunning: false,
