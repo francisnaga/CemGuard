@@ -7,7 +7,8 @@ import { CheckCircle2 } from "lucide-react";
 
 export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
   const resolveTicket = useStore(state => state.resolveTicket);
-  const getPriorityColor = (p: string) => {
+  const getPriorityColor = (p: string, status: string) => {
+    if (status === 'Ended') return 'text-muted-foreground bg-muted border-border';
     switch(p) {
       case 'Critical': return 'text-destructive bg-destructive/10 border-destructive/20';
       case 'High': return 'text-warning bg-warning/10 border-warning/20';
@@ -41,9 +42,9 @@ export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
           </thead>
           <tbody className="divide-y divide-border text-xs">
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-muted/10 transition-colors">
+              <tr key={item.id} className={cn("transition-colors", item.status === 'Ended' ? "opacity-60 bg-muted/5" : "hover:bg-muted/10")}>
                 <td className="px-4 py-3">
-                  <span className={cn("px-1.5 py-0.5 rounded-sm border font-semibold", getPriorityColor(item.priority))}>
+                  <span className={cn("px-1.5 py-0.5 rounded-sm border font-semibold", getPriorityColor(item.priority, item.status))}>
                     {item.priority}
                   </span>
                 </td>

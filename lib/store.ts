@@ -519,6 +519,9 @@ export const useStore = create<DashboardState>((set, get) => {
     if (crusher.utilization === 0) {
       rawmill.utilization = Math.max(0, rawmill.utilization - 20); 
       kiln.utilization = Math.max(50, kiln.utilization - 10); 
+    } else {
+      if (rawmill.utilization < 90) rawmill.utilization = Math.min(90, rawmill.utilization + 10);
+      if (kiln.utilization < 90) kiln.utilization = Math.min(90, kiln.utilization + 5);
     }
 
     utilizations.rawmill = rawmill.utilization;
