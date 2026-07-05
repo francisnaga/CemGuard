@@ -248,22 +248,31 @@ export const useStore = create<DashboardState>((set, get) => {
       newClock = 32;
     } else if (scenario === 'Progressive Wear') {
       newClock = 45;
-      crusher.wearAccumulation += 3.5;
-      crusher.operatingHours += 2500;
-      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Crusher showing progressive wear patterns.' });
+      const rawmill = newMachines.find((m: any) => m.id === 'rawmill');
+      if (rawmill) {
+        rawmill.wearAccumulation += 3.5;
+        rawmill.operatingHours += 2500;
+        newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Raw Mill showing progressive wear patterns in main drive.' });
+      }
     } else if (scenario === 'Imminent Failure') {
       newClock = 50;
-      crusher.wearAccumulation += 5.5;
-      crusher.operatingHours += 4000;
-      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Critical', code: 'VIB-101', message: 'Crusher RMS Vibration rapidly increasing.' });
+      const kiln = newMachines.find((m: any) => m.id === 'kiln');
+      if (kiln) {
+        kiln.wearAccumulation += 5.5;
+        kiln.operatingHours += 4000;
+        newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Critical', code: 'VIB-101', message: 'Kiln support roller RMS Vibration rapidly increasing.' });
+      }
     } else if (scenario === 'Emergency Shutdown') {
       newClock = 52;
-      crusher.wearAccumulation += 8.0;
-      crusher.availability = 0;
-      crusher.utilization = 0;
-      crusher.loadFactor = 0;
-      newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
-      newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Bearing failure predicted.' });
+      const cementmill = newMachines.find((m: any) => m.id === 'cementmill');
+      if (cementmill) {
+        cementmill.wearAccumulation += 8.0;
+        cementmill.availability = 0;
+        cementmill.utilization = 0;
+        cementmill.loadFactor = 0;
+        newBottleneck = { machine: 'Cement Mill', reason: 'Gearbox failure & Emergency Shutdown', loss: 100 };
+        newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Cement Mill gearbox failure predicted.' });
+      }
     }
 
     set({ 
