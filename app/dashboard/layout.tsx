@@ -121,12 +121,12 @@ export default function DashboardLayout({
               <select
                 value={currentView}
                 onChange={(e) => useStore.getState().setCurrentView(e.target.value as any)}
-                className="bg-transparent font-semibold text-primary focus:outline-none cursor-pointer max-w-[140px] truncate"
+                className="bg-transparent font-semibold text-primary focus:outline-none cursor-pointer max-w-[140px] truncate appearance-none"
               >
-                <option value="Executive">Executive</option>
-                <option value="Plant Manager">Plant Manager</option>
-                <option value="Reliability Engineer">Reliability Engineer</option>
-                <option value="Maintenance Manager">Maintenance Manager</option>
+                <option className="bg-background text-foreground" value="Executive">Executive</option>
+                <option className="bg-background text-foreground" value="Plant Manager">Plant Manager</option>
+                <option className="bg-background text-foreground" value="Reliability Engineer">Reliability Engineer</option>
+                <option className="bg-background text-foreground" value="Maintenance Manager">Maintenance Manager</option>
               </select>
               <ChevronDown className="h-3 w-3 text-muted-foreground" />
             </div>
@@ -141,14 +141,14 @@ export default function DashboardLayout({
                     if (!useStore.getState().dtIsRunning) useStore.getState().dtStart();
                   }
                 }}
-                className="bg-transparent font-bold text-primary focus:outline-none cursor-pointer max-w-[110px] truncate"
+                className="bg-transparent font-bold text-primary focus:outline-none cursor-pointer max-w-[110px] truncate appearance-none"
                 defaultValue=""
               >
-                <option value="" disabled>Scenario...</option>
-                <option value="Healthy Plant">Healthy Plant</option>
-                <option value="Progressive Wear">Progressive Wear</option>
-                <option value="Imminent Failure">Imminent Failure</option>
-                <option value="Emergency Shutdown">Emergency Shutdown</option>
+                <option className="bg-background text-foreground" value="" disabled>Scenario...</option>
+                <option className="bg-background text-foreground" value="Healthy Plant">Healthy Plant</option>
+                <option className="bg-background text-foreground" value="Progressive Wear">Progressive Wear</option>
+                <option className="bg-background text-foreground" value="Imminent Failure">Imminent Failure</option>
+                <option className="bg-background text-foreground" value="Emergency Shutdown">Emergency Shutdown</option>
               </select>
               <ChevronDown className="h-3 w-3 text-primary" />
             </div>

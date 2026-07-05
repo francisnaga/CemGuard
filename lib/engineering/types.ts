@@ -6,7 +6,9 @@ export type DegradationState =
   | 'Moderate Wear'
   | 'Severe Wear'
   | 'Critical'
-  | 'Failure';
+  | 'Failure'
+  | 'Offline'
+  | 'Idle';
 
 // Global Plant States
 export type PlantState = 
@@ -88,4 +90,15 @@ export interface BusinessImpact {
   co2ImpactTons: number; // Emissions from restart/inefficiency
   repairCost: number;
   totalRiskExposure: number;
+}
+
+export interface QueueItem {
+  id: string;
+  equipment: string;
+  priority: 'Critical' | 'High' | 'Medium' | 'Low';
+  strategy: MaintenanceStrategy;
+  failureMode: string;
+  confidence: number;
+  deadline: string;
+  status: 'Pending' | 'Scheduled' | 'In Progress' | 'Ended';
 }

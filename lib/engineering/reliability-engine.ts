@@ -6,9 +6,11 @@ const HEALTH_MAP: Record<DegradationState, number> = {
   'Healthy': 95,
   'Minor Wear': 80,
   'Moderate Wear': 60,
-  'Severe Wear': 40,
-  'Critical': 20,
-  'Failure': 0
+  'Severe Wear': 30,
+  'Critical': 10,
+  'Failure': 0,
+  'Offline': 0,
+  'Idle': 100,
 };
 
 export function calculateHealthIndex(state: DegradationState): number {

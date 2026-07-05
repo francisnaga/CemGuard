@@ -42,23 +42,35 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
           {nodes.map((node, index) => (
             <div key={node.id} className="relative flex items-center group shrink-0">
               {/* The Machine Block */}
-            <div 
-              onMouseEnter={() => setHoveredNode(node)}
-              onMouseLeave={() => setHoveredNode(null)}
-              className={cn(
-                "w-32 h-32 rounded-lg border-2 flex flex-col items-center justify-center transition-all duration-300 cursor-pointer hover:scale-110",
-                getColorClass(node.context.currentState)
-              )}
-            >
-              <span className="font-bold text-white text-center px-2 drop-shadow-md">{node.name}</span>
-              <span className="text-xs text-white/80 mt-1">{node.context.currentState}</span>
+              <div 
+                onMouseEnter={() => setHoveredNode(node)}
+                onMouseLeave={() => setHoveredNode(null)}
+                className={cn(
+                  "relative w-32 h-32 rounded-md border flex flex-col items-center justify-center transition-colors cursor-pointer",
+                  node.context.currentState === 'Healthy' || node.context.currentState === 'New' ? "bg-card border-success" :
+                  node.context.currentState === 'Minor Wear' || node.context.currentState === 'Moderate Wear' ? "bg-card border-warning" :
+                  node.context.currentState === 'Idle' || node.context.currentState === 'Offline' ? "bg-card border-muted opacity-60" :
+                  "bg-card border-destructive"
+                )}
+              >
+                {/* Top border indicator for status */}
+                <div className={cn(
+                  "absolute top-0 left-0 right-0 h-1.5 rounded-t-md",
+                   node.context.currentState === 'Healthy' || node.context.currentState === 'New' ? "bg-success" :
+                   node.context.currentState === 'Minor Wear' || node.context.currentState === 'Moderate Wear' ? "bg-warning" :
+                   node.context.currentState === 'Idle' || node.context.currentState === 'Offline' ? "bg-muted" :
+                   "bg-destructive"
+                )} />
+              
+              <span className="font-semibold text-foreground text-center px-2 text-sm">{node.name}</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">{node.context.currentState}</span>
             </div>
 
             {/* Connecting Line (except last) */}
             {index < nodes.length - 1 && (
-              <div className="w-16 h-1 bg-border relative">
-                {/* Flow animation */}
-                <div className="absolute top-0 left-0 h-full bg-primary/50 w-full animate-[pulse_2s_ease-in-out_infinite]" />
+              <div className="w-16 h-px bg-border relative">
+                {/* Flow indicator (static, no pulse) */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-0 h-0.5 bg-primary/30 w-full" />
               </div>
             )}
           </div>
@@ -68,22 +80,22 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
 
       {/* Hover Tooltip */}
       {hoveredNode && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border rounded-lg p-4 shadow-xl flex space-x-6 z-50 animate-in fade-in zoom-in duration-200">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border rounded-md p-4 shadow-md flex space-x-6 z-50">
           <div>
-            <p className="text-xs text-muted-foreground">Equipment</p>
-            <p className="font-bold text-foreground">{hoveredNode.name}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Equipment</p>
+            <p className="font-semibold text-foreground text-sm">{hoveredNode.name}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Health</p>
-            <p className="font-bold text-foreground">{hoveredNode.health}%</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Health</p>
+            <p className="font-mono text-foreground text-sm">{hoveredNode.health.toFixed(1)}%</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">{hoveredNode.isProcessTemp ? 'Process Temp' : 'Bearing Temp'}</p>
-            <p className="font-bold text-foreground">{hoveredNode.temperature.toFixed(hoveredNode.isProcessTemp ? 0 : 1)}degC</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{hoveredNode.isProcessTemp ? 'Process Temp' : 'Bearing Temp'}</p>
+            <p className="font-mono text-foreground text-sm">{hoveredNode.temperature.toFixed(hoveredNode.isProcessTemp ? 0 : 1)}°C</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Risk Level</p>
-            <p className={cn("font-bold", (hoveredNode.riskTier === 'High' || hoveredNode.riskTier === 'Critical') ? "text-destructive" : hoveredNode.riskTier === 'Medium' ? "text-yellow-500" : "text-success")}>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk Level</p>
+            <p className={cn("text-sm font-semibold", (hoveredNode.riskTier === 'High' || hoveredNode.riskTier === 'Critical') ? "text-destructive" : hoveredNode.riskTier === 'Medium' ? "text-warning" : "text-success")}>
               {hoveredNode.riskTier}
             </p>
           </div>

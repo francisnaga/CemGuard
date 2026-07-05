@@ -106,6 +106,7 @@ interface DashboardState {
   };
   dtBottleneck: { machine: string; reason: string; loss: number } | null;
   dtHistory: HistorySnapshot[];
+  dtTickets: import('@/lib/engineering/types').QueueItem[];
 
   setCurrentView: (view: 'Executive' | 'Plant Manager' | 'Reliability Engineer' | 'Maintenance Manager') => void;
   loadScenario: (scenario: 'Healthy Plant' | 'Progressive Wear' | 'Imminent Failure' | 'Emergency Shutdown') => void;
@@ -121,6 +122,7 @@ interface DashboardState {
   dtPause: () => void;
   dtReset: () => void;
   dtTick: () => void;
+  resolveTicket: (ticketId: string) => void;
 }
 
 const initialMachines: MachineState[] = [
@@ -203,6 +205,18 @@ export const useStore = create<DashboardState>((set, get) => {
   },
   dtBottleneck: null,
   dtHistory: warmupHistory,
+  dtTickets: [
+    {
+      id: 'old-1',
+      equipment: 'Conveyor B',
+      priority: 'Low',
+      strategy: 'Preventive',
+      failureMode: 'Roller Inspection',
+      confidence: 95,
+      deadline: 'Past',
+      status: 'Ended'
+    }
+  ],
 
   setCurrentView: (view) => set({ currentView: view }),
   loadScenario: (scenario) => {
@@ -241,6 +255,40 @@ export const useStore = create<DashboardState>((set, get) => {
       dtEvents: newEvents,
       dtCrewStatus: newCrew,
       dtBottleneck: newBottleneck
+    });
+  },
+  resolveTicket: (ticketId) => {
+    set((state) => {
+      const newTickets = state.dtTickets.map(t => 
+        t.id === ticketId ? { ...t, status: 'Ended' as const } : t
+      );
+      
+      const ticket = state.dtTickets.find(t => t.id === ticketId);
+      if (!ticket) return { dtTickets: newTickets };
+
+      const newMachines = state.dtMachines.map(m => {
+        if (m.name === ticket.equipment) {
+          // Reset machine to healthy baseline
+          return {
+            ...m,
+            health: 95,
+            vibrationRms: 2.0,
+            vibrationZone: 'A',
+            temperatureC: 45.0,
+            failureProb: 5.0,
+            wearAccumulation: 0.1,
+            availability: 98,
+            utilization: 90,
+            loadFactor: 0.85
+          };
+        }
+        return m;
+      });
+
+      return {
+        dtTickets: newTickets,
+        dtMachines: newMachines
+      };
     });
   },
   setAlertOpen: (isOpen) => set({ isAlertOpen: isOpen }),
@@ -386,6 +434,40 @@ export const useStore = create<DashboardState>((set, get) => {
 
       // Composite Health
       machine.health = calculateHealthIndex(params, machine.vibrationRms, machine.temperatureC);
+
+      // Auto-generate Ticket if needed
+      if (machine.failureProb > 20) {
+        const existingTicket = get().dtTickets.find(t => t.equipment === machine.name && (t.status === 'Pending' || t.status === 'Scheduled' || t.status === 'In Progress'));
+        if (!existingTicket) {
+          const newTicket: import('@/lib/engineering/types').QueueItem = {
+            id: `tkt-${Math.random().toString(36).substring(2, 8)}`,
+            equipment: machine.name,
+            priority: machine.risk,
+            strategy: machine.failureProb > 70 ? 'Emergency' : machine.failureProb > 50 ? 'Corrective' : 'Predictive',
+            failureMode: machine.vibrationZone === 'D' || machine.vibrationZone === 'C' 
+              ? `High Vibration (Zone ${machine.vibrationZone})` 
+              : machine.temperatureC > 85 
+                ? `Overheating (${machine.temperatureC.toFixed(1)}degC)`
+                : 'Degraded Health',
+            confidence: Math.max(10, Math.round(100 - (machine.failureProbUpper - machine.failureProbLower))),
+            deadline: machine.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - machine.failureProb) / 2))} Days`,
+            status: 'Pending'
+          };
+          // Schedule state update to add ticket
+          setTimeout(() => {
+            set((state) => ({ dtTickets: [...state.dtTickets, newTicket] }));
+          }, 0);
+        } else {
+            // update existing ticket priority if it worsens
+            if (machine.risk === 'Critical' && existingTicket.priority !== 'Critical') {
+                setTimeout(() => {
+                    set((state) => ({
+                        dtTickets: state.dtTickets.map(t => t.id === existingTicket.id ? { ...t, priority: 'Critical', strategy: 'Emergency', deadline: 'Immediate' } : t)
+                    }));
+                }, 0);
+            }
+        }
+      }
 
       return machine;
     });

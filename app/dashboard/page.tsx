@@ -9,13 +9,14 @@ import { generateInsight } from '@/lib/engineering/insight-engine';
 import { SectionA_KPIs } from '@/features/dashboard/components/SectionA_KPIs';
 import { SectionB_Insight } from '@/features/dashboard/components/SectionB_Insight';
 import { SectionC_PlantSVG } from '@/features/dashboard/components/SectionC_PlantSVG';
+import { formatNaira } from '@/lib/utils';
 import { SectionD_Ranking } from '@/features/dashboard/components/SectionD_Ranking';
 import { SectionE_BusinessImpact } from '@/features/dashboard/components/SectionE_BusinessImpact';
 import { SectionF_MaintenanceQueue } from '@/features/dashboard/components/SectionF_MaintenanceQueue';
 import { SectionG_Trends } from '@/features/dashboard/components/SectionG_Trends';
 
 export default function DashboardPage() {
-  const { dtMachines, dtClock, dtHistory, presentationMode, simulationDay, currentView } = useStore();
+  const { dtMachines, dtClock, dtHistory, dtTickets, presentationMode, simulationDay, currentView } = useStore();
   const isLive = dtClock > 32;
 
   // Single Source of Truth: Read from dtMachines and dtHistory
@@ -73,7 +74,7 @@ export default function DashboardPage() {
           primaryInsight={insight.situation}
           observation={insight.observation}
           recommendedAction={insight.recommendation}
-          expectedImpact={`Avoids NGN ${(impact.totalRiskExposure / 1000000).toFixed(1)}M in risk exposure and ${impact.downtimeHours} hours of downtime.`}
+          expectedImpact={`Avoids ${formatNaira(impact.totalRiskExposure)} in risk exposure and ${impact.downtimeHours} hours of downtime.`}
           presentationMode={presentationMode}
           severity={insight.severity}
         />
@@ -84,7 +85,7 @@ export default function DashboardPage() {
             <SectionC_PlantSVG nodes={dtMachines.map(m => ({
               id: m.id,
               name: m.name,
-              context: { currentState: m.risk === 'Low' ? 'Healthy' : m.risk === 'Medium' ? 'Minor Wear' : m.risk === 'High' ? 'Severe Wear' : 'Critical', plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
+              context: { currentState: m.risk === 'Critical' ? 'Critical' : m.availability === 0 || m.utilization === 0 ? 'Offline' : m.risk === 'Medium' ? 'Minor Wear' : m.risk === 'High' ? 'Severe Wear' : 'Healthy', plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
               health: m.health,
               temperature: m.temperatureC,
               isProcessTemp: m.id === 'kiln',
@@ -117,24 +118,7 @@ export default function DashboardPage() {
         <SectionE_BusinessImpact impact={impact} />
 
         {/* 5 */}
-        <SectionF_MaintenanceQueue items={dtMachines
-          .filter(m => m.failureProb > 20)
-          .sort((a, b) => b.failureProb - a.failureProb)
-          .map(m => ({
-            id: m.id,
-            equipment: m.name,
-            priority: m.risk,
-            strategy: m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : 'Predictive',
-            failureMode: m.vibrationZone === 'D' || m.vibrationZone === 'C' 
-              ? `High Vibration (Zone ${m.vibrationZone})` 
-              : m.temperatureC > 85 
-                ? `Overheating (${m.temperatureC.toFixed(1)}degC)`
-                : 'Degraded Health',
-            confidence: Math.max(10, Math.round(100 - (m.failureProbUpper - m.failureProbLower))),
-            deadline: m.failureProb > 80 ? `Immediate` : `Within ${Math.max(1, Math.round((80 - m.failureProb) / 2))} Days`,
-            status: 'Pending'
-          }))
-        } />
+        <SectionF_MaintenanceQueue items={[...dtTickets].sort((a, b) => b.priority === 'Critical' ? 1 : -1)} />
 
         {/* 6 */}
         <SectionG_Trends 

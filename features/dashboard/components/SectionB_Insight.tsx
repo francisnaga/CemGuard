@@ -19,21 +19,19 @@ export function SectionB_Insight({
   severity
 }: InsightProps) {
 
-  const borderColor = severity === 'Critical' ? 'border-destructive' : severity === 'Warning' ? 'border-yellow-500/50' : 'border-success';
-  const bgColor = severity === 'Critical' ? 'bg-destructive/5' : severity === 'Warning' ? 'bg-yellow-500/5' : 'bg-success/5';
+  const borderColor = severity === 'Critical' ? 'border-l-destructive' : severity === 'Warning' ? 'border-l-warning' : 'border-l-success';
+  const Icon = severity === 'Critical' ? AlertTriangle : severity === 'Warning' ? AlertTriangle : Info;
+  const iconColor = severity === 'Critical' ? 'text-destructive' : severity === 'Warning' ? 'text-warning' : 'text-success';
   
   return (
     <div className={cn(
-      "w-full rounded-2xl border bg-card p-8 shadow-sm transition-all duration-500",
+      "w-full rounded-md border border-border border-l-4 bg-card p-6 shadow-sm",
       borderColor,
-      bgColor,
-      presentationMode ? "scale-[1.02] shadow-[0_0_30px_rgba(255,255,255,0.05)] my-8" : "my-6"
+      presentationMode ? "my-8" : "my-6"
     )}>
       <div className="flex items-center space-x-3 mb-6">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <AlertTriangle className={cn("h-6 w-6", severity === 'Critical' ? 'text-destructive' : 'text-primary')} />
-        </div>
-        <h2 className="text-xl font-bold tracking-tight text-foreground">Executive Insight</h2>
+        <Icon className={cn("h-5 w-5", iconColor)} />
+        <h2 className="text-lg font-bold tracking-tight text-foreground uppercase">Executive Insight</h2>
       </div>
 
       <div className={cn(
@@ -43,12 +41,12 @@ export function SectionB_Insight({
         
         {/* Primary Insight */}
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center">
-            <Info className="h-4 w-4 mr-2" /> Situation
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Situation
           </h3>
           <p className={cn(
             "font-medium text-foreground",
-            presentationMode ? "text-2xl" : "text-lg"
+            presentationMode ? "text-xl" : "text-base"
           )}>
             {primaryInsight}
           </p>
@@ -56,30 +54,30 @@ export function SectionB_Insight({
 
         {/* Observation */}
         <div className="space-y-2 border-l border-border pl-6">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Observation
           </h3>
-          <p className="text-foreground/80">
+          <p className="text-foreground/90 text-sm">
             {observation}
           </p>
         </div>
 
         {/* Recommended Action */}
         <div className="space-y-2 border-l border-border pl-6">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center">
-            <CheckCircle2 className="h-4 w-4 mr-2" /> Recommendation
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Recommendation
           </h3>
-          <p className="text-foreground/80 font-medium text-primary">
+          <p className="text-foreground/90 font-medium text-sm text-primary">
             {recommendedAction}
           </p>
         </div>
 
         {/* Business Impact */}
         <div className="space-y-2 border-l border-border pl-6">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center">
-            <DollarSign className="h-4 w-4 mr-2" /> Expected Impact
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Expected Impact
           </h3>
-          <p className="text-foreground/80 font-medium">
+          <p className="text-foreground/90 font-medium text-sm">
             {expectedImpact}
           </p>
         </div>

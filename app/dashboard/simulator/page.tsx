@@ -15,12 +15,12 @@ export default function FlagshipSimulatorPage() {
     <div className="flex flex-col space-y-6">
       
       {/* Tab Navigation */}
-      <div className="bg-card border border-border rounded-xl p-2 flex space-x-2 overflow-x-auto">
+      <div className="bg-card border border-border rounded-md p-1.5 flex space-x-1 overflow-x-auto">
         <button 
           onClick={() => setActiveTab('digital-twin')}
           className={cn(
-            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
-            activeTab === 'digital-twin' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
+            "flex items-center px-6 py-2.5 rounded-sm text-sm font-semibold transition-colors",
+            activeTab === 'digital-twin' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
           )}
         >
           <Database className="h-4 w-4 mr-2" /> Live Plant View
@@ -28,8 +28,8 @@ export default function FlagshipSimulatorPage() {
         <button 
           onClick={() => setActiveTab('strategy')}
           className={cn(
-            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
-            activeTab === 'strategy' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
+            "flex items-center px-6 py-2.5 rounded-sm text-sm font-semibold transition-colors",
+            activeTab === 'strategy' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
           )}
         >
           <Activity className="h-4 w-4 mr-2" /> Timeline & Degradation
@@ -37,8 +37,8 @@ export default function FlagshipSimulatorPage() {
         <button 
           onClick={() => setActiveTab('scenarios')}
           className={cn(
-            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
-            activeTab === 'scenarios' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
+            "flex items-center px-6 py-2.5 rounded-sm text-sm font-semibold transition-colors",
+            activeTab === 'scenarios' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
           )}
         >
           <BarChart3 className="h-4 w-4 mr-2" /> Decision Comparison
@@ -46,8 +46,8 @@ export default function FlagshipSimulatorPage() {
         <button 
           onClick={() => setActiveTab('brief')}
           className={cn(
-            "flex items-center px-6 py-3 rounded-lg text-sm font-semibold transition-colors",
-            activeTab === 'brief' ? "bg-primary/20 text-primary" : "text-muted-foreground hover:bg-muted"
+            "flex items-center px-6 py-2.5 rounded-sm text-sm font-semibold transition-colors",
+            activeTab === 'brief' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
           )}
         >
           <FileText className="h-4 w-4 mr-2" /> Printable Brief

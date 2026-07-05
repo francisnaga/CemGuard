@@ -1,74 +1,76 @@
 import { MaintenanceStrategy } from "@/lib/engineering/types";
 import { cn } from "@/lib/utils";
 
-interface QueueItem {
-  id: string;
-  equipment: string;
-  priority: 'Critical' | 'High' | 'Medium' | 'Low';
-  strategy: MaintenanceStrategy;
-  failureMode: string;
-  confidence: number;
-  deadline: string;
-  status: 'Pending' | 'Scheduled' | 'In Progress';
-}
+import { QueueItem } from "@/lib/engineering/types";
+import { useStore } from "@/lib/store";
+import { CheckCircle2 } from "lucide-react";
 
 export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
+  const resolveTicket = useStore(state => state.resolveTicket);
   const getPriorityColor = (p: string) => {
     switch(p) {
-      case 'Critical': return 'text-destructive bg-destructive/10';
-      case 'High': return 'text-orange-500 bg-orange-500/10';
-      case 'Medium': return 'text-yellow-500 bg-yellow-500/10';
-      case 'Low': return 'text-success bg-success/10';
+      case 'Critical': return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'High': return 'text-warning bg-warning/10 border-warning/20';
+      case 'Medium': return 'text-warning bg-warning/10 border-warning/20';
+      case 'Low': return 'text-success bg-success/10 border-success/20';
       default: return '';
     }
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-6 overflow-hidden">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4">
-        Prescriptive Maintenance Queue
-      </h3>
+    <div className="bg-card border border-border rounded-md overflow-hidden">
+      <div className="p-4 border-b border-border">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Prescriptive Maintenance Queue
+        </h3>
+      </div>
       
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
-          <thead className="text-xs text-muted-foreground uppercase bg-muted/50">
+          <thead className="text-[10px] text-muted-foreground uppercase tracking-wider bg-muted/30">
             <tr>
-              <th className="px-4 py-3 rounded-tl-md">Priority</th>
-              <th className="px-4 py-3">Equipment</th>
-              <th className="px-4 py-3">Predicted Mode</th>
-              <th className="px-4 py-3">Strategy</th>
-              <th className="px-4 py-3">Confidence</th>
-              <th className="px-4 py-3">Deadline</th>
-              <th className="px-4 py-3 rounded-tr-md">Status</th>
+              <th className="px-4 py-2 font-semibold">Priority</th>
+              <th className="px-4 py-2 font-semibold">Equipment</th>
+              <th className="px-4 py-2 font-semibold">Predicted Mode</th>
+              <th className="px-4 py-2 font-semibold">Strategy</th>
+              <th className="px-4 py-2 font-semibold text-right">Confidence</th>
+              <th className="px-4 py-2 font-semibold text-right">Deadline</th>
+              <th className="px-4 py-2 font-semibold">Status</th>
+              <th className="px-4 py-2 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-border">
+          <tbody className="divide-y divide-border text-xs">
             {items.map((item) => (
-              <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+              <tr key={item.id} className="hover:bg-muted/10 transition-colors">
                 <td className="px-4 py-3">
-                  <span className={cn("px-2 py-1 rounded-full text-xs font-semibold", getPriorityColor(item.priority))}>
+                  <span className={cn("px-1.5 py-0.5 rounded-sm border font-semibold", getPriorityColor(item.priority))}>
                     {item.priority}
                   </span>
                 </td>
-                <td className="px-4 py-3 font-medium text-foreground">{item.equipment}</td>
+                <td className="px-4 py-3 font-semibold text-foreground">{item.equipment}</td>
                 <td className="px-4 py-3 text-muted-foreground">{item.failureMode}</td>
                 <td className="px-4 py-3 text-foreground">{item.strategy}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-foreground">{item.confidence}%</span>
-                    <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary" 
-                        style={{ width: `${item.confidence}%` }}
-                      />
-                    </div>
-                  </div>
+                <td className="px-4 py-3 text-right font-mono text-foreground">
+                  {item.confidence}%
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">{item.deadline}</td>
+                <td className="px-4 py-3 text-right font-mono text-muted-foreground">{item.deadline}</td>
                 <td className="px-4 py-3">
-                  <span className="px-2 py-1 bg-secondary text-secondary-foreground rounded text-xs">
+                  <span className={cn("px-1.5 py-0.5 rounded-sm border text-[10px] uppercase tracking-wider font-semibold", 
+                    item.status === 'Ended' ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground border-border"
+                  )}>
                     {item.status}
                   </span>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  {item.status !== 'Ended' && (
+                    <button 
+                      onClick={() => resolveTicket(item.id)}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary rounded-md text-xs font-semibold transition-colors"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Resolve
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

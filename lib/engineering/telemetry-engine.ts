@@ -12,10 +12,12 @@ const DEGRADATION_IMPACT: Record<DegradationState, { valueMultiplier: number, no
   'New': { valueMultiplier: 1.0, noiseFactor: 0.01 },
   'Healthy': { valueMultiplier: 1.05, noiseFactor: 0.02 },
   'Minor Wear': { valueMultiplier: 1.15, noiseFactor: 0.05 },
-  'Moderate Wear': { valueMultiplier: 1.35, noiseFactor: 0.1 },
-  'Severe Wear': { valueMultiplier: 1.6, noiseFactor: 0.15 },
-  'Critical': { valueMultiplier: 1.9, noiseFactor: 0.25 },
-  'Failure': { valueMultiplier: 0.0, noiseFactor: 0.0 } // 0 when failed
+  'Moderate Wear': { valueMultiplier: 1.30, noiseFactor: 0.10 },
+  'Severe Wear': { valueMultiplier: 1.50, noiseFactor: 0.15 },
+  'Critical': { valueMultiplier: 2.00, noiseFactor: 0.25 },
+  'Failure': { valueMultiplier: 0.0, noiseFactor: 0.0 },
+  'Offline': { valueMultiplier: 0.0, noiseFactor: 0.0 },
+  'Idle': { valueMultiplier: 0.1, noiseFactor: 0.01 },
 };
 
 export function generateTelemetry(

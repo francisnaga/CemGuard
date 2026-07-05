@@ -1,4 +1,5 @@
 import { login } from "./actions";
+import { SubmitButton } from "./submit-button";
 
 export default function LoginPage() {
   return (
@@ -10,7 +11,7 @@ export default function LoginPage() {
           <p className="text-xs text-muted-foreground/60 mt-1 uppercase tracking-wider">Research & Demonstration Environment</p>
           <p className="text-xs text-muted-foreground/40 mt-1">Dangote Cement Plc Research Prototype</p>
         </div>
-        <form className="space-y-4">
+        <form action={login} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1" htmlFor="email">Email</label>
             <input 
@@ -33,12 +34,7 @@ export default function LoginPage() {
               placeholder="••••••••" 
             />
           </div>
-          <button 
-            formAction={login} 
-            className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-md font-medium hover:bg-primary/90 transition-colors"
-          >
-            Sign In
-          </button>
+          <SubmitButton />
         </form>
       </div>
     </div>

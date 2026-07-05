@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatNaira } from "@/lib/utils";
 import { MetricExplainer } from "@/components/MetricExplainer";
 
 interface KPICardProps {
@@ -18,25 +18,25 @@ interface KPICardProps {
 function KPICard({ title, value, trendDir, trendValue, trendText, isGood, highlighted, explainerBasis, explainerFormula }: KPICardProps) {
   return (
     <div className={cn(
-      "flex flex-col p-6 bg-card rounded-xl border transition-all duration-300",
-      highlighted ? "border-primary shadow-[0_0_15px_rgba(255,255,255,0.1)]" : "border-border"
+      "flex flex-col p-5 bg-card rounded-md border",
+      highlighted ? "border-primary" : "border-border"
     )}>
       <MetricExplainer title={title} basis={explainerBasis} formula={explainerFormula}>
-        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
       </MetricExplainer>
-      <p className="mt-2 text-3xl font-bold tracking-tight text-foreground">{value}</p>
+      <p className="mt-3 text-3xl font-mono font-bold tracking-tight text-foreground">{value}</p>
       
-      <div className="mt-4 flex items-center space-x-2 text-sm">
+      <div className="mt-4 flex items-center space-x-2 text-xs">
         <span className={cn(
-          "flex items-center font-medium",
-          isGood ? "text-success" : "text-destructive"
+          "flex items-center font-mono font-medium px-1.5 py-0.5 rounded-sm border",
+          isGood ? "bg-success/10 text-success border-success/20" : "bg-destructive/10 text-destructive border-destructive/20"
         )}>
-          {trendDir === 'up' && <ArrowUpRight className="h-4 w-4 mr-1" />}
-          {trendDir === 'down' && <ArrowDownRight className="h-4 w-4 mr-1" />}
-          {trendDir === 'neutral' && <Minus className="h-4 w-4 mr-1" />}
+          {trendDir === 'up' && <ArrowUpRight className="h-3 w-3 mr-1" />}
+          {trendDir === 'down' && <ArrowDownRight className="h-3 w-3 mr-1" />}
+          {trendDir === 'neutral' && <Minus className="h-3 w-3 mr-1" />}
           {trendValue}
         </span>
-        <span className="text-muted-foreground">{trendText}</span>
+        <span className="text-muted-foreground uppercase">{trendText}</span>
       </div>
     </div>
   );
@@ -78,9 +78,9 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="Risk Exposure" 
-        value={`NGN ${(kpiData.risk / 1_000_000).toFixed(1)}M`} 
+        value={formatNaira(kpiData.risk)} 
         trendDir={kpiData.riskTrend > 0 ? 'up' : kpiData.riskTrend < 0 ? 'down' : 'neutral'} 
-        trendValue={`NGN ${Math.abs(kpiData.riskTrend).toFixed(1)}M`} 
+        trendValue={formatNaira(Math.abs(kpiData.riskTrend))} 
         trendText="Change" 
         isGood={kpiData.riskTrend <= 0}
         highlighted={presentationMode && kpiData.risk > 10_000_000}
@@ -99,7 +99,7 @@ export function SectionA_KPIs({ kpiData, presentationMode }: { kpiData: any, pre
       />
       <KPICard 
         title="Maint. Cost Avoided" 
-        value={`NGN ${kpiData.savings.toFixed(1)}M`} 
+        value={formatNaira(kpiData.savings, true)} 
         trendDir={kpiData.savingsTrend > 0 ? 'up' : kpiData.savingsTrend < 0 ? 'down' : 'neutral'} 
         trendValue={`${Math.abs(kpiData.savingsTrend).toFixed(1)}%`} 
         trendText={kpiData.savingsTrend > 0 ? 'Improving' : kpiData.savingsTrend < 0 ? 'Decreasing' : 'Stable'} 

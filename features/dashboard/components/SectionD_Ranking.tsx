@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { formatNaira } from "@/lib/utils";
 import { AlertCircle } from "lucide-react";
 
 interface RankedEquipment {
@@ -16,8 +17,8 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
   const sorted = [...rankings].sort((a, b) => b.expectedRisk - a.expectedRisk);
 
   return (
-    <div className="flex flex-col space-y-4 bg-card border border-border p-6 rounded-xl h-full">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+    <div className="flex flex-col space-y-4 bg-card border border-border p-6 rounded-md h-full">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
         High Risk Priority (Top 3)
       </h3>
       
@@ -25,34 +26,28 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
         <div 
           key={item.id} 
           className={cn(
-            "relative flex items-center p-4 rounded-lg border overflow-hidden",
-            (item.riskTier === 'Critical' || item.riskTier === 'High') ? "border-destructive bg-destructive/5" : "border-border bg-background/50"
+            "relative flex items-center p-4 border border-border border-l-4 rounded-sm bg-card",
+            (item.riskTier === 'Critical' || item.riskTier === 'High') ? "border-l-destructive" : "border-l-muted"
           )}
         >
           {/* F1 Style Position Marker */}
-          <div className={cn(
-            "absolute left-0 top-0 bottom-0 w-8 flex items-center justify-center font-bold text-lg",
-            (item.riskTier === 'Critical' || item.riskTier === 'High') ? "bg-destructive text-white" : "bg-muted text-muted-foreground"
-          )}>
+          <div className="w-8 flex items-center justify-center font-mono font-bold text-lg text-muted-foreground">
             #{index + 1}
           </div>
           
-          <div className="ml-10 flex-1 flex justify-between items-center">
+          <div className="ml-4 flex-1 flex justify-between items-center">
             <div>
-              <p className="font-bold text-foreground">{item.name}</p>
-              <div className="flex items-center text-xs text-muted-foreground mt-1">
-                {item.riskTier === 'Critical' || item.riskTier === 'High' ? (
-                  <AlertCircle className="h-3 w-3 mr-1 text-destructive" />
-                ) : null}
+              <p className="font-semibold text-foreground text-sm">{item.name}</p>
+              <div className="flex items-center text-[10px] uppercase tracking-wider text-muted-foreground mt-1">
                 {item.failureMode}
               </div>
             </div>
             
             <div className="text-right">
-              <p className={cn("text-xl font-bold tracking-tight", (item.riskTier === 'Critical' || item.riskTier === 'High') ? "text-destructive" : "text-foreground")}>
-                NGN {(item.exposureAmount / 1_000_000).toFixed(1)}M
+              <p className={cn("text-lg font-mono font-bold tracking-tight", (item.riskTier === 'Critical' || item.riskTier === 'High') ? "text-destructive" : "text-foreground")}>
+                {formatNaira(item.exposureAmount)}
               </p>
-              <p className="text-xs text-muted-foreground">Exposure</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Exposure</p>
             </div>
           </div>
         </div>
