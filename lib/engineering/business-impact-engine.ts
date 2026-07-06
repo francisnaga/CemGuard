@@ -67,7 +67,7 @@ export function calculateBusinessImpact(
   if (equipmentCategory === 'Kiln') categoryMultiplier = 5.0;
   if (equipmentCategory === 'Mill') categoryMultiplier = 3.0;
 
-  downtimeHours *= categoryMultiplier;
+  downtimeHours = Number((downtimeHours * categoryMultiplier).toFixed(1));
   const repairCost = REPAIR_BASE_COST * repairCostMultiplier * categoryMultiplier;
   const productionLossValue = downtimeHours * HOURLY_PRODUCTION_VALUE;
   
