@@ -60,7 +60,7 @@ export function SectionD_Ranking({ rankings }: { rankings: RankedEquipment[] }) 
                   onClick={() => openDigitalTwin(item.id)}
                   className="mt-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
                 >
-                  <Activity className="w-3 h-3" /> Inspect Twin
+                  <Activity className="w-3 h-3" /> Access Diagnostics
                 </button>
               </div>
             </div>

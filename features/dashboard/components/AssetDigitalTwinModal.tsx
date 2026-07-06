@@ -46,7 +46,7 @@ export function AssetDigitalTwinModal() {
       />
       
       {/* Modal Body */}
-      <div className="relative bg-card border border-border shadow-2xl rounded-2xl w-full max-w-7xl h-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative bg-card border border-border shadow-2xl rounded-2xl w-full max-w-7xl h-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in">
         
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border bg-muted/10 relative overflow-hidden">

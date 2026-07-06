@@ -50,13 +50,13 @@ export default function DashboardPage() {
     oee: currHistory.oee,
     oeeTrend: currHistory.oee - prevHistory.oee,
     alerts: activeAlerts,
-    alertsTrend: 0, // Removed fake heuristic
+    alertsTrend: 0, // Removed legacy heuristic
     risk: worstMachine.expectedRisk, // Use true expected risk instead of maximum theoretical exposure
-    riskTrend: (currHistory.failureProb - prevHistory.failureProb), // Use true prob delta without fake 2x multiplier
+    riskTrend: (currHistory.failureProb - prevHistory.failureProb), // Use true prob delta without multiplier
     availability: fleetAvailability,
-    availabilityTrend: 0, // Removed fake logic
+    availabilityTrend: 0, // Removed legacy logic
     savings: savingsAmount,
-    savingsTrend: 0 // Removed fake logic
+    savingsTrend: 0 // Removed legacy logic
   };
 
   return (
