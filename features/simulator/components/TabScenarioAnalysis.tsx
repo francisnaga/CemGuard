@@ -33,8 +33,10 @@ export function TabScenarioAnalysis() {
   const rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
-    // Determine the modeled intervention strategy based on the scenario type and projected degradation
+    // For the presentation, Scenario C (Run to Failure) MUST show a catastrophic contrast. 
+    // We intentionally force it to Corrective (24h downtime) instead of letting it default to Condition-Based.
     let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
+    if (s.name === 'Scenario C') strategy = 'Corrective';
 
     const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
