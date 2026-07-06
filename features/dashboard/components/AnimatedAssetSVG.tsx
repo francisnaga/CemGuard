@@ -250,8 +250,111 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
     </svg>
   );
 
+  const renderBallMill = () => (
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
+      <style>{`
+        @keyframes rotate-ballmill { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 20; } }
+        @keyframes ballmill-vibrate { 0% { transform: translate(0,0); } 50% { transform: translate(0px, 1.5px); } 100% { transform: translate(0,0); } }
+      `}</style>
+      
+      <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
+
+      <g style={{ animation: isCritical ? 'ballmill-vibrate 0.1s infinite' : 'none' }}>
+        {/* Foundation Bases */}
+        <path d="M 15 70 L 25 70 L 25 95 L 15 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        <path d="M 75 70 L 85 70 L 85 95 L 75 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+
+        {/* Trunnion Bearings */}
+        <rect x="18" y="55" width="4" height="20" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+        <rect x="78" y="55" width="4" height="20" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+
+        {/* Main Mill Body (Horizontal Cylinder) */}
+        <rect x="22" y="35" width="56" height="40" rx="3" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Bull Gear (Drive) */}
+        <rect x="68" y="30" width="8" height="50" rx="2" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Drive Motor and Pinion Box */}
+        <rect x="70" y="75" width="25" height="15" rx="1" fill={`url(#${uid}-metal-horiz)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Rotation Texture Lines */}
+        <g style={{ animation: isStopped ? 'none' : `rotate-ballmill ${animationDuration} linear infinite` }}>
+          <path d="M 24 45 L 66 45 M 24 65 L 66 65" stroke="#0f172a" strokeWidth="1.5" strokeDasharray="4 8" strokeOpacity="0.4" />
+        </g>
+      </g>
+      
+      <g transform="translate(10, 10)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
+      </g>
+    </svg>
+  );
+
+  const renderPacker = () => (
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
+      <style>{`
+        @keyframes spin-packer { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+        @keyframes bag-drop { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 50% { transform: translate(15px, 20px); opacity: 1; } 90% { opacity: 1; } 100% { transform: translate(25px, 20px); opacity: 0; } }
+        @keyframes packer-vibrate { 0% { transform: translate(0,0); } 50% { transform: translate(1px, -1px); } 100% { transform: translate(0,0); } }
+      `}</style>
+
+      <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
+
+      <g style={{ animation: isCritical ? 'packer-vibrate 0.1s infinite' : 'none' }}>
+        {/* Main Base and Conveyor */}
+        <rect x="20" y="80" width="60" height="15" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        <rect x="25" y="75" width="50" height="5" fill="#1e293b" />
+        
+        {/* Central Silo / Feed Tube */}
+        <rect x="40" y="10" width="20" height="30" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+
+        {/* Rotary Carousel Frame */}
+        <g transform="translate(50, 55)">
+          {/* Top Plate */}
+          <ellipse cx="0" cy="-20" rx="30" ry="8" fill={`url(#${uid}-metal-horiz)`} filter={`url(#${uid}-shadow)`} />
+          {/* Bottom Plate */}
+          <ellipse cx="0" cy="15" rx="30" ry="8" fill={`url(#${uid}-metal-horiz)`} filter={`url(#${uid}-shadow)`} />
+          {/* Central Housing */}
+          <rect x="-20" y="-20" width="40" height="35" fill={`url(#${uid}-metal)`} />
+          
+          {/* Spinning Spouts and Bags on Carousel */}
+          <g style={{ animation: isStopped ? 'none' : `spin-packer ${animationDuration} linear infinite` }}>
+            {/* Spouts */}
+            <rect x="-25" y="-10" width="6" height="15" fill={`url(#${uid}-metal-dark)`} />
+            <rect x="-10" y="-5" width="6" height="15" fill={`url(#${uid}-metal-dark)`} />
+            <rect x="5" y="-5" width="6" height="15" fill={`url(#${uid}-metal-dark)`} />
+            <rect x="20" y="-10" width="6" height="15" fill={`url(#${uid}-metal-dark)`} />
+            
+            {/* Bags on Spouts */}
+            <rect x="-27" y="5" width="10" height="12" rx="1" fill="#e2e8f0" />
+            <rect x="-12" y="10" width="10" height="12" rx="1" fill="#e2e8f0" />
+            <rect x="3" y="10" width="10" height="12" rx="1" fill="#e2e8f0" />
+            <rect x="18" y="5" width="10" height="12" rx="1" fill="#e2e8f0" />
+          </g>
+        </g>
+
+        {/* Dropping Bags FX onto Conveyor */}
+        {!isStopped && (
+          <g>
+            <rect x="65" y="65" width="12" height="8" rx="1" fill="#e2e8f0" style={{ animation: 'bag-drop 1.5s infinite' }} filter={`url(#${uid}-shadow)`} />
+            <rect x="65" y="65" width="12" height="8" rx="1" fill="#cbd5e1" style={{ animation: 'bag-drop 1.5s infinite 0.75s' }} filter={`url(#${uid}-shadow)`} />
+          </g>
+        )}
+      </g>
+      
+      <g transform="translate(10, 10)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
+      </g>
+    </svg>
+  );
+
   if (machine.id.includes('crusher')) return renderCrusher();
   if (machine.id.includes('kiln') || machine.id.includes('cooler')) return renderKiln();
+  if (machine.id.includes('packing')) return renderPacker();
+  if (machine.id.includes('cementmill')) return renderBallMill();
   return renderMill();
 }, (prev, next) => {
   return prev.machine.risk === next.machine.risk &&
