@@ -2,7 +2,7 @@
 
 import { FileText, CheckCircle2, CheckSquare } from 'lucide-react';
 import { useStore } from '@/lib/store';
-import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
 import { generateInsight } from '@/lib/engineering/insight-engine';
 
 export function TabExecutiveBrief() {
@@ -11,7 +11,7 @@ export function TabExecutiveBrief() {
 
   if (!worstMachine) return null;
 
-  const strategy = worstMachine.failureProb > 70 ? 'Emergency' : worstMachine.failureProb > 50 ? 'Corrective' : worstMachine.failureProb > 20 ? 'Predictive' : 'Preventive';
+  const strategy = determineMaintenanceStrategy(worstMachine.failureProb);
   const category = worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
   const impact = calculateBusinessImpact(strategy, category);
   const insight = generateInsight(worstMachine, impact);

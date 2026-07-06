@@ -7,6 +7,13 @@ const HOURLY_PRODUCTION_VALUE = 54_000_000; // NGN /hr
 const CO2_EMISSION_PER_RESTART = 15;        // tons CO₂ per cold restart
 const REPAIR_BASE_COST = 5_000_000;         // NGN  base parts + labour for standard repair
 
+export function determineMaintenanceStrategy(failureProb: number, delayDays: number = 0): MaintenanceStrategy {
+  if (delayDays === 0) return 'Preventive';
+  if (failureProb > 70) return 'Emergency';
+  if (failureProb > 40) return 'Predictive';
+  return 'Condition-Based';
+}
+
 export function calculateBusinessImpact(
   strategy: MaintenanceStrategy,
   equipmentCategory: string,

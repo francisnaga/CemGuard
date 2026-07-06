@@ -3,7 +3,7 @@
 import { useStore } from '@/lib/store';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
 import { generateInsight } from '@/lib/engineering/insight-engine';
 
 import { SectionA_KPIs } from '@/features/dashboard/components/SectionA_KPIs';
@@ -95,7 +95,7 @@ export default function DashboardPage() {
           </div>
           <div className="lg:col-span-1">
             <SectionD_Ranking rankings={dtMachines.map(m => {
-              const impact = calculateBusinessImpact(m.failureProb > 50 ? 'Corrective' : 'Predictive', m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher');
+              const impact = calculateBusinessImpact(determineMaintenanceStrategy(m.failureProb), m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher');
               return {
                 id: m.id,
                 name: m.name,
@@ -127,7 +127,7 @@ export default function DashboardPage() {
             day: `${Math.floor(h.time * 15 / 60)}:${(h.time * 15 % 60).toString().padStart(2, '0')}`,
             health: h.health,
             prob: h.failureProb,
-            downtime: calculateBusinessImpact(h.failureProb > 50 ? 'Corrective' : 'Predictive', worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher').downtimeHours,
+            downtime: calculateBusinessImpact(determineMaintenanceStrategy(h.failureProb), worstMachine.name.includes('Kiln') ? 'Kiln' : worstMachine.name.includes('Mill') ? 'Mill' : 'Crusher').downtimeHours,
             oee: h.oee
           }))} 
           presentationMode={presentationMode} 

@@ -6,7 +6,7 @@ import { cn, formatNaira } from '@/lib/utils';
 
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
-import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
 
 export function TabScenarioAnalysis() {
   const dtMachines = useStore(s => s.dtMachines);
@@ -34,8 +34,7 @@ export function TabScenarioAnalysis() {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
     // Determine the modeled intervention strategy based on the scenario type and projected degradation
-    let strategy: 'Preventive' | 'Condition-Based' | 'Predictive' | 'Corrective' | 'Emergency' = 
-      s.delay === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based';
+    let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
 
     const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {

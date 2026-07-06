@@ -3,7 +3,7 @@
 import { useStore, PLANT_PROFILES } from '@/lib/store';
 import { Factory, Activity, Clock, ShieldAlert, CheckCircle2, TrendingDown, ArrowRight } from 'lucide-react';
 import { cn, formatNaira } from '@/lib/utils';
-import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
 import { generateInsight } from '@/lib/engineering/insight-engine';
 
 export default function ReportsPage() {
@@ -13,7 +13,7 @@ export default function ReportsPage() {
   const formattedDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   const machinesWithImpact = dtMachines.map(m => {
-    const strategy = m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : m.failureProb > 20 ? 'Predictive' : 'Preventive';
+    const strategy = determineMaintenanceStrategy(m.failureProb);
     const category = m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher';
     const impact = calculateBusinessImpact(strategy, category);
     const expectedRisk = impact.totalRiskExposure * (m.failureProb / 100);

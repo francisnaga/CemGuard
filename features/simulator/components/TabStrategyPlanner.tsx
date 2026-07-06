@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ShieldAlert, Settings2, TrendingUp, LineChart } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
-import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
+import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
 import { cn, formatNaira } from '@/lib/utils';
 
 export function TabStrategyPlanner() {
@@ -39,7 +39,7 @@ export function TabStrategyPlanner() {
 
   // Use the exact same unified business impact function as the rest of the app
   const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
-    delayDays === 0 ? 'Preventive' : projectedProb > 70 ? 'Emergency' : projectedProb > 40 ? 'Predictive' : 'Condition-Based',
+    determineMaintenanceStrategy(projectedProb, delayDays),
     targetMachine.name,
     sparesLeadTime,
     delayDays
