@@ -1,232 +1,251 @@
+import React, { useId } from 'react';
 import { cn } from "@/lib/utils";
-
-import React from 'react';
 
 export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
   const isCritical = machine.risk === 'Critical';
   const isWarning = machine.risk === 'High' || machine.risk === 'Medium';
   const isStopped = machine.utilization === 0 || machine.availability === 0;
-
-  // Animation duration based on RPM (clamped to sensible visual limits)
-  const baseRPM = Math.max(1, machine.rpm || 100);
-  const animationDuration = isStopped ? '0s' : `${Math.max(0.5, Math.min(10, 6000 / baseRPM))}s`;
-
-  // Color logic for status indicators
+  
+  // Dynamic parameters based on physics
+  const baseRPM = machine.rpm || 10;
+  const animationDuration = isStopped ? '0s' : `${Math.max(0.2, Math.min(10, 60 / baseRPM))}s`;
   const statusColor = isCritical ? '#ef4444' : isWarning ? '#eab308' : '#22c55e';
+  
+  // Use unique ID prefix for gradients to prevent cross-SVG conflicts
+  const uid = useId().replace(/:/g, '');
 
-  // Shared Defs for 3D Shading
-  const SharedDefs = () => (
+  const defs = (
     <defs>
-      <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
-        <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#000" floodOpacity="0.5" />
-      </filter>
-      <filter id="glow-critical">
-        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-        <feMerge>
-          <feMergeNode in="coloredBlur"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
-      
-      <linearGradient id="metal-cylinder" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#334155" />
-        <stop offset="30%" stopColor="#94a3b8" />
-        <stop offset="50%" stopColor="#f1f5f9" />
-        <stop offset="70%" stopColor="#94a3b8" />
+      <linearGradient id={`${uid}-metal`} x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#e2e8f0" />
+        <stop offset="20%" stopColor="#ffffff" />
+        <stop offset="50%" stopColor="#94a3b8" />
+        <stop offset="80%" stopColor="#475569" />
         <stop offset="100%" stopColor="#1e293b" />
       </linearGradient>
 
-      <linearGradient id="metal-cylinder-vert" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#1e293b" />
-        <stop offset="30%" stopColor="#94a3b8" />
-        <stop offset="50%" stopColor="#f1f5f9" />
-        <stop offset="70%" stopColor="#94a3b8" />
-        <stop offset="100%" stopColor="#0f172a" />
+      <linearGradient id={`${uid}-metal-horiz`} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor="#e2e8f0" />
+        <stop offset="20%" stopColor="#ffffff" />
+        <stop offset="50%" stopColor="#94a3b8" />
+        <stop offset="80%" stopColor="#475569" />
+        <stop offset="100%" stopColor="#1e293b" />
       </linearGradient>
-
-      <linearGradient id="metal-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      
+      <linearGradient id={`${uid}-metal-dark`} x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stopColor="#475569" />
         <stop offset="50%" stopColor="#1e293b" />
         <stop offset="100%" stopColor="#0f172a" />
       </linearGradient>
 
-      <radialGradient id="flame-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#fef08a" stopOpacity="1" />
-        <stop offset="40%" stopColor="#f97316" stopOpacity="0.8" />
-        <stop offset="80%" stopColor="#ef4444" stopOpacity="0.3" />
+      <linearGradient id={`${uid}-kiln-heat`} x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#475569" />
+        <stop offset="20%" stopColor="#ef4444" />
+        <stop offset="50%" stopColor="#f97316" />
+        <stop offset="80%" stopColor="#ef4444" />
+        <stop offset="100%" stopColor="#0f172a" />
+      </linearGradient>
+
+      <radialGradient id={`${uid}-glow`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor={statusColor} stopOpacity="0.8" />
+        <stop offset="50%" stopColor={statusColor} stopOpacity="0.3" />
+        <stop offset="100%" stopColor={statusColor} stopOpacity="0" />
+      </radialGradient>
+
+      <radialGradient id={`${uid}-fire`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+        <stop offset="20%" stopColor="#fef08a" stopOpacity="0.9" />
+        <stop offset="60%" stopColor="#f97316" stopOpacity="0.6" />
         <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
       </radialGradient>
-      
-      <linearGradient id="heat-body" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#334155" />
-        <stop offset="50%" stopColor="#f43f5e" />
-        <stop offset="100%" stopColor="#1e293b" />
-      </linearGradient>
+
+      <filter id={`${uid}-shadow`} x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="2" dy="4" stdDeviation="3" floodOpacity="0.4" />
+      </filter>
     </defs>
   );
 
-  const renderCrusher = () => (
-    <svg viewBox="0 0 100 100" className={cn("w-full h-full", className)}>
-      <SharedDefs />
-      <style>{`
-        @keyframes spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
-        @keyframes vibrate-crusher { 0% { transform: translate(0,0); } 20% { transform: translate(-1px,1px); } 40% { transform: translate(1px,-1px); } 60% { transform: translate(-1px,-1px); } 80% { transform: translate(1px,1px); } 100% { transform: translate(0,0); } }
-      `}</style>
-      <g style={{ animation: isCritical ? 'vibrate-crusher 0.1s infinite' : 'none' }}>
-        
-        {/* Back Casing */}
-        <path d="M 20 20 L 80 20 L 70 85 L 30 85 Z" fill="url(#metal-dark)" filter="url(#drop-shadow)" />
-        {/* Internal Cavity */}
-        <path d="M 25 25 L 75 25 L 68 80 L 32 80 Z" fill="#020617" />
-        
-        {/* Status Indicator LED */}
-        <circle cx="85" cy="15" r="3" fill={statusColor} filter={isCritical || isWarning ? "url(#glow-critical)" : ""} />
-
-        {/* Left Rotor Group */}
-        <g style={{ transformOrigin: '38px 55px', animation: isStopped ? 'none' : `spin-cw ${animationDuration} linear infinite` }}>
-          {/* Main Drum */}
-          <circle cx="38" cy="55" r="14" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
-          {/* Teeth */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
-            <path key={i} d={`M 38 41 L 35 34 L 41 34 Z`} fill="url(#metal-dark)" transform={`rotate(${angle} 38 55)`} />
-          ))}
-          {/* Shaft */}
-          <circle cx="38" cy="55" r="5" fill="#0f172a" />
-          <circle cx="38" cy="55" r="3" fill="#cbd5e1" />
-        </g>
-
-        {/* Right Rotor Group */}
-        <g style={{ transformOrigin: '62px 55px', animation: isStopped ? 'none' : `spin-ccw ${animationDuration} linear infinite` }}>
-          {/* Main Drum */}
-          <circle cx="62" cy="55" r="14" fill="url(#metal-cylinder-vert)" filter="url(#drop-shadow)" />
-          {/* Teeth */}
-          {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((angle, i) => (
-            <path key={i} d={`M 62 41 L 59 34 L 65 34 Z`} fill="url(#metal-dark)" transform={`rotate(${angle} 62 55)`} />
-          ))}
-          {/* Shaft */}
-          <circle cx="62" cy="55" r="5" fill="#0f172a" />
-          <circle cx="62" cy="55" r="3" fill="#cbd5e1" />
-        </g>
-
-        {/* Front Hopper Frame */}
-        <path d="M 15 15 L 85 15 L 85 22 L 15 22 Z" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
-        <path d="M 40 85 L 60 85 L 60 95 L 40 95 Z" fill="url(#metal-dark)" />
-        {/* Falling Material (if running) */}
-        {!isStopped && (
-          <g fill="#94a3b8" className="opacity-60" style={{ animation: `spin-cw 0.3s linear infinite` }}>
-            <circle cx="45" cy="88" r="2" />
-            <circle cx="55" cy="92" r="1.5" />
-            <circle cx="50" cy="85" r="2.5" />
-          </g>
-        )}
-      </g>
-    </svg>
-  );
-
   const renderKiln = () => (
-    <svg viewBox="0 0 100 100" className={cn("w-full h-full", className)}>
-      <SharedDefs />
+    <svg viewBox="0 0 120 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
       <style>{`
-        @keyframes rotate-kiln { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 40; } }
-        @keyframes flame-flicker { 0% { transform: scale(1) translate(0,0); opacity: 0.9; } 50% { transform: scale(1.1) translate(-2px, 1px); opacity: 1; } 100% { transform: scale(1) translate(0,0); opacity: 0.9; } }
-        @keyframes vibrate-kiln { 0% { transform: translate(0,0) rotate(-8deg); } 50% { transform: translate(0, 2px) rotate(-8deg); } 100% { transform: translate(0,0) rotate(-8deg); } }
+        @keyframes rotate-kiln { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 20; } }
+        @keyframes fire-pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+        @keyframes kiln-vibrate { 0% { transform: translate(0,0) rotate(-6deg); } 50% { transform: translate(0px, 1.5px) rotate(-6deg); } 100% { transform: translate(0,0) rotate(-6deg); } }
       `}</style>
-      <g style={{ transformOrigin: '50px 50px', transform: 'rotate(-8deg)', animation: isCritical ? 'vibrate-kiln 0.2s infinite' : 'none' }}>
+      
+      {/* Background Ambient Glow */}
+      <circle cx="60" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-50" />
+
+      {/* Tilted Group for Kiln */}
+      <g style={{ transformOrigin: '60px 50px', transform: 'rotate(-6deg)', animation: isCritical ? 'kiln-vibrate 0.1s infinite' : 'none' }}>
         
-        {/* Background Supports */}
-        <path d="M 26 70 L 34 70 L 34 95 L 26 95 Z" fill="url(#metal-dark)" />
-        <path d="M 66 65 L 74 65 L 74 95 L 66 95 Z" fill="url(#metal-dark)" />
+        {/* Foundation / Piers */}
+        <path d="M 25 70 L 35 70 L 35 110 L 25 110 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        <path d="M 85 70 L 95 70 L 95 110 L 85 110 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
 
-        {/* Support Rollers (Tires) */}
-        <ellipse cx="30" cy="70" rx="8" ry="4" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
-        <ellipse cx="70" cy="65" rx="8" ry="4" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
+        {/* Support Rollers */}
+        <ellipse cx="30" cy="68" rx="7" ry="5" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+        <ellipse cx="90" cy="68" rx="7" ry="5" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
 
-        {/* Main Kiln Body */}
-        <rect x="10" y="35" width="80" height="28" rx="2" fill={machine.temperatureC > 1000 ? "url(#heat-body)" : "url(#metal-cylinder-vert)"} filter="url(#drop-shadow)" />
+        {/* Main Cylinder Tube */}
+        {/* We use horizontal gradient so it looks like a lit tube */}
+        <rect x="5" y="35" width="110" height="30" rx="3" fill={machine.temperatureC > 1000 ? `url(#${uid}-kiln-heat)` : `url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
         
         {/* Riding Rings (Steel Girths) */}
-        <rect x="25" y="32" width="10" height="34" rx="1" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
-        <rect x="65" y="32" width="10" height="34" rx="1" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
+        <rect x="23" y="32" width="14" height="36" rx="2" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+        <rect x="83" y="32" width="14" height="36" rx="2" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
         
-        {/* Rotation texture lines */}
-        <path d="M 12 45 L 88 45 M 12 55 L 88 55" stroke="#1e293b" strokeWidth="1" strokeDasharray="5 15" strokeOpacity="0.4" style={{ animation: isStopped ? 'none' : `rotate-kiln ${animationDuration} linear infinite` }} />
+        {/* Rotation Texture Lines */}
+        <g style={{ animation: isStopped ? 'none' : `rotate-kiln ${animationDuration} linear infinite` }}>
+          <path d="M 5 45 L 115 45 M 5 55 L 115 55" stroke="#0f172a" strokeWidth="1.5" strokeDasharray="4 8" strokeOpacity="0.4" />
+        </g>
         
-        {/* Status LED */}
-        <circle cx="15" cy="40" r="2" fill={statusColor} filter={isCritical || isWarning ? "url(#glow-critical)" : ""} />
+        {/* Burner Hood (Right Side) */}
+        <path d="M 110 30 L 125 35 L 125 65 L 110 70 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Exhaust Housing (Left Side) */}
+        <path d="M -5 25 L 10 30 L 10 70 L -5 75 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
 
-        {/* Burner Flame */}
+        {/* Flame FX inside Burner Hood */}
         {!isStopped && (
-          <g style={{ transformOrigin: '85px 50px', animation: 'flame-flicker 0.1s infinite' }}>
-            <circle cx="90" cy="49" r="12" fill="url(#flame-glow)" />
-            <path d="M 80 44 Q 95 49 80 54 Z" fill="#f97316" />
-            <path d="M 80 46 Q 90 49 80 52 Z" fill="#fef08a" />
+          <g style={{ transformOrigin: '115px 50px', animation: 'fire-pulse 0.15s infinite' }}>
+            <circle cx="118" cy="50" r="14" fill={`url(#${uid}-fire)`} />
+            <path d="M 112 45 Q 100 50 112 55 Z" fill="#ffffff" opacity="0.9" />
           </g>
         )}
       </g>
       
-      {/* Front Piers */}
-      <path d="M 22 72 L 30 72 L 32 95 L 20 95 Z" fill="url(#metal-cylinder-vert)" filter="url(#drop-shadow)" />
-      <path d="M 62 67 L 70 67 L 72 95 L 60 95 Z" fill="url(#metal-cylinder-vert)" filter="url(#drop-shadow)" />
+      {/* Front Status Plate */}
+      <g transform="translate(10, 85)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
+      </g>
     </svg>
   );
 
   const renderMill = () => (
-    <svg viewBox="0 0 100 100" className={cn("w-full h-full", className)}>
-      <SharedDefs />
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
       <style>{`
-        @keyframes spin-mill-table { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 40; } }
-        @keyframes spin-roller { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes vibrate-mill { 0% { transform: translate(0,0); } 25% { transform: translate(1px, 0); } 50% { transform: translate(0, 1px); } 75% { transform: translate(-1px, 0); } 100% { transform: translate(0,0); } }
+        @keyframes spin-table { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+        @keyframes spin-roller-l { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-roller-r { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes mill-vibrate { 0% { transform: translate(0,0); } 50% { transform: translate(1px, -1px); } 100% { transform: translate(0,0); } }
       `}</style>
-      <g style={{ animation: isCritical ? 'vibrate-mill 0.1s infinite' : 'none' }}>
-        
-        {/* Outer Casing / Mill Body */}
-        <path d="M 25 15 L 75 15 L 85 45 L 85 85 L 15 85 L 15 45 Z" fill="url(#metal-dark)" filter="url(#drop-shadow)" />
-        
-        {/* Inner Grinding Cavity */}
-        <ellipse cx="50" cy="45" rx="35" ry="12" fill="#020617" />
-        <path d="M 15 45 L 85 45 L 80 80 L 20 80 Z" fill="#0f172a" />
 
-        {/* Grinding Table (Rotating Base) */}
-        <ellipse cx="50" cy="75" rx="28" ry="8" fill="url(#metal-cylinder)" filter="url(#drop-shadow)" />
-        {/* Table Texture (Spins) */}
-        <ellipse cx="50" cy="75" rx="24" ry="5" fill="none" stroke="#1e293b" strokeWidth="2" strokeDasharray="8 8" style={{ animation: isStopped ? 'none' : `spin-mill-table ${animationDuration} linear infinite` }} />
+      {/* Ambient Glow */}
+      <circle cx="50" cy="50" r="45" fill={`url(#${uid}-glow)`} className="opacity-40" />
+
+      <g style={{ animation: isCritical ? 'mill-vibrate 0.1s infinite' : 'none' }}>
+        {/* Massive Base / Gearbox */}
+        <path d="M 20 70 L 80 70 L 85 95 L 15 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        <rect x="40" y="90" width="20" height="10" fill="#020617" />
+        
+        {/* Rotating Grinding Table */}
+        {/* Simulated 3D perspective by compressing Y */}
+        <g transform="translate(50, 70)">
+          <ellipse cx="0" cy="0" rx="35" ry="12" fill={`url(#${uid}-metal-horiz)`} filter={`url(#${uid}-shadow)`} />
+          {/* Table surface */}
+          <ellipse cx="0" cy="-2" rx="33" ry="10" fill="#cbd5e1" />
+          
+          {/* Animated Table Texture (Spinning) */}
+          <g style={{ animation: isStopped ? 'none' : `spin-table ${animationDuration} linear infinite` }}>
+             <ellipse cx="0" cy="-2" rx="20" ry="6" fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="10 20" />
+             <ellipse cx="0" cy="-2" rx="10" ry="3" fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="5 10" />
+          </g>
+        </g>
 
         {/* Central Shaft */}
-        <path d="M 45 15 L 55 15 L 52 75 L 48 75 Z" fill="url(#metal-cylinder)" />
+        <rect x="45" y="20" width="10" height="40" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
 
-        {/* Roller 1 (Left) */}
-        <g style={{ transformOrigin: '32px 55px', animation: isStopped ? 'none' : `spin-roller ${animationDuration} linear infinite` }}>
-          <circle cx="32" cy="55" r="12" fill="url(#metal-cylinder-vert)" filter="url(#drop-shadow)" />
-          <circle cx="32" cy="55" r="8" fill="none" stroke="#475569" strokeWidth="2" />
-          <circle cx="32" cy="55" r="4" fill="#0f172a" />
-          <circle cx="32" cy="55" r="2" fill="#cbd5e1" />
-        </g>
-        {/* Hydraulic Arm L */}
-        <path d="M 15 35 L 32 55 L 28 55 L 15 38 Z" fill="url(#metal-dark)" />
-
-        {/* Roller 2 (Right) */}
-        <g style={{ transformOrigin: '68px 55px', animation: isStopped ? 'none' : `spin-roller ${animationDuration} linear infinite` }}>
-          <circle cx="68" cy="55" r="12" fill="url(#metal-cylinder-vert)" filter="url(#drop-shadow)" />
-          <circle cx="68" cy="55" r="8" fill="none" stroke="#475569" strokeWidth="2" />
-          <circle cx="68" cy="55" r="4" fill="#0f172a" />
-          <circle cx="68" cy="55" r="2" fill="#cbd5e1" />
-        </g>
-        {/* Hydraulic Arm R */}
-        <path d="M 85 35 L 68 55 L 72 55 L 85 38 Z" fill="url(#metal-dark)" />
-
-        {/* Roller 3 (Center Back) - Slightly darker to show depth */}
-        <g style={{ transformOrigin: '50px 45px', animation: isStopped ? 'none' : `spin-roller ${animationDuration} linear infinite` }}>
-          <circle cx="50" cy="45" r="10" fill="url(#metal-dark)" filter="url(#drop-shadow)" />
-          <circle cx="50" cy="45" r="3" fill="#0f172a" />
+        {/* Left Grinding Roller */}
+        <g transform="translate(25, 55)">
+          {/* Roller Arm */}
+          <path d="M 20 -35 L 0 0 L 10 0 L 25 -30 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+          {/* Spinning Roller Cone */}
+          <g style={{ animation: isStopped ? 'none' : `spin-roller-l ${animationDuration} linear infinite` }}>
+            <ellipse cx="0" cy="0" rx="14" ry="18" fill={`url(#${uid}-metal-horiz)`} transform="rotate(30)" filter={`url(#${uid}-shadow)`} />
+            {/* Center Pin */}
+            <circle cx="2" cy="-2" r="4" fill="#0f172a" />
+          </g>
         </g>
 
-        {/* Status LED */}
-        <circle cx="20" cy="20" r="3" fill={statusColor} filter={isCritical || isWarning ? "url(#glow-critical)" : ""} />
+        {/* Right Grinding Roller */}
+        <g transform="translate(75, 55)">
+          {/* Roller Arm */}
+          <path d="M -20 -35 L 0 0 L -10 0 L -25 -30 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+          {/* Spinning Roller Cone */}
+          <g style={{ animation: isStopped ? 'none' : `spin-roller-r ${animationDuration} linear infinite` }}>
+            <ellipse cx="0" cy="0" rx="14" ry="18" fill={`url(#${uid}-metal-horiz)`} transform="rotate(-30)" filter={`url(#${uid}-shadow)`} />
+            {/* Center Pin */}
+            <circle cx="-2" cy="-2" r="4" fill="#0f172a" />
+          </g>
+        </g>
+      </g>
+      
+      <g transform="translate(10, 15)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
+      </g>
+    </svg>
+  );
 
-        {/* Front Transparent Shield Overlay */}
-        <path d="M 25 15 L 75 15 L 85 45 L 85 85 L 15 85 L 15 45 Z" fill="#94a3b8" fillOpacity="0.1" pointerEvents="none" />
+  const renderCrusher = () => (
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
+      <style>{`
+        @keyframes spin-cw { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes spin-ccw { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes rock-fall { 0% { transform: translateY(-10px); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(50px); opacity: 0; } }
+        @keyframes crusher-vibrate { 0% { transform: translate(0,0); } 50% { transform: translate(1px, 2px); } 100% { transform: translate(0,0); } }
+      `}</style>
+      
+      <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
+
+      <g style={{ animation: isCritical ? 'crusher-vibrate 0.1s infinite' : 'none' }}>
+        {/* Main Casing Body */}
+        <path d="M 15 30 L 85 30 L 75 90 L 25 90 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Internal Dark Cavity */}
+        <path d="M 22 35 L 78 35 L 70 85 L 30 85 Z" fill="#020617" />
+        
+        {/* Falling Rocks FX */}
+        {!isStopped && (
+          <g>
+            <path d="M 45 40 Q 48 38 50 42 Q 47 45 45 40" fill="#94a3b8" style={{ animation: 'rock-fall 0.8s infinite' }} />
+            <path d="M 55 35 Q 58 32 60 37 Q 54 39 55 35" fill="#64748b" style={{ animation: 'rock-fall 0.6s infinite 0.2s' }} />
+            <path d="M 40 45 Q 43 41 47 44 Q 42 48 40 45" fill="#cbd5e1" style={{ animation: 'rock-fall 0.9s infinite 0.4s' }} />
+          </g>
+        )}
+
+        {/* Left Crusher Rotor */}
+        <g style={{ transformOrigin: '35px 60px', animation: isStopped ? 'none' : `spin-cw ${animationDuration} linear infinite` }}>
+          <circle cx="35" cy="60" r="16" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+          {/* Heavy Teeth */}
+          {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+            <path key={i} d="M 35 44 L 30 35 L 40 35 Z" fill={`url(#${uid}-metal-dark)`} transform={`rotate(${angle} 35 60)`} />
+          ))}
+          <circle cx="35" cy="60" r="5" fill="#0f172a" />
+        </g>
+
+        {/* Right Crusher Rotor */}
+        <g style={{ transformOrigin: '65px 60px', animation: isStopped ? 'none' : `spin-ccw ${animationDuration} linear infinite` }}>
+          <circle cx="65" cy="60" r="16" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+          {/* Heavy Teeth */}
+          {[30, 90, 150, 210, 270, 330].map((angle, i) => (
+            <path key={i} d="M 65 44 L 60 35 L 70 35 Z" fill={`url(#${uid}-metal-dark)`} transform={`rotate(${angle} 65 60)`} />
+          ))}
+          <circle cx="65" cy="60" r="5" fill="#0f172a" />
+        </g>
+        
+        {/* Front Top Hopper Shield */}
+        <path d="M 10 20 L 90 20 L 85 30 L 15 30 Z" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+      </g>
+      
+      <g transform="translate(10, 10)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
       </g>
     </svg>
   );
@@ -238,5 +257,6 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
   return prev.machine.risk === next.machine.risk &&
          prev.machine.utilization === next.machine.utilization &&
          prev.machine.availability === next.machine.availability &&
-         prev.machine.rpm === next.machine.rpm;
+         prev.machine.rpm === next.machine.rpm &&
+         prev.machine.temperatureC === next.machine.temperatureC;
 });
