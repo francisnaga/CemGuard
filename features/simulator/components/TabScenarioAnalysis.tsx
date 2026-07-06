@@ -119,8 +119,8 @@ export function TabScenarioAnalysis() {
               {scenarios.map(s => (
                 <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>
                   <div className="flex items-center space-x-2">
-                    <span className={s.downtime > 20 ? "text-destructive" : s.downtime > 10 ? "text-orange-500" : "text-success"}>{s.downtime} Hrs</span>
-                    {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.downtime > scenarios[1].downtime ? '+' : ''}{s.downtime - scenarios[1].downtime} Hrs)</span>}
+                    <span className={s.downtime > 20 ? "text-destructive" : s.downtime > 10 ? "text-orange-500" : "text-success"}>{Number(s.downtime).toFixed(1)} Hrs</span>
+                    {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.downtime > scenarios[1].downtime ? '+' : ''}{Number(s.downtime - scenarios[1].downtime).toFixed(1)} Hrs)</span>}
                   </div>
                 </td>
               ))}

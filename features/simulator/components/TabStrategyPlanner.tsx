@@ -166,7 +166,7 @@ export function TabStrategyPlanner() {
             <div className="bg-muted/30 border border-border p-5 rounded-xl">
               <p className="text-sm text-muted-foreground mb-1">Estimated Downtime</p>
               <p className="text-2xl font-bold tracking-tight mb-1 text-destructive">
-                {downtimeEst} Hrs
+                {Number(downtimeEst).toFixed(1)} Hrs
               </p>
             </div>
 

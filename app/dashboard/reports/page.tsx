@@ -142,7 +142,7 @@ export default function ReportsPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-3 text-sm">
                 <CheckCircle2 className="h-5 w-5 text-foreground" />
-                <span className="font-semibold text-foreground">Prevents <span className="font-mono">{impact.downtimeHours - plannedImpact.downtimeHours}</span> Hrs Unplanned Downtime</span>
+                <span className="font-semibold text-foreground">Prevents <span className="font-mono">{Number(impact.downtimeHours - plannedImpact.downtimeHours).toFixed(1)}</span> Hrs Unplanned Downtime</span>
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <TrendingDown className="h-5 w-5 text-foreground" />
