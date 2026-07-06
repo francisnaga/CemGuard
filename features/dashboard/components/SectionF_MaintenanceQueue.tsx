@@ -22,7 +22,7 @@ export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
     }
   };
 
-  const displayItems = items.slice(0, 5);
+  const displayItems = items.filter(item => item.status !== 'Ended').slice(0, 5);
 
   const groupedItems = items.reduce((acc, item) => {
     const day = item.day || 1;

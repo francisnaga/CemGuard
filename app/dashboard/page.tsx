@@ -39,7 +39,8 @@ export default function DashboardPage() {
   const savingsAmount = (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000;
 
   const insight = generateInsight(worstMachine, impact);
-  const activeAlerts = dtMachines.filter(m => m.vibrationZone === 'C' || m.vibrationZone === 'D').length;
+  const dtEvents = useStore(s => s.dtEvents);
+  const activeAlerts = dtEvents.filter((e) => e.category === 'Warning' || e.category === 'Critical').length;
 
   const totalPlantRiskExposure = machinesWithImpact
     .filter(m => m.risk !== 'Low')

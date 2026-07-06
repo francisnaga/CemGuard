@@ -95,7 +95,7 @@ interface DashboardState {
   dtEnergyTarget: number;
   dtEnergyCurrent: number;
   dtCO2Target: number;
-  dtCO2Current: number;
+  dtCO2Current: number | string;
   dtMachines: MachineState[];
   dtEvents: EventLogItem[];
   dtCrewStatus: {
@@ -289,6 +289,9 @@ export const useStore = create<DashboardState>((set, get) => {
       dtTickets: initialTickets,
       dtHistory: JSON.parse(JSON.stringify(warmupHistory)) // Deep copy so we don't mutate the original warmup
     });
+    
+    // Force one physics tick to immediately graph the failure spike in the history charts
+    get().dtTick();
   },
   resolveMaintenanceIssue: (machineId, ticketId) => {
     set((state) => {
@@ -561,8 +564,11 @@ export const useStore = create<DashboardState>((set, get) => {
     const newEff = Math.round((newThroughput / 450) * 100);
 
     let newEnergy = 4.2;
-    let newCO2 = 815;
-    if (crusher.utilization === 0) {
+    let newCO2: number | string = 815;
+    if (newThroughput === 0) {
+      newEnergy = 0.2;
+      newCO2 = 'N/A';
+    } else if (crusher.utilization === 0) {
       newEnergy = 4.9; 
       newCO2 = 860;
     }
