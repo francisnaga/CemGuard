@@ -36,7 +36,7 @@ export function calculateBusinessImpact(
   // Impact varies heavily by strategy (RCM principle)
   switch (strategy) {
     case 'Preventive':
-      downtimeHours = 2 + waitPenaltyHours; 
+      downtimeHours = 2; // Strictly 2 hours. You don't take the machine offline while waiting for spares in a preventive scenario.
       repairCostMultiplier = 1.0 * delayPenaltyCost;
       co2ImpactTons = 0; 
       break;

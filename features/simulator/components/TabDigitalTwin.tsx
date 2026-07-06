@@ -48,11 +48,11 @@ export function TabDigitalTwin() {
     <div className="space-y-6 animate-in fade-in duration-500">
       {(() => {
         const sequentialFlows: number[] = [];
-        let currentMaxFlow = Infinity;
+        let upstreamLimit = Infinity;
         dtMachines.forEach(m => {
           const theoretical = Math.round((m.throughputCapacity || 450) * (m.utilization / 100));
-          currentMaxFlow = Math.min(currentMaxFlow, theoretical);
-          sequentialFlows.push(currentMaxFlow);
+          upstreamLimit = Math.min(upstreamLimit, theoretical);
+          sequentialFlows.push(upstreamLimit);
         });
 
         return (

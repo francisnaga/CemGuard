@@ -36,6 +36,7 @@ export default function DashboardPage() {
   
   const impact = worstMachine.impact;
   const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
+  const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
   const savingsAmount = worstMachine.failureProb > 20 
     ? (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000 
     : 0;
@@ -82,7 +83,7 @@ export default function DashboardPage() {
           primaryInsight={insight.situation}
           observation={insight.observation}
           recommendedAction={insight.recommendation}
-          expectedImpact={`Avoids ${formatNaira(impact.totalRiskExposure)} in risk exposure and ${impact.downtimeHours} hours of downtime.`}
+          expectedImpact={`Avoids ${formatNaira(Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure))} in risk exposure and ${Math.max(0, emergencyImpact.downtimeHours - plannedImpact.downtimeHours)} hours of downtime.`}
           presentationMode={presentationMode}
           severity={insight.severity}
         />

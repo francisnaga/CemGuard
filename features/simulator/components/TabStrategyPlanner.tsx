@@ -34,7 +34,7 @@ export function TabStrategyPlanner() {
 
   // Real math: time to 80% failure probability = eta * (-ln(0.2))^(1/beta)
   const t80 = effectiveEta * Math.pow(-Math.log(1 - 0.8), 1 / beta);
-  const remainingLifeHours = Math.max(0, t80 - (currentHours + projectedHours));
+  const remainingLifeHours = Math.max(0, t80 - currentHours); // Do NOT subtract projectedHours here, RUL is physical current state
   const remainingLifeDays = Math.round(remainingLifeHours / 24);
 
   // Use the exact same unified business impact function as the rest of the app, 
