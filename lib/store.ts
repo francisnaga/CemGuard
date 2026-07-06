@@ -72,7 +72,7 @@ export interface PlantProfile {
 }
 
 export const PLANT_PROFILES: PlantProfile[] = [
-  { id: 'obajana', name: 'Obajana Plant', capacity: 13250, budget: 'NGN 850M', energyBaseline: 12.4 },
+  { id: 'obajana', name: 'Obajana Plant', capacity: 10800, budget: 'NGN 850M', energyBaseline: 12.4 },
   { id: 'ibese', name: 'Ibese Plant', capacity: 12000, budget: 'NGN 780M', energyBaseline: 11.2 },
   { id: 'gboko', name: 'Gboko Plant', capacity: 4000, budget: 'NGN 320M', energyBaseline: 4.1 },
   { id: 'okpella', name: 'Okpella Plant', capacity: 3000, budget: 'NGN 210M', energyBaseline: 3.2 },
