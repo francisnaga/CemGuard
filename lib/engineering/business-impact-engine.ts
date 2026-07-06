@@ -68,7 +68,7 @@ export function calculateBusinessImpact(
   if (equipmentCategory.includes('Mill')) categoryMultiplier = 3.0;
 
   downtimeHours = Number((downtimeHours * categoryMultiplier).toFixed(1));
-  const repairCost = REPAIR_BASE_COST * repairCostMultiplier * categoryMultiplier;
+  const repairCost = REPAIR_BASE_COST * repairCostMultiplier;
   const productionLossValue = downtimeHours * HOURLY_PRODUCTION_VALUE;
   
   // Priority 1 Fix: Waterfall components must sum exactly to total.
@@ -79,7 +79,7 @@ export function calculateBusinessImpact(
     downtimeHours,
     productionLossValue,
     revenueLoss,
-    co2ImpactTons: co2ImpactTons * categoryMultiplier,
+    co2ImpactTons: Number((downtimeHours * 450 * 0.815).toFixed(1)),
     repairCost,
     totalRiskExposure
   };
