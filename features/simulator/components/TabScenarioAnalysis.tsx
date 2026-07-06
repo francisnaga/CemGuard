@@ -27,16 +27,13 @@ export function TabScenarioAnalysis() {
   const scenariosDef = [
     { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false },
     { name: 'Scenario B', subtitle: 'Current Baseline', delay: Math.max(1, targetMachine.vibrationZone === 'C' ? 7 : 14), isCurrent: true },
-    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false }
+    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 90, isCurrent: false }
   ];
 
   const rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
-    // For the presentation, Scenario C (Run to Failure) MUST show a catastrophic contrast. 
-    // We intentionally force it to Corrective (24h downtime) instead of letting it default to Condition-Based.
     let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
-    if (s.name === 'Scenario C') strategy = 'Corrective';
 
     const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
