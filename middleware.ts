@@ -40,19 +40,8 @@ export default async function proxy(request: NextRequest) {
     '/maintenance', '/plant', '/settings'
   ].some(route => request.nextUrl.pathname.startsWith(route))
 
-  // Redirect unauthenticated users trying to access ANY protected route
-  if (!user && !isAuthRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  // Redirect authenticated users trying to access login
-  if (user && isAuthRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
-  }
+  // Removed auth gates for public demo access
+  // Demo users can freely access /dashboard
 
   // Redirect placeholder routes to dashboard
   if (isPlaceholderRoute) {
