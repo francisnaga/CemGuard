@@ -124,7 +124,7 @@ export function TabStrategyPlanner() {
 
         <div className="p-3 bg-muted/30 border border-border rounded-lg text-[10px] text-muted-foreground">
           <p className="font-bold uppercase tracking-wide text-foreground mb-1">Model Basis</p>
-          <p>Weibull projection (beta={beta}, eta={baseEta.toLocaleString()} hrs). Business values use NGN 2,500,000/hr (representative).</p>
+          <p>Weibull projection (beta={beta}, eta={baseEta.toLocaleString()} hrs). Business values use NGN 54,000,000/hr (representative).</p>
         </div>
       </div>
 

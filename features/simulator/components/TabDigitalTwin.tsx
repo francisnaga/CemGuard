@@ -46,6 +46,17 @@ export function TabDigitalTwin() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {(() => {
+        const sequentialFlows: number[] = [];
+        let currentMaxFlow = Infinity;
+        dtMachines.forEach(m => {
+          const theoretical = Math.round((m.throughputCapacity || 450) * (m.utilization / 100));
+          currentMaxFlow = Math.min(currentMaxFlow, theoretical);
+          sequentialFlows.push(currentMaxFlow);
+        });
+
+        return (
+          <>
 
       {/* STATE MACHINE PROGRESS BAR */}
       <div className="bg-card border border-border rounded-xl p-6 shadow-sm mb-6">
@@ -148,13 +159,13 @@ export function TabDigitalTwin() {
           <span className="text-xs font-bold uppercase text-muted-foreground tracking-wider">CO₂ Intensity</span>
           <div className="mt-2 flex justify-between items-end">
             <div>
-              <p className={cn("text-2xl font-bold", dtCO2Current > dtCO2Target ? "text-orange-500" : "text-foreground")}>{dtCO2Current}</p>
+              <p className={cn("text-2xl font-bold", typeof dtCO2Current === 'number' && dtCO2Current > dtCO2Target ? "text-orange-500" : "text-foreground")}>{dtCO2Current}</p>
               <p className="text-xs text-muted-foreground">kg / ton</p>
             </div>
             <div className="text-right">
               <p className="text-sm font-medium text-muted-foreground">Target: {dtCO2Target}</p>
-              <p className={cn("text-xs font-bold", dtCO2Current > dtCO2Target ? "text-orange-500" : "text-success")}>
-                Variance: {((dtCO2Current - dtCO2Target) / dtCO2Target * 100).toFixed(1)}%
+              <p className={cn("text-xs font-bold", typeof dtCO2Current === 'number' && dtCO2Current > dtCO2Target ? "text-orange-500" : "text-success")}>
+                {typeof dtCO2Current === 'number' ? `${(dtCO2Current - dtCO2Target > 0 ? '+' : '')}${dtCO2Current - dtCO2Target} vs target` : 'N/A'}
               </p>
             </div>
           </div>
@@ -216,8 +227,8 @@ export function TabDigitalTwin() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Flow Rate</span>
-                    <span className={cn("font-mono font-semibold", m.utilization === 0 ? "text-destructive" : "text-foreground")}>
-                      {dtThroughputActual === 0 ? 0 : Math.round(m.throughputCapacity * (m.utilization / 100))} <span className="text-[9px] text-muted-foreground">t/h</span>
+                    <span className={cn("font-mono font-semibold", m.utilization === 0 || dtThroughputCurrent === 0 ? "text-destructive" : "text-foreground")}>
+                      {dtThroughputCurrent === 0 ? 0 : sequentialFlows[i]} <span className="text-[9px] text-muted-foreground">t/h</span>
                     </span>
                   </div>
                   
@@ -296,9 +307,10 @@ export function TabDigitalTwin() {
             </div>
           </div>
         </div>
-
       </div>
-
+      </>
+        );
+      })()}
     </div>
   );
 }

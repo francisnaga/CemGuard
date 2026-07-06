@@ -36,27 +36,27 @@ export function calculateBusinessImpact(
   // Impact varies heavily by strategy (RCM principle)
   switch (strategy) {
     case 'Preventive':
-      downtimeHours = (2 * delayPenaltyTime) + waitPenaltyHours; 
+      downtimeHours = 2 + waitPenaltyHours; 
       repairCostMultiplier = 1.0 * delayPenaltyCost;
       co2ImpactTons = 0; 
       break;
     case 'Condition-Based':
-      downtimeHours = (4 * delayPenaltyTime) + waitPenaltyHours;
+      downtimeHours = 4 + waitPenaltyHours;
       repairCostMultiplier = 1.2 * delayPenaltyCost;
       co2ImpactTons = 2;
       break;
     case 'Predictive':
-      downtimeHours = (8 * delayPenaltyTime) + waitPenaltyHours; 
+      downtimeHours = 8 + waitPenaltyHours; 
       repairCostMultiplier = 1.5 * delayPenaltyCost;
       co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = (24 * delayPenaltyTime) + waitPenaltyHours; 
+      downtimeHours = 24 + waitPenaltyHours; 
       repairCostMultiplier = 3.0 * delayPenaltyCost; 
       co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = (72 * delayPenaltyTime) + waitPenaltyHours; 
+      downtimeHours = 72 + waitPenaltyHours; 
       repairCostMultiplier = 10.0 * delayPenaltyCost; 
       co2ImpactTons = 15; 
       break;

@@ -274,8 +274,8 @@ export const useStore = create<DashboardState>((set, get) => {
           m.utilization = 0; // Starved of cement
           m.loadFactor = 0;
         } else if (m.id !== 'cementmill') {
-          m.loadFactor = 0.5; // Plant throttles back to 50% due to dispatch bottleneck
-          m.utilization = 50;
+          m.loadFactor = 0; // Plant throttles back to 0 due to emergency stop
+          m.utilization = 0;
         }
       });
     }
@@ -545,7 +545,7 @@ export const useStore = create<DashboardState>((set, get) => {
     }
 
     const allMachineFlowRates = updatedMachines.map(m => Math.round((m.throughputCapacity || 450) * (m.utilization / 100)));
-    let newThroughput = Math.min(...allMachineFlowRates);
+    const newThroughput = Math.min(...allMachineFlowRates);
 
     const bottleneckAvailability = Math.min(...updatedMachines.map(m => m.availability));
 
