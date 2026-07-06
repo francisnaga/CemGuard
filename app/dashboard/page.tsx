@@ -116,7 +116,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 4 */}
-        <SectionE_BusinessImpact impact={impact} />
+        <SectionE_BusinessImpact impact={impact} strategy={worstMachine.strategy} prob={worstMachine.failureProb} />
 
         {/* 5 */}
         <SectionF_MaintenanceQueue items={[...dtTickets].sort((a, b) => b.createdAt - a.createdAt)} />

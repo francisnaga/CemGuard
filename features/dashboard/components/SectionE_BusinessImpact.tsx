@@ -2,11 +2,11 @@ import { ArrowRight, Activity, Clock, TrendingDown, DollarSign, CloudRain, Shiel
 import { BusinessImpact } from "@/lib/engineering/types";
 import { formatNaira } from "@/lib/utils";
 
-export function SectionE_BusinessImpact({ impact }: { impact: BusinessImpact }) {
+export function SectionE_BusinessImpact({ impact, strategy = 'Preventive', prob = 0 }: { impact: BusinessImpact, strategy?: string, prob?: number }) {
   const formatCur = (val: number) => formatNaira(val);
 
   const steps = [
-    { label: 'Failure', value: 'Trigger', icon: Activity, color: 'text-destructive' },
+    { label: 'Projected Action', value: strategy, icon: Activity, color: strategy === 'Preventive' ? 'text-success' : 'text-destructive' },
     { label: 'Downtime', value: `${impact.downtimeHours} Hrs`, icon: Clock, color: 'text-yellow-500' },
     { label: 'Production Loss', value: formatCur(impact.productionLossValue), icon: TrendingDown, color: 'text-orange-500' },
     { label: 'Repair Cost', value: formatCur(impact.repairCost), icon: DollarSign, color: 'text-red-500' },
