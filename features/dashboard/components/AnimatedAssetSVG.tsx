@@ -351,8 +351,90 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
     </svg>
   );
 
+  const renderCooler = () => (
+    <svg viewBox="0 0 100 100" className={cn("w-full h-full drop-shadow-2xl", className)}>
+      {defs}
+      <style>{`
+        @keyframes spin-fan { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes cooler-vibrate { 0% { transform: translate(0,0); } 50% { transform: translate(0, 1px); } 100% { transform: translate(0,0); } }
+        @keyframes clinker-move { 0% { stroke-dashoffset: 20; } 100% { stroke-dashoffset: 0; } }
+      `}</style>
+      
+      {/* Background Ambient Glow */}
+      <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
+
+      <g style={{ animation: isCritical ? 'cooler-vibrate 0.1s infinite' : 'none' }}>
+        
+        {/* Under-Grate Cooling Fans */}
+        <g transform="translate(25, 80)">
+           <rect x="-5" y="0" width="10" height="15" fill={`url(#${uid}-metal-dark)`} />
+           <g style={{ animation: isStopped ? 'none' : `spin-fan ${animationDuration} linear infinite`, transformOrigin: '0px 10px' }}>
+             <circle cx="0" cy="10" r="6" fill={`url(#${uid}-metal)`} />
+             <path d="M 0 4 L 3 10 L -3 10 Z" fill="#0f172a" />
+             <path d="M 0 16 L 3 10 L -3 10 Z" fill="#0f172a" />
+           </g>
+        </g>
+        <g transform="translate(50, 82)">
+           <rect x="-5" y="0" width="10" height="15" fill={`url(#${uid}-metal-dark)`} />
+           <g style={{ animation: isStopped ? 'none' : `spin-fan ${animationDuration} linear infinite`, transformOrigin: '0px 10px' }}>
+             <circle cx="0" cy="10" r="6" fill={`url(#${uid}-metal)`} />
+             <path d="M 0 4 L 3 10 L -3 10 Z" fill="#0f172a" />
+             <path d="M 0 16 L 3 10 L -3 10 Z" fill="#0f172a" />
+           </g>
+        </g>
+        <g transform="translate(75, 84)">
+           <rect x="-5" y="0" width="10" height="15" fill={`url(#${uid}-metal-dark)`} />
+           <g style={{ animation: isStopped ? 'none' : `spin-fan ${animationDuration} linear infinite`, transformOrigin: '0px 10px' }}>
+             <circle cx="0" cy="10" r="6" fill={`url(#${uid}-metal)`} />
+             <path d="M 0 4 L 3 10 L -3 10 Z" fill="#0f172a" />
+             <path d="M 0 16 L 3 10 L -3 10 Z" fill="#0f172a" />
+           </g>
+        </g>
+
+        {/* Main Casing Body */}
+        {/* Sloped top, flat bottom */}
+        <path d="M 10 40 L 90 55 L 90 85 L 10 80 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Side Access Doors */}
+        <rect x="20" y="55" width="15" height="15" fill={`url(#${uid}-metal)`} rx="1" />
+        <rect x="45" y="58" width="15" height="15" fill={`url(#${uid}-metal)`} rx="1" />
+        <rect x="70" y="61" width="15" height="15" fill={`url(#${uid}-metal)`} rx="1" />
+        
+        {/* Exhaust Stack */}
+        <path d="M 20 40 L 35 43 L 30 15 L 25 15 Z" fill={`url(#${uid}-metal-horiz)`} filter={`url(#${uid}-shadow)`} />
+
+        {/* Hot Clinker Inlet (Left) */}
+        <rect x="5" y="30" width="15" height="25" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+        
+        {/* Moving Clinker Bed (Visible through an open cutaway window) */}
+        <path d="M 15 48 L 85 62 L 85 70 L 15 56 Z" fill="#020617" />
+        
+        {/* Clinker gradient (Red -> Gray) */}
+        <defs>
+          <linearGradient id={`${uid}-clinker-bed`} x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#fef08a" />
+            <stop offset="20%" stopColor="#f97316" />
+            <stop offset="60%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#475569" />
+          </linearGradient>
+        </defs>
+        
+        <path d="M 15 52 L 85 66 M 15 56 L 85 70" stroke={`url(#${uid}-clinker-bed)`} strokeWidth="3" strokeDasharray="5 5" style={{ animation: isStopped ? 'none' : `clinker-move ${animationDuration} linear infinite` }} />
+
+        {/* Cooled Clinker Outlet (Right) */}
+        <rect x="80" y="65" width="15" height="25" fill={`url(#${uid}-metal)`} filter={`url(#${uid}-shadow)`} />
+      </g>
+      
+      <g transform="translate(10, 10)">
+        <rect x="0" y="0" width="8" height="8" rx="4" fill={statusColor} filter={`url(#${uid}-shadow)`} />
+        <text x="14" y="7" fontSize="8" fill="#64748b" fontWeight="bold" className="font-mono">RPM: {machine.rpm?.toFixed(1)}</text>
+      </g>
+    </svg>
+  );
+
   if (machine.id.includes('crusher')) return renderCrusher();
-  if (machine.id.includes('kiln') || machine.id.includes('cooler')) return renderKiln();
+  if (machine.id.includes('kiln')) return renderKiln();
+  if (machine.id.includes('cooler')) return renderCooler();
   if (machine.id.includes('packing')) return renderPacker();
   if (machine.id.includes('cementmill')) return renderBallMill();
   return renderMill();
