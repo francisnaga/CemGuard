@@ -28,33 +28,37 @@ export function calculateBusinessImpact(
   const waitPenaltyDays = Math.max(0, sparesLeadTimeDays - plannedDelayDays);
   const waitPenaltyHours = waitPenaltyDays * 24;
 
+  // Continuous degradation penalty: Operating a degraded machine causes secondary damage.
+  // We model a 15% repair cost penalty and 10% downtime penalty for every 30 days of delay.
+  const delayPenaltyCost = 1.0 + (plannedDelayDays / 30) * 0.15;
+  const delayPenaltyTime = 1.0 + (plannedDelayDays / 30) * 0.10;
+
   // Impact varies heavily by strategy (RCM principle)
   switch (strategy) {
     case 'Preventive':
-      downtimeHours = 2 + waitPenaltyHours; // Quick scheduled inspection
-      repairCostMultiplier = 1.0;
-      co2ImpactTons = 0; // No cold restart needed
+      downtimeHours = (2 * delayPenaltyTime) + waitPenaltyHours; 
+      repairCostMultiplier = 1.0 * delayPenaltyCost;
+      co2ImpactTons = 0; 
       break;
     case 'Condition-Based':
-      downtimeHours = 4 + waitPenaltyHours;
-      repairCostMultiplier = 1.2;
+      downtimeHours = (4 * delayPenaltyTime) + waitPenaltyHours;
+      repairCostMultiplier = 1.2 * delayPenaltyCost;
       co2ImpactTons = 2;
       break;
     case 'Predictive':
-      downtimeHours = 8 + waitPenaltyHours; // Planned targeted repair
-      repairCostMultiplier = 1.5;
+      downtimeHours = (8 * delayPenaltyTime) + waitPenaltyHours; 
+      repairCostMultiplier = 1.5 * delayPenaltyCost;
       co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = 24 + waitPenaltyHours; // Unplanned, waiting for parts
-      repairCostMultiplier = 3.0; // Overtime, expedited shipping
+      downtimeHours = (24 * delayPenaltyTime) + waitPenaltyHours; 
+      repairCostMultiplier = 3.0 * delayPenaltyCost; 
       co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = 72 + waitPenaltyHours; // Catastrophic failure + waiting for parts
-      repairCostMultiplier = 10.0; // Massive collateral damage
-      co2ImpactTons = 15; // Full cold restart
-
+      downtimeHours = (72 * delayPenaltyTime) + waitPenaltyHours; 
+      repairCostMultiplier = 10.0 * delayPenaltyCost; 
+      co2ImpactTons = 15; 
       break;
   }
 
