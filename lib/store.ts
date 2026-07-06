@@ -124,7 +124,7 @@ interface DashboardState {
   dtPause: () => void;
   dtReset: () => void;
   dtTick: () => void;
-  resolveTicket: (ticketId: string) => void;
+  resolveMaintenanceIssue: (machineId: string, ticketId: string) => void;
   openDigitalTwin: (machineId: string) => void;
   closeDigitalTwin: () => void;
 }
@@ -303,28 +303,25 @@ export const useStore = create<DashboardState>((set, get) => {
       dtHistory: JSON.parse(JSON.stringify(warmupHistory)) // Deep copy so we don't mutate the original warmup
     });
   },
-  resolveTicket: (ticketId) => {
+  resolveMaintenanceIssue: (machineId, ticketId) => {
     set((state) => {
       const newTickets = state.dtTickets.map(t => 
         t.id === ticketId ? { ...t, status: 'Ended' as const } : t
       );
       
-      const ticket = state.dtTickets.find(t => t.id === ticketId);
-      if (!ticket) return { dtTickets: newTickets };
-
       const newMachines = state.dtMachines.map(m => {
-        if (m.name === ticket.equipment) {
-          // Reset machine to healthy baseline
+        if (m.id === machineId) {
+          // Reset machine to baseline
           return {
             ...m,
-            health: 95,
-            vibrationRms: 2.0,
+            health: 100,
+            vibrationRms: 1.5,
             vibrationZone: 'A',
             temperatureC: 45.0,
-            failureProb: 5.0,
-            wearAccumulation: 0.1,
-            availability: 98,
-            utilization: 90,
+            failureProb: 0.1,
+            wearAccumulation: 0,
+            availability: 100,
+            utilization: 85,
             loadFactor: 0.85
           };
         }
@@ -556,33 +553,24 @@ export const useStore = create<DashboardState>((set, get) => {
       newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
     }
 
-    const capacities = {
-      crusher: updatedMachines.find(m => m.id === 'crusher')!.throughputCapacity,
-      rawmill: updatedMachines.find(m => m.id === 'rawmill')!.throughputCapacity,
-      kiln: updatedMachines.find(m => m.id === 'kiln')!.throughputCapacity,
-    };
-    const utilizations = {
-      crusher: updatedMachines.find(m => m.id === 'crusher')!.utilization,
-      rawmill: updatedMachines.find(m => m.id === 'rawmill')!.utilization,
-      kiln: updatedMachines.find(m => m.id === 'kiln')!.utilization,
-    };
-
-    if (crusher.utilization === 0) {
-      rawmill.utilization = Math.max(0, rawmill.utilization - 20); 
-      kiln.utilization = Math.max(50, kiln.utilization - 10); 
+    // Cascading Throughput (Theory of Constraints)
+    // The plant's total throughput capacity is constrained by the weakest link in the chain
+    const bottleneckAvailability = Math.min(...updatedMachines.map(m => m.availability));
+    const bottleneckCapacity = Math.min(...updatedMachines.map(m => m.throughputCapacity || 450));
+    
+    // If ANY machine triggers an 'Emergency Shutdown' or 'Imminent Failure' (0% availability),
+    // the global plant throughput MUST instantly drop to 0, simulating a starved line.
+    let newThroughput = 0;
+    if (bottleneckAvailability > 0) {
+      newThroughput = Math.round(bottleneckCapacity * (bottleneckAvailability / 100));
     } else {
-      if (rawmill.utilization < 90) rawmill.utilization = Math.min(90, rawmill.utilization + 10);
-      if (kiln.utilization < 90) kiln.utilization = Math.min(90, kiln.utilization + 5);
+      newThroughput = 0;
     }
 
-    utilizations.rawmill = rawmill.utilization;
-    utilizations.kiln = kiln.utilization;
-
-    const newThroughput = Math.round(calculateMassFlow(capacities, utilizations));
     const throughputRatio = newThroughput / 450; // 450 t/h nominal
-    const availabilityRatio = crusher.utilization > 0 ? 0.98 : 0.0;
+    const availabilityRatio = bottleneckAvailability > 0 ? (bottleneckAvailability / 100) : 0.0;
     const newOEE = calculateOEE(availabilityRatio, Math.min(1, throughputRatio));
-    const newEff = Math.round((newThroughput / capacities.kiln) * 100);
+    const newEff = Math.round((newThroughput / 450) * 100);
 
     let newEnergy = 4.2;
     let newCO2 = 815;

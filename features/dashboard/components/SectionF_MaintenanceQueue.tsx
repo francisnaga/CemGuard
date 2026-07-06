@@ -8,7 +8,7 @@ import { CheckCircle2, History, X } from "lucide-react";
 import { useState } from "react";
 
 export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
-  const resolveTicket = useStore(state => state.resolveTicket);
+  const resolveMaintenanceIssue = useStore(state => state.resolveMaintenanceIssue);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const getPriorityColor = (p: string, status: string) => {
@@ -61,7 +61,12 @@ export function SectionF_MaintenanceQueue({ items }: { items: QueueItem[] }) {
         <td className="px-4 py-3 text-right">
           {item.status !== 'Ended' && (
             <button 
-              onClick={() => resolveTicket(item.id)}
+              onClick={() => {
+                const machine = useStore.getState().dtMachines.find(m => m.name === item.equipment);
+                if (machine) {
+                  resolveMaintenanceIssue(machine.id, item.id);
+                }
+              }}
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary rounded-md text-xs font-semibold transition-colors"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
