@@ -5,7 +5,7 @@ import { ShieldAlert, Settings2, TrendingUp, LineChart } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
 import { calculateBusinessImpact } from '@/lib/engineering/business-impact-engine';
-import { cn } from '@/lib/utils';
+import { cn, formatNaira } from '@/lib/utils';
 
 export function TabStrategyPlanner() {
   const [delayDays, setDelayDays] = useState(14);
