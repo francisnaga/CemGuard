@@ -5,7 +5,7 @@ import { useStore } from "@/lib/store";
 export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
   const isCritical = machine.risk === 'Critical';
   const isWarning = machine.risk === 'High' || machine.risk === 'Medium';
-  const isLive = useStore(s => s.isLive);
+  const isLive = useStore(s => s.dtClock > 32);
   const isStopped = !isLive || machine.utilization === 0 || machine.availability === 0;
   
   // Dynamic parameters based on physics
