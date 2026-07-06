@@ -55,85 +55,89 @@ export function TabScenarioAnalysis() {
   }));
 
   return (
-    <div className="bg-card border border-border p-6 rounded-xl animate-in fade-in duration-500">
+    <div className="bg-card border border-border p-6 rounded-xl shadow-sm animate-in fade-in duration-500">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold">Scenario Analysis</h2>
-          <p className="text-sm text-muted-foreground">Compare strategic alternatives side-by-side.</p>
+          <h2 className="text-sm font-bold uppercase tracking-widest text-foreground">Scenario Analysis</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Compare strategic alternatives side-by-side.</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <select 
+        <div className="flex items-center space-x-3">
+          <select
             value={targetId}
             onChange={(e) => setTargetId(e.target.value)}
-            className="bg-background border border-border rounded-lg p-2 text-sm font-medium focus:outline-none focus:border-primary"
+            className="bg-background border border-border rounded-lg px-3 py-2 text-xs font-semibold focus:outline-none focus:border-primary transition-colors"
           >
             {dtMachines.map(m => (
               <option key={m.id} value={m.id}>{m.name}</option>
             ))}
           </select>
-          <button className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-lg shadow hover:bg-primary/90">
-            Save Current as Scenario
+          <button className="px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg shadow hover:bg-primary/90 transition-colors">
+            Save Scenario
           </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-xl border border-border">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
-              <th className="p-4 border-b border-border bg-muted/20 text-xs font-bold uppercase tracking-wider text-muted-foreground">Metric</th>
+              <th className="p-4 border-b border-border bg-muted/30 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Metric</th>
               {scenarios.map(s => (
                 <th key={s.name} className={cn(
-                  "p-4 border-b border-border bg-muted/20 w-[25%]",
+                  "p-4 border-b border-border bg-muted/30 w-[25%]",
                   s.isCurrent ? "border-t-2 border-t-primary bg-primary/5" : ""
                 )}>
-                  <div className="flex flex-col">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-foreground">{s.name}</span>
-                      {s.isRecommended && <div className="flex items-center text-[10px] uppercase font-bold text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded"><Star className="h-3 w-3 mr-1 fill-yellow-500" /> Recommended</div>}
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-foreground text-sm">{s.name}</span>
+                      {s.isRecommended && (
+                        <div className="flex items-center gap-1 text-[9px] uppercase font-bold tracking-widest text-yellow-400 bg-yellow-500/15 border border-yellow-500/30 px-2 py-0.5 rounded-md">
+                          <Star className="h-3 w-3 fill-yellow-400" /> Best
+                        </div>
+                      )}
                     </div>
-                    <span className="text-xs text-muted-foreground">{s.subtitle}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{s.subtitle}</span>
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            <tr>
-              <td className="p-4 text-sm font-semibold text-muted-foreground">Delay (Days)</td>
+            <tr className="hover:bg-muted/5 transition-colors">
+              <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Delay (Days)</td>
               {scenarios.map(s => (
-                <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>{s.delay} Days</td>
+                <td key={s.name} className={cn("p-4 font-mono font-bold tabular-nums text-sm", s.isCurrent ? "bg-primary/5" : "")}>{s.delay} Days</td>
               ))}
             </tr>
-            <tr>
-              <td className="p-4 text-sm font-semibold text-muted-foreground">Failure Risk</td>
+            <tr className="hover:bg-muted/5 transition-colors">
+              <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Failure Risk</td>
               {scenarios.map(s => (
-                <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>
-                  <div className="flex items-center space-x-2">
-                    <span className={s.risk > 50 ? "text-destructive" : s.risk > 30 ? "text-orange-500" : "text-success"}>{s.risk}%</span>
-                    {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.risk > scenarios[1].risk ? '+' : ''}{s.risk - scenarios[1].risk}%)</span>}
+                <td key={s.name} className={cn("p-4", s.isCurrent ? "bg-primary/5" : "")}>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("font-mono font-bold text-sm tabular-nums", s.risk > 50 ? "text-red-400" : s.risk > 30 ? "text-orange-400" : "text-emerald-400")}>{s.risk}%</span>
+                    {!s.isCurrent && <span className="text-[10px] text-muted-foreground font-mono">({s.risk > scenarios[1].risk ? '+' : ''}{s.risk - scenarios[1].risk}%)</span>}
                   </div>
                 </td>
               ))}
             </tr>
-            <tr>
-              <td className="p-4 text-sm font-semibold text-muted-foreground">Downtime</td>
+            <tr className="hover:bg-muted/5 transition-colors">
+              <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Downtime</td>
               {scenarios.map(s => (
-                <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>
-                  <div className="flex items-center space-x-2">
-                    <span className={s.downtime > 20 ? "text-destructive" : s.downtime > 10 ? "text-orange-500" : "text-success"}>{Number(s.downtime).toFixed(1)} Hrs</span>
-                    {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.downtime > scenarios[1].downtime ? '+' : ''}{Number(s.downtime - scenarios[1].downtime).toFixed(1)} Hrs)</span>}
+                <td key={s.name} className={cn("p-4", s.isCurrent ? "bg-primary/5" : "")}>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("font-mono font-bold text-sm tabular-nums", s.downtime > 20 ? "text-red-400" : s.downtime > 10 ? "text-orange-400" : "text-emerald-400")}>{Number(s.downtime).toFixed(1)} Hrs</span>
+                    {!s.isCurrent && <span className="text-[10px] text-muted-foreground font-mono">({s.downtime > scenarios[1].downtime ? '+' : ''}{Number(s.downtime - scenarios[1].downtime).toFixed(1)} Hrs)</span>}
                   </div>
                 </td>
               ))}
             </tr>
-            <tr>
-              <td className="p-4 text-sm font-semibold text-muted-foreground">Exposure Cost</td>
+            <tr className="hover:bg-muted/5 transition-colors">
+              <td className="p-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Exposure Cost</td>
               {scenarios.map(s => (
-                <td key={s.name} className={cn("p-4 text-sm font-bold", s.isCurrent ? "bg-primary/5" : "")}>
-                  <div className="flex items-center space-x-2">
-                    <span className={s.cost > 50 ? "text-destructive" : s.cost > 20 ? "text-orange-500" : "text-success"}>{formatNaira(s.cost, true)}</span>
-                    {s.isCurrent ? null : <span className="text-xs text-muted-foreground">({s.cost > scenarios[1].cost ? '+' : ''}{formatNaira(Math.abs(s.cost - scenarios[1].cost), true)})</span>}
+                <td key={s.name} className={cn("p-4", s.isCurrent ? "bg-primary/5" : "")}>
+                  <div className="flex items-center gap-2">
+                    <span className={cn("font-mono font-bold text-sm tabular-nums", s.cost > 50 ? "text-red-400" : s.cost > 20 ? "text-orange-400" : "text-emerald-400")}>{formatNaira(s.cost, true)}</span>
+                    {!s.isCurrent && <span className="text-[10px] text-muted-foreground font-mono">({s.cost > scenarios[1].cost ? '+' : ''}{formatNaira(Math.abs(s.cost - scenarios[1].cost), true)})</span>}
                   </div>
                 </td>
               ))}
