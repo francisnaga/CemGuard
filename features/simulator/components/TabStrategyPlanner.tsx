@@ -173,7 +173,7 @@ export function TabStrategyPlanner() {
             <div className="bg-muted/30 border border-border p-5 rounded-xl">
               <p className="text-sm text-muted-foreground mb-1">Revenue Exposure</p>
               <p className="text-2xl font-bold tracking-tight mb-2 text-destructive">
-                NGN {emergencyCostM.toFixed(1)}M
+                {formatNaira(emergencyCostM, true)}
               </p>
               <p className="text-xs text-muted-foreground">Representative — see model basis</p>
             </div>
@@ -185,8 +185,8 @@ export function TabStrategyPlanner() {
           <p className="text-muted-foreground">
             <strong className="text-foreground">Strategy Recommendation</strong><br/>
             {delayDays === 0 
-              ? `Immediate maintenance eliminates the current ${(currentP).toFixed(1)}% failure risk at a planned cost of NGN ${plannedCost.toFixed(1)}M. This is the recommended path if spares are available.`
-              : `Delaying ${delayDays} days escalates Weibull-projected failure probability to ${(projectedProb).toFixed(1)}%, driving estimated exposure to NGN ${emergencyCostM.toFixed(1)}M. Urgent priority maintenance is advised before this threshold is reached.`
+              ? `Immediate maintenance eliminates the current ${(currentP).toFixed(1)}% failure risk at a planned cost of ${formatNaira(plannedCost, true)}. This is the recommended path if spares are available.`
+              : `Delaying ${delayDays} days escalates Weibull-projected failure probability to ${(projectedProb).toFixed(1)}%, driving estimated exposure to ${formatNaira(emergencyCostM, true)}. Urgent priority maintenance is advised before this threshold is reached.`
             }
           </p>
         </div>

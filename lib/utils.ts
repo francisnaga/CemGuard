@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatNaira(value: number, isMillions: boolean = false) {
   const rawValue = isMillions ? value * 1_000_000 : value;
   if (rawValue >= 1_000_000_000) {
-    return `₦${(rawValue / 1_000_000_000).toFixed(1)}B`;
+    return `NGN ${(rawValue / 1_000_000_000).toFixed(1)}B`;
   }
-  return `₦${(rawValue / 1_000_000).toFixed(1)}M`;
+  return `NGN ${(rawValue / 1_000_000).toFixed(1)}M`;
 }

@@ -1,6 +1,8 @@
 import { MachineState } from '../store';
 import { BusinessImpact } from './types';
 
+import { formatNaira } from '../utils';
+
 export interface Insight {
   situation: string;
   observation: string;
@@ -13,7 +15,7 @@ export function generateInsight(
   impact: BusinessImpact
 ): Insight {
   const { vibrationZone: zone, health, failureProb: pf, name } = machine;
-  const formatCurrency = (val: number) => `NGN ${(val / 1000000).toFixed(1)}M`;
+  const formatCurrency = (val: number) => formatNaira(val, false);
 
   // Priority 2 - Rule-Based Severity Bands (Cascading logic to prevent gaps)
   if (pf >= 70 || zone === 'D') {
