@@ -62,12 +62,7 @@ export function calculateBusinessImpact(
       break;
   }
 
-  // Multiply by equipment criticality (Kiln takes longer than Conveyor)
-  let categoryMultiplier = 1.0;
-  if (equipmentCategory.includes('Kiln')) categoryMultiplier = 5.0;
-  if (equipmentCategory.includes('Mill')) categoryMultiplier = 3.0;
-
-  downtimeHours = Number((downtimeHours * categoryMultiplier).toFixed(1));
+  downtimeHours = Number((downtimeHours).toFixed(1));
   const repairCost = REPAIR_BASE_COST * repairCostMultiplier;
   const productionLossValue = downtimeHours * HOURLY_PRODUCTION_VALUE;
   

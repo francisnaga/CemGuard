@@ -217,7 +217,7 @@ export function TabDigitalTwin() {
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Flow Rate</span>
                     <span className={cn("font-mono font-semibold", m.utilization === 0 ? "text-destructive" : "text-foreground")}>
-                      {Math.round(m.throughputCapacity * (m.utilization / 100))} <span className="text-[9px] text-muted-foreground">t/h</span>
+                      {dtThroughputActual === 0 ? 0 : Math.round(m.throughputCapacity * (m.utilization / 100))} <span className="text-[9px] text-muted-foreground">t/h</span>
                     </span>
                   </div>
                   

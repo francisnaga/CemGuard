@@ -162,20 +162,7 @@ const initialMachines: MachineState[] = [
   },
 ];
 
-export const initialTickets: QueueItem[] = [
-  {
-    id: 'old-1',
-    equipment: 'Conveyor B',
-    priority: 'Low',
-    strategy: 'Preventive',
-    failureMode: 'Roller Inspection',
-    confidence: 95,
-    deadline: 'Past',
-    status: 'Ended',
-    createdAt: 28, // Sometime before start
-    day: 1
-  }
-];
+export const initialTickets: QueueItem[] = [];
 
 export const useStore = create<DashboardState>((set, get) => {
   // Generate synthetic warm-up history for the last 30 ticks
