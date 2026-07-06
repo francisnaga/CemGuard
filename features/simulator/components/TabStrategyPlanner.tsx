@@ -82,7 +82,7 @@ export function TabStrategyPlanner() {
             <input 
               type="range" 
               min="0" 
-              max="90" 
+              max="30"
               value={delayDays}
               onChange={(e) => setDelayDays(parseInt(e.target.value))}
               className="mt-2 w-full accent-primary" 

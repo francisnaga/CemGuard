@@ -27,13 +27,15 @@ export function TabScenarioAnalysis() {
   const scenariosDef = [
     { name: 'Scenario A', subtitle: 'Immediate Maintenance', delay: 0, isCurrent: false },
     { name: 'Scenario B', subtitle: 'Current Baseline', delay: Math.max(1, targetMachine.vibrationZone === 'C' ? 7 : 14), isCurrent: true },
-    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 90, isCurrent: false }
+    { name: 'Scenario C', subtitle: 'Run to Failure', delay: 30, isCurrent: false }
   ];
 
   const rawScenarios = scenariosDef.map(s => {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
     let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
+    // Force Corrective for presentation contrast if Run to Failure is selected
+    if (s.name === 'Scenario C') strategy = 'Corrective';
 
     const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
