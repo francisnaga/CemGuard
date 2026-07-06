@@ -330,7 +330,8 @@ export const useStore = create<DashboardState>((set, get) => {
 
       return {
         dtTickets: newTickets,
-        dtMachines: newMachines
+        dtMachines: newMachines,
+        dtCrewStatus: { ...state.dtCrewStatus, status: 'Available', target: 'None', priority: 'None' }
       };
     });
   },

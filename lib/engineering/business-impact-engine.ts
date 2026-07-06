@@ -1,9 +1,9 @@
 import { BusinessImpact, MaintenanceStrategy } from './types';
 
-// Cost assumptions (representative, documented)
-// Cement production: ~450 t/h, wholesale price ~NGN 5,500/ton → NGN 2,475,000/hr ≈ NGN 2.5M/hr
-// Source: Representative industry benchmark (calibrate with actual historian data)
-const HOURLY_PRODUCTION_VALUE = 2_500_000; // NGN /hr
+// Cost assumptions (realistic Dangote benchmark)
+// Cement production: ~450 t/h. 1 ton = 20 bags. Wholesale price ~NGN 6,000/bag -> NGN 120,000/ton.
+// 450 t/h * 120,000 = NGN 54,000,000/hr
+const HOURLY_PRODUCTION_VALUE = 54_000_000; // NGN /hr
 const CO2_EMISSION_PER_RESTART = 15;        // tons CO₂ per cold restart
 const REPAIR_BASE_COST = 5_000_000;         // NGN  base parts + labour for standard repair
 
