@@ -36,7 +36,9 @@ export default function DashboardPage() {
   
   const impact = worstMachine.impact;
   const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
-  const savingsAmount = (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000;
+  const savingsAmount = worstMachine.failureProb > 20 
+    ? (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000 
+    : 0;
 
   const insight = generateInsight(worstMachine, impact);
   const dtEvents = useStore(s => s.dtEvents);

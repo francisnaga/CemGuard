@@ -18,7 +18,7 @@ export function TabExecutiveBrief() {
   const strategy = determineMaintenanceStrategy(targetMachine.failureProb);
   const category = targetMachine.name.includes('Kiln') ? 'Kiln' : targetMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
   const impact = calculateBusinessImpact(strategy, category);
-  const insight = generateInsight(targetMachine, impact);
+  const insight = generateInsight(targetMachine, impact, store.plantState);
 
   return (
     <div className="max-w-4xl mx-auto bg-card border border-border p-8 md:p-12 rounded-xl animate-in fade-in duration-500 relative">

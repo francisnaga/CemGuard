@@ -544,19 +544,10 @@ export const useStore = create<DashboardState>((set, get) => {
       newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
     }
 
-    // Cascading Throughput (Theory of Constraints)
-    // The plant's total throughput capacity is constrained by the weakest link in the chain
+    const allMachineFlowRates = updatedMachines.map(m => Math.round((m.throughputCapacity || 450) * (m.utilization / 100)));
+    let newThroughput = Math.min(...allMachineFlowRates);
+
     const bottleneckAvailability = Math.min(...updatedMachines.map(m => m.availability));
-    const bottleneckCapacity = Math.min(...updatedMachines.map(m => m.throughputCapacity || 450));
-    
-    // If ANY machine triggers an 'Emergency Shutdown' or 'Imminent Failure' (0% availability),
-    // the global plant throughput MUST instantly drop to 0, simulating a starved line.
-    let newThroughput = 0;
-    if (bottleneckAvailability > 0) {
-      newThroughput = Math.round(bottleneckCapacity * (bottleneckAvailability / 100));
-    } else {
-      newThroughput = 0;
-    }
 
     const throughputRatio = newThroughput / 450; // 450 t/h nominal
     const availabilityRatio = bottleneckAvailability > 0 ? (bottleneckAvailability / 100) : 0.0;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ShieldAlert, Settings2, TrendingUp, LineChart } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
@@ -37,15 +37,21 @@ export function TabStrategyPlanner() {
   const remainingLifeHours = Math.max(0, t80 - (currentHours + projectedHours));
   const remainingLifeDays = Math.round(remainingLifeHours / 24);
 
-  // Use the exact same unified business impact function as the rest of the app
-  const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = calculateBusinessImpact(
-    determineMaintenanceStrategy(projectedProb, delayDays),
-    targetMachine.name,
-    sparesLeadTime,
-    delayDays
-  );
-  
-  const plannedCost = calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
+  // Use the exact same unified business impact function as the rest of the app, 
+  // enforcing strict React reactivity with useMemo to prevent stale state bugs.
+  const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = React.useMemo(() => {
+    return calculateBusinessImpact(
+      determineMaintenanceStrategy(projectedProb, delayDays),
+      targetMachine.name,
+      sparesLeadTime,
+      delayDays
+    );
+  }, [projectedProb, delayDays, targetMachine.name, sparesLeadTime]);
+
+  const plannedCost = React.useMemo(() => {
+    return calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
+  }, [targetMachine.name, sparesLeadTime, delayDays]);
+
   const emergencyCostM = totalRiskExposure / 1_000_000;
 
   const probColor = projectedProb > 70 ? 'text-destructive' : projectedProb > 40 ? 'text-orange-500' : 'text-success';

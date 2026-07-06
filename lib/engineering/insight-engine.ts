@@ -12,10 +12,20 @@ export interface Insight {
 
 export function generateInsight(
   machine: MachineState,
-  impact: BusinessImpact
+  impact: BusinessImpact,
+  globalPlantState?: string
 ): Insight {
   const { vibrationZone: zone, health, failureProb: pf, name } = machine;
   const formatCurrency = (val: number) => formatNaira(val, false);
+
+  if (globalPlantState === 'Emergency Shutdown') {
+    return {
+      situation: `PLANT IN EMERGENCY SHUTDOWN.`,
+      observation: `Catastrophic failure has occurred. Throughput is 0 t/h.`,
+      recommendation: `Commence immediate emergency corrective action. All non-essential systems halted.`,
+      severity: 'Critical'
+    };
+  }
 
   // Priority 2 - Rule-Based Severity Bands (Cascading logic to prevent gaps)
   if (pf >= 70 || zone === 'D') {
