@@ -1,10 +1,12 @@
 import React, { useId } from 'react';
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/store";
 
 export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
   const isCritical = machine.risk === 'Critical';
   const isWarning = machine.risk === 'High' || machine.risk === 'Medium';
-  const isStopped = machine.utilization === 0 || machine.availability === 0;
+  const isLive = useStore(s => s.isLive);
+  const isStopped = !isLive || machine.utilization === 0 || machine.availability === 0;
   
   // Dynamic parameters based on physics
   const baseRPM = machine.rpm || 10;
@@ -78,7 +80,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
       <circle cx="60" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-50" />
 
       {/* Tilted Group for Kiln */}
-      <g style={{ transformOrigin: '60px 50px', transform: 'rotate(-6deg)', animation: isCritical ? 'kiln-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ transformOrigin: '60px 50px', transform: 'rotate(-6deg)', animation: (isCritical && !isStopped) ? 'kiln-vibrate 0.1s infinite' : 'none' }}>
         
         {/* Foundation / Piers */}
         <path d="M 25 70 L 35 70 L 35 110 L 25 110 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
@@ -137,7 +139,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
       {/* Ambient Glow */}
       <circle cx="50" cy="50" r="45" fill={`url(#${uid}-glow)`} className="opacity-40" />
 
-      <g style={{ animation: isCritical ? 'mill-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ animation: (isCritical && !isStopped) ? 'mill-vibrate 0.1s infinite' : 'none' }}>
         {/* Massive Base / Gearbox */}
         <path d="M 20 70 L 80 70 L 85 95 L 15 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
         <rect x="40" y="90" width="20" height="10" fill="#020617" />
@@ -203,7 +205,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
       
       <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
 
-      <g style={{ animation: isCritical ? 'crusher-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ animation: (isCritical && !isStopped) ? 'crusher-vibrate 0.1s infinite' : 'none' }}>
         {/* Main Casing Body */}
         <path d="M 15 30 L 85 30 L 75 90 L 25 90 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
         
@@ -260,7 +262,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
       
       <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
 
-      <g style={{ animation: isCritical ? 'ballmill-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ animation: (isCritical && !isStopped) ? 'ballmill-vibrate 0.1s infinite' : 'none' }}>
         {/* Foundation Bases */}
         <path d="M 15 70 L 25 70 L 25 95 L 15 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
         <path d="M 75 70 L 85 70 L 85 95 L 75 95 Z" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
@@ -302,7 +304,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
 
       <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
 
-      <g style={{ animation: isCritical ? 'packer-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ animation: (isCritical && !isStopped) ? 'packer-vibrate 0.1s infinite' : 'none' }}>
         {/* Main Base and Conveyor */}
         <rect x="20" y="80" width="60" height="15" fill={`url(#${uid}-metal-dark)`} filter={`url(#${uid}-shadow)`} />
         <rect x="25" y="75" width="50" height="5" fill="#1e293b" />
@@ -363,7 +365,7 @@ export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, 
       {/* Background Ambient Glow */}
       <circle cx="50" cy="50" r="40" fill={`url(#${uid}-glow)`} className="opacity-40" />
 
-      <g style={{ animation: isCritical ? 'cooler-vibrate 0.1s infinite' : 'none' }}>
+      <g style={{ animation: (isCritical && !isStopped) ? 'cooler-vibrate 0.1s infinite' : 'none' }}>
         
         {/* Under-Grate Cooling Fans */}
         <g transform="translate(25, 80)">
