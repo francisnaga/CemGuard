@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 
-export function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
+import React from 'react';
+
+export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
   const isCritical = machine.risk === 'Critical';
   const isWarning = machine.risk === 'High' || machine.risk === 'Medium';
   const isStopped = machine.utilization === 0 || machine.availability === 0;
@@ -232,4 +234,9 @@ export function AnimatedAssetSVG({ machine, className }: { machine: any; classNa
   if (machine.id.includes('crusher')) return renderCrusher();
   if (machine.id.includes('kiln') || machine.id.includes('cooler')) return renderKiln();
   return renderMill();
-}
+}, (prev, next) => {
+  return prev.machine.risk === next.machine.risk &&
+         prev.machine.utilization === next.machine.utilization &&
+         prev.machine.availability === next.machine.availability &&
+         prev.machine.rpm === next.machine.rpm;
+});

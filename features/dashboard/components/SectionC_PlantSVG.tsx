@@ -16,7 +16,7 @@ interface PlantNodeProps {
 }
 
 export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
-  const [hoveredNode, setHoveredNode] = useState<PlantNodeProps | null>(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const openDigitalTwin = useStore((state) => state.openDigitalTwin);
 
   const getColorClass = (state: string) => {
@@ -45,8 +45,8 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
             <div key={node.id} className="relative flex items-center group shrink-0">
               {/* The Machine Block */}
               <div 
-                onMouseEnter={() => setHoveredNode(node)}
-                onMouseLeave={() => setHoveredNode(null)}
+                onMouseEnter={() => setHoveredNodeId(node.id)}
+                onMouseLeave={() => setHoveredNodeId(null)}
                 onClick={() => openDigitalTwin(node.id)}
                 className={cn(
                   "relative w-32 h-32 rounded-md border flex flex-col items-center justify-center transition-colors cursor-pointer hover:ring-2 hover:ring-primary/50",
@@ -82,28 +82,32 @@ export function SectionC_PlantSVG({ nodes }: { nodes: PlantNodeProps[] }) {
       </div>
 
       {/* Hover Tooltip */}
-      {hoveredNode && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border rounded-md p-4 shadow-md flex space-x-6 z-50">
-          <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Equipment</p>
-            <p className="font-semibold text-foreground text-sm">{hoveredNode.name}</p>
+      {hoveredNodeId && (() => {
+        const liveHoveredNode = nodes.find(n => n.id === hoveredNodeId);
+        if (!liveHoveredNode) return null;
+        return (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-popover border border-border rounded-md p-4 shadow-md flex space-x-6 z-50">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Equipment</p>
+              <p className="font-semibold text-foreground text-sm">{liveHoveredNode.name}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Health</p>
+              <p className="font-mono text-foreground text-sm">{liveHoveredNode.health.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{liveHoveredNode.isProcessTemp ? 'Process Temp' : 'Bearing Temp'}</p>
+              <p className="font-mono text-foreground text-sm">{liveHoveredNode.temperature.toFixed(liveHoveredNode.isProcessTemp ? 0 : 1)}°C</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk Level</p>
+              <p className={cn("font-mono font-bold text-sm", liveHoveredNode.riskTier === 'Critical' ? 'text-destructive' : liveHoveredNode.riskTier === 'Low' ? 'text-success' : 'text-warning')}>
+                {liveHoveredNode.riskTier}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Health</p>
-            <p className="font-mono text-foreground text-sm">{hoveredNode.health.toFixed(1)}%</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{hoveredNode.isProcessTemp ? 'Process Temp' : 'Bearing Temp'}</p>
-            <p className="font-mono text-foreground text-sm">{hoveredNode.temperature.toFixed(hoveredNode.isProcessTemp ? 0 : 1)}°C</p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Risk Level</p>
-            <p className={cn("text-sm font-semibold", (hoveredNode.riskTier === 'High' || hoveredNode.riskTier === 'Critical') ? "text-destructive" : hoveredNode.riskTier === 'Medium' ? "text-warning" : "text-success")}>
-              {hoveredNode.riskTier}
-            </p>
-          </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
