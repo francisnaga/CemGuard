@@ -26,6 +26,9 @@ export default function ReportsPage() {
   const insight = generateInsight(worstMachine, impact);
   const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
 
+  const maxPfMachine = dtMachines.reduce((max, m) => m.failureProb > max.failureProb ? m : max, dtMachines[0]);
+  const hasAtRiskAsset = dtMachines.some(m => m.risk !== 'Low');
+
   return (
     <div className="max-w-4xl mx-auto print:max-w-none print:w-full print:p-0 print:m-0">
       
@@ -82,7 +85,11 @@ export default function ReportsPage() {
             </div>
           </div>
           <p className="text-foreground/80 leading-relaxed text-sm text-justify">
-            This report details the current operational reliability of the {plantProfile.name}. {insight.situation} {insight.observation} If preventative maintenance is not scheduled, the cascading throughput loss will result in severe financial exposure.
+            This report details the current operational reliability of the {plantProfile.name}.
+            {hasAtRiskAsset 
+              ? ` Critical anomalies detected. The ${maxPfMachine.name} is currently driving plant risk with a P(f) of ${maxPfMachine.failureProb.toFixed(1)}%.` 
+              : ` No anomalies detected across monitored assets. Highest P(f) is ${maxPfMachine.failureProb.toFixed(1)}%.`}
+            {" "}If preventative maintenance is not scheduled, the cascading throughput loss will result in severe financial exposure.
           </p>
         </div>
 
