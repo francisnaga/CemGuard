@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full antialiased font-sans`}
+      className={`h-full antialiased font-sans light`}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
