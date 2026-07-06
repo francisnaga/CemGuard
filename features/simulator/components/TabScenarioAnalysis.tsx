@@ -34,8 +34,6 @@ export function TabScenarioAnalysis() {
     const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
     
     let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
-    // Force Corrective for presentation contrast if Run to Failure is selected
-    if (s.name === 'Scenario C') strategy = 'Corrective';
 
     const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
