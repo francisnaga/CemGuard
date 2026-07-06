@@ -89,7 +89,7 @@ export default function DashboardPage() {
               context: { currentState: m.risk === 'Critical' ? 'Critical' : m.availability === 0 || m.utilization === 0 ? 'Offline' : m.risk === 'Medium' ? 'Minor Wear' : m.risk === 'High' ? 'Severe Wear' : 'Healthy', plantState: 'Normal Production', category: m.name, equipmentId: m.id, installationDate: new Date(), currentDate: new Date(), environment: { ambientTemperature: 38, humidity: 65, dustLevel: 'High' } },
               health: m.health,
               temperature: m.temperatureC,
-              isProcessTemp: m.id === 'kiln',
+              isProcessTemp: false,
               riskTier: m.risk
             }))} />
           </div>
