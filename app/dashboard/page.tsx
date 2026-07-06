@@ -38,7 +38,7 @@ export default function DashboardPage() {
   const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
   const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
   const savingsAmount = worstMachine.failureProb > 20 
-    ? (emergencyImpact.totalRiskExposure - impact.totalRiskExposure) / 1_000_000 
+    ? Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure) / 1_000_000 
     : 0;
 
   const insight = generateInsight(worstMachine, impact);
