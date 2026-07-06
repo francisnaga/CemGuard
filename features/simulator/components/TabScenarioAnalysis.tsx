@@ -36,7 +36,7 @@ export function TabScenarioAnalysis() {
     
     const strategy = s.delay === 0 ? 'Preventive' : determineMaintenanceStrategy(projectedProb, s.delay);
     const category = targetMachine.name.includes('Kiln') ? 'Kiln' : targetMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
-    const impact = calculateBusinessImpact(strategy, category);
+    const impact = calculateBusinessImpact(strategy, category, 0, s.delay);
 
     return {
       ...s,

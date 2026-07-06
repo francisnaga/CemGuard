@@ -229,7 +229,7 @@ export const useStore = create<DashboardState>((set, get) => {
     ];
     let newClock = get().dtClock;
     const newCrew = { name: 'Crew Alpha', status: 'Available', target: 'None', eta: 0, priority: 'None' } as any;
-    let newBottleneck = null;
+    const newBottleneck = null;
 
     if (scenario === 'Healthy Plant') {
       newClock = 32;

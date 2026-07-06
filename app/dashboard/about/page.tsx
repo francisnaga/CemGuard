@@ -54,7 +54,7 @@ export default function AboutPage() {
               <h2 className="text-xl font-bold">Cost-of-Failure & ROI Engine</h2>
             </div>
             <p className="text-muted-foreground leading-relaxed text-sm mb-8">
-              The Decision Engine calculates exposure continuously. If the Crusher&apos;s nominal throughput is 5,000 tpd and clinker margin is NGN 14,200/ton, an unexpected 28-hour downtime event generates a direct revenue exposure of NGN 82.8M. The engine compares this against the cost of an 8-hour planned shutdown (NGN 12.0M) to generate the deterministic &quot;&#11088; Recommended&quot; flag.
+              The Decision Engine calculates exposure continuously. If the plant&apos;s nominal throughput is 10,800 tpd and wholesale cement value is NGN 120,000/ton, an unexpected 72-hour catastrophic emergency shutdown generates a direct revenue exposure of NGN 3.88B. The engine compares this against the exact cost of a 2-hour preventive planned shutdown (NGN 113.0M) to generate deterministic, financially-backed maintenance strategies.
             </p>
           </section>
 
