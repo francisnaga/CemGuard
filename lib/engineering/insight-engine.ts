@@ -32,26 +32,26 @@ export function generateInsight(
     return {
       situation: `${name} requires emergency intervention.`,
       observation: `Weibull P(f) = ${pf.toFixed(1)}%. ISO Zone ${zone}. Temperature ${machine.temperatureC.toFixed(1)}degC.`,
-      recommendation: `Execute immediate shutdown. Dispatch maintenance crew immediately. Estimated avoided loss: ${formatCurrency(impact.totalRiskExposure)}.`,
+      recommendation: `Schedule immediate intervention within 48 hours. Execute controlled shutdown. Estimated avoided loss: ${formatCurrency(impact.totalRiskExposure)}.`,
       severity: 'Critical'
     };
   }
 
-  if (pf >= 50 || health < 60) {
+  if (pf >= 50 || health < 60 || zone === 'C') {
     return {
-      situation: `${name} degradation is accelerating rapidly.`,
+      situation: `${name} degradation is accelerating.`,
       observation: `Failure probability reached ${pf.toFixed(1)}%. Vibration in Zone ${zone}. Health Index ${health.toFixed(1)}.`,
-      recommendation: `Schedule planned shutdown and replacement within 24 hours. Pre-stage spares to avoid ${formatCurrency(impact.totalRiskExposure)} exposure.`,
-      severity: 'Critical'
+      recommendation: `Schedule inspection within 7 days. Pre-stage spares to avoid ${formatCurrency(impact.totalRiskExposure)} exposure.`,
+      severity: 'Warning'
     };
   }
 
-  if (pf >= 15 || zone === 'C' || zone === 'B' || health < 75) {
+  if (pf >= 15 || zone === 'B' || health < 75) {
     return {
       situation: `${name} requires monitoring (Zone ${zone}).`,
       observation: `RMS velocity ${machine.vibrationRms.toFixed(2)} mm/s. Bearing temp ${machine.temperatureC.toFixed(1)}degC. P(f) = ${pf.toFixed(1)}%.`,
-      recommendation: `Schedule inspection within 48 hours; pre-stage spares if trend continues.`,
-      severity: 'Warning'
+      recommendation: `Routine monitoring. Maintain regular operational cadence.`,
+      severity: 'Healthy'
     };
   }
 

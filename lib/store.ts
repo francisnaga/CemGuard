@@ -265,7 +265,6 @@ export const useStore = create<DashboardState>((set, get) => {
         cementmill.availability = 0;
         cementmill.utilization = 0;
         cementmill.loadFactor = 0;
-        newBottleneck = { machine: 'Cement Mill', reason: 'Gearbox failure & Emergency Shutdown', loss: 100 };
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '13:00', category: 'Critical', code: 'INC-014', message: 'Emergency shutdown initiated. Cement Mill gearbox failure predicted.' });
       }
       // Cascading plant failure:
@@ -540,12 +539,21 @@ export const useStore = create<DashboardState>((set, get) => {
         id: Math.random().toString(36).substring(2, 11), time: timeStr, category: 'Critical', code: 'INC-014', 
         message: `Emergency shutdown initiated. Imminent bearing failure predicted.` 
       });
-
-      newBottleneck = { machine: 'Crusher', reason: 'Bearing failure & Emergency Shutdown', loss: 100 };
     }
 
     const allMachineFlowRates = updatedMachines.map(m => Math.round((m.throughputCapacity || 450) * (m.utilization / 100)));
     const newThroughput = Math.min(...allMachineFlowRates);
+    const bottleneckIndex = allMachineFlowRates.indexOf(newThroughput);
+    const actualBottleneckMachine = updatedMachines[bottleneckIndex];
+
+    newBottleneck = null;
+    if (newThroughput < 450) {
+      newBottleneck = {
+        machine: actualBottleneckMachine.name,
+        reason: newThroughput === 0 ? 'Machine Offline / Emergency Shutdown' : 'Flow Rate Constraint',
+        loss: Math.round(100 - (newThroughput / 450 * 100))
+      };
+    }
 
     const bottleneckAvailability = Math.min(...updatedMachines.map(m => m.availability));
 

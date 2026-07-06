@@ -31,14 +31,16 @@ export function TabScenarioAnalysis() {
   ];
 
   const rawScenarios = scenariosDef.map(s => {
-    const projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
+    let projectedProb = projectFailureProbability(currentHours, s.delay * 24, effectiveEta, beta);
+    if (s.delay === 0) projectedProb = 5; // Post-maintenance baseline
     
-    let strategy = determineMaintenanceStrategy(projectedProb, s.delay);
+    const strategy = s.delay === 0 ? 'Preventive' : determineMaintenanceStrategy(projectedProb, s.delay);
+    const category = targetMachine.name.includes('Kiln') ? 'Kiln' : targetMachine.name.includes('Mill') ? 'Mill' : 'Crusher';
+    const impact = calculateBusinessImpact(strategy, category);
 
-    const impact = calculateBusinessImpact(strategy, targetMachine.name);
     return {
       ...s,
-      risk: Math.round(projectedProb),
+      risk: s.delay === 0 ? 5 : Math.round(projectedProb),
       downtime: impact.downtimeHours,
       cost: impact.totalRiskExposure / 1_000_000
     };
