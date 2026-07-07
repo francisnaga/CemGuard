@@ -83,7 +83,7 @@ export default function DashboardPage() {
           primaryInsight={insight.situation}
           observation={insight.observation}
           recommendedAction={insight.recommendation}
-          expectedImpact={`Avoids ${formatNaira(Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure))} in risk exposure and ${Math.max(0, emergencyImpact.downtimeHours - plannedImpact.downtimeHours)} hours of downtime.`}
+          expectedImpact={insight.severity === 'Healthy' ? 'Maintains optimal OEE and prevents unnecessary maintenance expenditure.' : `Avoids ${formatNaira(Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure))} in risk exposure and ${Math.max(0, emergencyImpact.downtimeHours - plannedImpact.downtimeHours)} hours of downtime.`}
           presentationMode={presentationMode}
           severity={insight.severity}
         />
