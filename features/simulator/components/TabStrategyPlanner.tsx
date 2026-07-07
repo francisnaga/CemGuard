@@ -54,8 +54,9 @@ export function TabStrategyPlanner() {
   }, [currentStrategy, targetMachine.name, sparesLeadTime, delayDays]);
 
   const plannedCost = React.useMemo(() => {
-    return calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
-  }, [targetMachine.name, sparesLeadTime, delayDays]);
+    const strat = delayDays === 0 ? currentStrategy : 'Preventive';
+    return calculateBusinessImpact(strat, targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
+  }, [currentStrategy, targetMachine.name, sparesLeadTime, delayDays]);
 
   const emergencyCostM = totalRiskExposure / 1_000_000;
 
