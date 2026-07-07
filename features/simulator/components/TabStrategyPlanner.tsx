@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { ShieldAlert, Settings2, TrendingUp, LineChart } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldAlert, Settings2, TrendingUp, LineChart, Info } from 'lucide-react';
 import { useStore } from '@/lib/store';
 import { projectFailureProbability } from '@/lib/engineering/physics-engine';
 import { calculateBusinessImpact, determineMaintenanceStrategy } from '@/lib/engineering/business-impact-engine';
@@ -39,7 +39,7 @@ export function TabStrategyPlanner() {
 
   // Use the exact same unified business impact function as the rest of the app, 
   // enforcing strict React reactivity with useMemo to prevent stale state bugs.
-  const { repairCost, productionLossValue, totalRiskExposure, downtimeHours: downtimeEst } = React.useMemo(() => {
+  const { totalRiskExposure, downtimeHours: downtimeEst } = React.useMemo(() => {
     return calculateBusinessImpact(
       determineMaintenanceStrategy(projectedProb, delayDays),
       targetMachine.name,
@@ -135,12 +135,22 @@ export function TabStrategyPlanner() {
           <h2 className="text-lg font-bold">Strategy Impact Estimation</h2>
         </div>
 
-        {/* New warning about waiting for spares while plant is down */}
+        {/* Logistics protocol notice for planned preventive maintenance */}
         {delayDays === 0 && sparesLeadTime > 0 && (
+          <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
+            <Info className="h-5 w-5 text-blue-500 shrink-0" />
+            <p className="text-muted-foreground">
+              <strong className="text-blue-500">Logistics Protocol:</strong> Spares require a {sparesLeadTime}-day lead time. For planned preventive maintenance, parts are ordered immediately while the machine continues operating safely. Zero wait penalty is incurred; standard 2.0 hr shutdown applies upon arrival.
+            </p>
+          </div>
+        )}
+
+        {/* Warning when delaying maintenance exceeds spares lead time */}
+        {delayDays > 0 && sparesLeadTime > delayDays && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
             <p className="text-muted-foreground">
-              <strong className="text-orange-500">Warning:</strong> Initiating maintenance immediately without spares on-site will force a {sparesLeadTime}-day production halt while waiting for parts.
+              <strong className="text-orange-500">Warning:</strong> Delaying maintenance exceeds spares lead time. If failure occurs before parts arrive, the asset will suffer an unmitigated {(sparesLeadTime - delayDays) * 24}-hour transit halt.
             </p>
           </div>
         )}
