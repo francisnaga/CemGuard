@@ -47,11 +47,11 @@ export function calculateBusinessImpact(
       repairCostMultiplier = 1.5 * delayPenaltyCost;
       break;
     case 'Corrective':
-      downtimeHours = (24 + waitPenaltyHours) * delayPenaltyTime; // Unplanned breakdown forces asset offline while waiting for spares.
+      downtimeHours = ((24 + waitPenaltyHours) * delayPenaltyTime) + (plannedDelayDays * 24); // Unplanned breakdown forces asset offline; delaying repairs adds dead offline hours!
       repairCostMultiplier = 3.0 * delayPenaltyCost; 
       break;
     case 'Emergency':
-      downtimeHours = (72 + waitPenaltyHours) * delayPenaltyTime; // Catastrophic failure forces asset offline while waiting for spares.
+      downtimeHours = ((72 + waitPenaltyHours) * delayPenaltyTime) + (plannedDelayDays * 24); // Catastrophic failure forces asset offline; delaying repairs adds dead offline hours!
       repairCostMultiplier = 10.0 * delayPenaltyCost; 
       break;
   }

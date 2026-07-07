@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, X, Star } from 'lucide-react';
+import { Check, X, Star, ShieldAlert } from 'lucide-react';
 import { cn, formatNaira } from '@/lib/utils';
 
 import { useStore } from '@/lib/store';
@@ -80,6 +80,18 @@ export function TabScenarioAnalysis() {
         </div>
       </div>
 
+      {currentP > 70 && (
+        <div className="mb-6 p-4 border border-destructive/40 bg-destructive/10 rounded-xl flex items-start space-x-3 text-sm animate-pulse">
+          <ShieldAlert className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-destructive font-bold">EMERGENCY BREAKDOWN STATE (100% Failure Risk):</strong>{' '}
+            <span className="text-muted-foreground">
+              This asset has broken down (P(f) = 100%). &apos;Run to Failure&apos; and delayed maintenance scenarios (Scenario B &amp; C) are invalid because the machine is already offline. Any delay in repairs accumulates NGN 54,000,000/hr in unmitigated offline production losses (+24 hrs dead downtime per day of delay).
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -150,11 +162,19 @@ export function TabScenarioAnalysis() {
         <div>
           <p className="text-sm font-bold text-yellow-500 mb-1">Recommendation Basis</p>
           <p className="text-sm text-muted-foreground">
-            {bestScenario.name} ({bestScenario.subtitle}) is recommended. 
-            {bestScenario.name === currentBaseline.name ? (
-              <> The current operational baseline is the optimal strategy. Avoid unnecessary early maintenance or excessive delays to maximize financial efficiency.</>
+            {currentP > 70 ? (
+              <span className="font-semibold text-destructive">
+                EMERGENCY OVERRIDE: The asset has reached catastrophic breakdown state (100% failure risk). Scenario A (Immediate Emergency Maintenance) is the ONLY valid protocol. Delaying repairs (Scenario B or C) leaves the plant offline accumulating NGN 54,000,000 every hour in unmitigated downtime losses.
+              </span>
             ) : (
-              <> While it requires {bestScenario.downtime} hours of planned downtime {bestScenario.delay === 0 ? 'today' : `in ${bestScenario.delay} days`}, it mitigates a {Math.abs(currentBaseline.risk - bestScenario.risk)}% difference in failure probability compared to the baseline, saving an estimated {formatNaira(Math.abs(currentBaseline.cost - bestScenario.cost), true)} in avoidable exposure and {currentBaseline.downtime > bestScenario.downtime ? `preventing ${currentBaseline.downtime - bestScenario.downtime} hours of additional downtime.` : `incurring ${bestScenario.downtime - currentBaseline.downtime} hours of extra downtime for a much safer operating margin.`} </>
+              <>
+                {bestScenario.name} ({bestScenario.subtitle}) is recommended. 
+                {bestScenario.name === currentBaseline.name ? (
+                  <> The current operational baseline is the optimal strategy. Avoid unnecessary early maintenance or excessive delays to maximize financial efficiency.</>
+                ) : (
+                  <> While it requires {bestScenario.downtime} hours of planned downtime {bestScenario.delay === 0 ? 'today' : `in ${bestScenario.delay} days`}, it mitigates a {Math.abs(currentBaseline.risk - bestScenario.risk)}% difference in failure probability compared to the baseline, saving an estimated {formatNaira(Math.abs(currentBaseline.cost - bestScenario.cost), true)} in avoidable exposure and {currentBaseline.downtime > bestScenario.downtime ? `preventing ${currentBaseline.downtime - bestScenario.downtime} hours of additional downtime.` : `incurring ${bestScenario.downtime - currentBaseline.downtime} hours of extra downtime for a much safer operating margin.`} </>
+                )}
+              </>
             )}
           </p>
         </div>
