@@ -6,11 +6,12 @@ import { BusinessImpact, MaintenanceStrategy } from './types';
 const HOURLY_PRODUCTION_VALUE = 54_000_000; // NGN /hr
 const REPAIR_BASE_COST = 5_000_000;         // NGN  base parts + labour for standard repair
 
-export function determineMaintenanceStrategy(failureProb: number, delayDays: number = 0): MaintenanceStrategy {
-  if (delayDays === 0) return 'Preventive';
+export function determineMaintenanceStrategy(failureProb: number, delayDays?: number): MaintenanceStrategy {
   if (failureProb > 70) return 'Emergency';
-  if (failureProb > 40) return 'Predictive';
-  return 'Condition-Based';
+  if (failureProb > 50) return 'Corrective';
+  if (failureProb > 20) return 'Predictive';
+  if (delayDays !== undefined && delayDays > 0) return 'Condition-Based';
+  return 'Preventive';
 }
 
 export function calculateBusinessImpact(

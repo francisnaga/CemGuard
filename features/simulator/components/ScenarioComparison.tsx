@@ -81,9 +81,9 @@ export function ScenarioComparison({
               })}
             </tr>
 
-            {/* Revenue Loss */}
+            {/* Production Loss Cost */}
             <tr className="hover:bg-muted/10 transition-colors">
-              <td className="px-4 py-3 font-medium text-muted-foreground">Revenue Loss</td>
+              <td className="px-4 py-3 font-medium text-muted-foreground">Production Loss Cost</td>
               <td className="px-4 py-3 border-l border-border bg-primary/5 font-bold text-destructive">{formatNaira(currentScenario.revenueLoss, true)}</td>
               {savedScenarios.map(s => {
                 const diff = s.revenueLoss - currentScenario.revenueLoss;

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
 import { PlantState, QueueItem } from './engineering/types';
+import { determineMaintenanceStrategy } from './engineering/business-impact-engine';
 import { 
   calculateVibration, 
   calculateBearingTemperature, 
@@ -407,7 +408,7 @@ export const useStore = create<DashboardState>((set, get) => {
               id: `tkt-${Math.random().toString(36).substring(2, 8)}`,
               equipment: machine.name,
               priority: machine.risk,
-              strategy: machine.failureProb > 70 ? 'Emergency' : machine.failureProb > 50 ? 'Corrective' : 'Predictive',
+              strategy: determineMaintenanceStrategy(machine.failureProb),
               failureMode: machine.vibrationZone === 'D' || machine.vibrationZone === 'C' 
                 ? `High Vibration (Zone ${machine.vibrationZone})` 
                 : machine.temperatureC > 85 

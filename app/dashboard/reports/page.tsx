@@ -153,7 +153,7 @@ export default function ReportsPage() {
               </div>
               <div className="flex items-center space-x-3 text-sm">
                 <TrendingDown className="h-5 w-5 text-foreground" />
-                <span className="font-semibold text-foreground">Mitigates <span className="font-mono">{formatNaira(impact.totalRiskExposure)}</span> Revenue Exposure</span>
+                <span className="font-semibold text-foreground">Mitigates <span className="font-mono">{formatNaira(impact.totalRiskExposure)}</span> Production Loss Cost</span>
               </div>
             </div>
           </div>

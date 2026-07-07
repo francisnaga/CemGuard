@@ -34,7 +34,7 @@ Manufacturing lines operate in series. CemGuard's state engine natively understa
 ### 4. Financial Risk Translation Engine
 CemGuard abandons generic "Red/Yellow/Green" status lights in favor of rigorous statistical mechanics and financial modeling:
 - **Weibull Distribution Analysis:** Calculates the exact, real-time probability of failure $P(f)$ based on operational hours and ISO 10816 vibration parameters.
-- **Realistic Economic Benchmarking:** Maps mechanical risk directly to lost revenue. Assumes a realistic 450 t/h output at ₦120,000/ton, calculating exact downtime exposure at **₦54,000,000 per hour** to justify predictive maintenance costs to executives.
+- **Realistic Economic Benchmarking:** Maps mechanical risk directly to production loss cost. Assumes a realistic 450 t/h output at ₦120,000/ton, calculating exact downtime exposure at **₦54,000,000 per hour** to justify predictive maintenance costs to executives.
 
 ---
 

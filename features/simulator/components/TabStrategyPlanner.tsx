@@ -187,7 +187,7 @@ export function TabStrategyPlanner() {
             </div>
 
             <div className="bg-muted/30 border border-border p-5 rounded-xl">
-              <p className="text-sm text-muted-foreground mb-1">Revenue Exposure</p>
+              <p className="text-sm text-muted-foreground mb-1">Production Loss Cost</p>
               <p className="text-2xl font-bold tracking-tight mb-2 text-destructive">
                 {formatNaira(emergencyCostM, true)}
               </p>
