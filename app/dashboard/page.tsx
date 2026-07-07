@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const fleetAvailability = dtMachines.reduce((sum, m) => sum + m.availability, 0) / dtMachines.length;
 
   const machinesWithImpact = dtMachines.map(m => {
-    const strategy = m.failureProb > 70 ? 'Emergency' : m.failureProb > 50 ? 'Corrective' : m.failureProb > 20 ? 'Predictive' : 'Preventive';
+    const strategy = determineMaintenanceStrategy(m.failureProb);
     const category = m.name.includes('Kiln') ? 'Kiln' : m.name.includes('Mill') ? 'Mill' : 'Crusher';
     const impact = calculateBusinessImpact(strategy, category);
     const expectedRisk = impact.totalRiskExposure * (m.failureProb / 100);
