@@ -549,7 +549,8 @@ export const useStore = create<DashboardState>((set, get) => {
     const allMachineFlowRates = updatedMachines.map(m => Math.round((m.throughputCapacity || 450) * (m.utilization / 100)));
     const newThroughput = Math.min(...allMachineFlowRates);
     const bottleneckIndex = allMachineFlowRates.indexOf(newThroughput);
-    const actualBottleneckMachine = updatedMachines[bottleneckIndex];
+    const brokenMachine = updatedMachines.find(m => m.availability === 0);
+    const actualBottleneckMachine = brokenMachine || updatedMachines[bottleneckIndex];
 
     newBottleneck = null;
     if (newThroughput < 450) {
