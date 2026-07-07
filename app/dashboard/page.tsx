@@ -36,6 +36,8 @@ export default function DashboardPage() {
   
   const impact = worstMachine.impact;
   const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
+  const insight = generateInsight(worstMachine, impact);
+  
   let expectedImpactStr = '';
   let savingsAmount = 0;
   
@@ -51,7 +53,6 @@ export default function DashboardPage() {
     savingsAmount = savings / 1_000_000;
   }
 
-  const insight = generateInsight(worstMachine, impact);
   const dtEvents = useStore(s => s.dtEvents);
   const activeAlerts = dtEvents.filter((e) => e.category === 'Warning' || e.category === 'Critical').length;
 

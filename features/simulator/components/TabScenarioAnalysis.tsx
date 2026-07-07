@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, X, Star } from 'lucide-react';
 import { cn, formatNaira } from '@/lib/utils';
 
@@ -13,6 +13,13 @@ export function TabScenarioAnalysis() {
   const [targetId, setTargetId] = useState('crusher');
   
   const targetMachine = dtMachines.find(m => m.id === targetId) || dtMachines[0];
+
+  useEffect(() => {
+    const worst = dtMachines.reduce((max, m) => m.failureProb > max.failureProb ? m : max, dtMachines[0]);
+    if (worst && worst.id !== targetId) {
+      setTargetId(worst.id);
+    }
+  }, [dtMachines]);
 
   const currentHours  = targetMachine.operatingHours;
   const baseEta       = targetMachine.baseEta;
