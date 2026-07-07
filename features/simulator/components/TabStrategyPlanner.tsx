@@ -31,14 +31,16 @@ export function TabStrategyPlanner() {
 
   const projectedHours = delayDays * 24;
   let projectedProb  = projectFailureProbability(currentHours, projectedHours, effectiveEta, beta);
-  if (delayDays === 0) projectedProb = 5; // Post-maintenance baseline (immediate preventive intervention)
+  if (delayDays === 0 && targetMachine.failureProb <= 50) projectedProb = 5; // Post-maintenance baseline ONLY for non-breakdown assets
 
   // Real math: time to 80% failure probability = eta * (-ln(0.2))^(1/beta)
   const t80 = effectiveEta * Math.pow(-Math.log(1 - 0.8), 1 / beta);
   const remainingLifeHours = Math.max(0, t80 - currentHours); // Do NOT subtract projectedHours here, RUL is physical current state
   const remainingLifeDays = Math.round(remainingLifeHours / 24);
 
-  const currentStrategy = delayDays === 0 ? 'Preventive' : determineMaintenanceStrategy(projectedProb, delayDays);
+  const currentStrategy = delayDays === 0 
+    ? (targetMachine.failureProb > 70 ? 'Emergency' : targetMachine.failureProb > 50 ? 'Corrective' : 'Preventive')
+    : determineMaintenanceStrategy(projectedProb, delayDays);
 
   // Use the exact same unified business impact function as the rest of the app, 
   // enforcing strict React reactivity with useMemo to prevent stale state bugs.
@@ -139,7 +141,7 @@ export function TabStrategyPlanner() {
         </div>
 
         {/* Logistics protocol notice for planned preventive/condition-based maintenance */}
-        {(currentStrategy === 'Preventive' || currentStrategy === 'Condition-Based' || currentStrategy === 'Predictive') && delayDays === 0 && sparesLeadTime > 0 && (
+        {(currentStrategy === 'Preventive' || currentStrategy === 'Condition-Based' || currentStrategy === 'Predictive') && delayDays >= sparesLeadTime && sparesLeadTime > 0 && (
           <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <Info className="h-5 w-5 text-blue-500 shrink-0" />
             <p className="text-muted-foreground">
@@ -159,7 +161,7 @@ export function TabStrategyPlanner() {
         )}
 
         {/* Warning when delaying maintenance exceeds spares lead time on non-breakdown state */}
-        {(currentStrategy !== 'Emergency' && currentStrategy !== 'Corrective') && delayDays > 0 && sparesLeadTime > delayDays && (
+        {(currentStrategy !== 'Emergency' && currentStrategy !== 'Corrective') && delayDays < sparesLeadTime && sparesLeadTime > 0 && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
             <p className="text-muted-foreground">
