@@ -24,7 +24,11 @@ export default function ReportsPage() {
   const strategy = worstMachine.strategy;
   const impact = worstMachine.impact;
   const insight = generateInsight(worstMachine, impact);
+  const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
   const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
+  
+  const avoidedRisk = Math.max(0, emergencyImpact.totalRiskExposure - impact.totalRiskExposure);
+  const avoidedDowntime = Math.max(0, emergencyImpact.downtimeHours - impact.downtimeHours);
 
   const maxPfMachine = dtMachines.reduce((max, m) => m.failureProb > max.failureProb ? m : max, dtMachines[0]);
   const hasAtRiskAsset = dtMachines.some(m => m.risk !== 'Low');
@@ -152,11 +156,11 @@ export default function ReportsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center space-x-3 text-sm">
                   <CheckCircle2 className="h-5 w-5 text-foreground" />
-                  <span className="font-semibold text-foreground">Prevents <span className="font-mono">{Number(impact.downtimeHours - plannedImpact.downtimeHours).toFixed(1)}</span> Hrs Unplanned Downtime</span>
+                  <span className="font-semibold text-foreground">Prevents <span className="font-mono">{avoidedDowntime.toFixed(1)}</span> Hrs Unplanned Downtime</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <TrendingDown className="h-5 w-5 text-foreground" />
-                  <span className="font-semibold text-foreground">Mitigates <span className="font-mono">{formatNaira(impact.totalRiskExposure)}</span> Revenue Exposure</span>
+                  <span className="font-semibold text-foreground">Mitigates <span className="font-mono">{formatNaira(avoidedRisk)}</span> Revenue Exposure</span>
                 </div>
               </div>
             )}

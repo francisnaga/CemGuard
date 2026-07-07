@@ -36,10 +36,20 @@ export default function DashboardPage() {
   
   const impact = worstMachine.impact;
   const emergencyImpact = calculateBusinessImpact('Emergency', worstMachine.category);
-  const plannedImpact = calculateBusinessImpact('Preventive', worstMachine.category);
-  const savingsAmount = worstMachine.failureProb > 20 
-    ? Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure) / 1_000_000 
-    : 0;
+  let expectedImpactStr = '';
+  let savingsAmount = 0;
+  
+  if (insight.severity === 'Healthy') {
+    expectedImpactStr = 'Maintains optimal OEE and prevents unnecessary maintenance expenditure.';
+  } else if (worstMachine.availability === 0 || worstMachine.strategy === 'Emergency') {
+    expectedImpactStr = `Requires immediate Emergency Repair. Expected cost: ${formatNaira(impact.totalRiskExposure)} and ${impact.downtimeHours} hours of downtime.`;
+  } else {
+    // We are intervening before Emergency
+    const savings = Math.max(0, emergencyImpact.totalRiskExposure - impact.totalRiskExposure);
+    const downtimeSavings = Math.max(0, emergencyImpact.downtimeHours - impact.downtimeHours);
+    expectedImpactStr = `Intervening now avoids ${formatNaira(savings)} in risk exposure and ${downtimeSavings} hours of downtime.`;
+    savingsAmount = savings / 1_000_000;
+  }
 
   const insight = generateInsight(worstMachine, impact);
   const dtEvents = useStore(s => s.dtEvents);
@@ -83,7 +93,7 @@ export default function DashboardPage() {
           primaryInsight={insight.situation}
           observation={insight.observation}
           recommendedAction={insight.recommendation}
-          expectedImpact={insight.severity === 'Healthy' ? 'Maintains optimal OEE and prevents unnecessary maintenance expenditure.' : `Avoids ${formatNaira(Math.max(0, emergencyImpact.totalRiskExposure - plannedImpact.totalRiskExposure))} in risk exposure and ${Math.max(0, emergencyImpact.downtimeHours - plannedImpact.downtimeHours)} hours of downtime.`}
+          expectedImpact={expectedImpactStr}
           presentationMode={presentationMode}
           severity={insight.severity}
         />
