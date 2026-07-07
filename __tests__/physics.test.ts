@@ -1,6 +1,5 @@
 import { calculateWeibullFailureProb } from '../lib/engineering/physics-engine';
 import { calculateCostOfFailure } from '../lib/engineering/business-impact-engine';
-import { EQUIPMENT_PROFILES } from '../lib/engineering/equipment-profiles';
 
 describe('Physics Engine', () => {
   it('calculates Weibull failure probability correctly', () => {

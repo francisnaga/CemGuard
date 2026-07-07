@@ -4,7 +4,6 @@ import { BusinessImpact, MaintenanceStrategy } from './types';
 // Cement production: ~450 t/h. 1 ton = 20 bags. Wholesale price ~NGN 6,000/bag -> NGN 120,000/ton.
 // 450 t/h * 120,000 = NGN 54,000,000/hr
 const HOURLY_PRODUCTION_VALUE = 54_000_000; // NGN /hr
-const CO2_EMISSION_PER_RESTART = 15;        // tons CO₂ per cold restart
 const REPAIR_BASE_COST = 5_000_000;         // NGN  base parts + labour for standard repair
 
 export function determineMaintenanceStrategy(failureProb: number, delayDays: number = 0): MaintenanceStrategy {
@@ -23,7 +22,6 @@ export function calculateBusinessImpact(
   
   let downtimeHours = 0;
   let repairCostMultiplier = 1.0;
-  let co2ImpactTons = 0;
 
   const waitPenaltyDays = Math.max(0, sparesLeadTimeDays - plannedDelayDays);
   const waitPenaltyHours = waitPenaltyDays * 24;
@@ -38,27 +36,22 @@ export function calculateBusinessImpact(
     case 'Preventive':
       downtimeHours = 2; // Strictly 2 hours. You don't take the machine offline while waiting for spares in a preventive scenario.
       repairCostMultiplier = 1.0 * delayPenaltyCost;
-      co2ImpactTons = 0; 
       break;
     case 'Condition-Based':
-      downtimeHours = 4 + waitPenaltyHours;
+      downtimeHours = 4 * delayPenaltyTime; // Planned intervention while running; wait penalty only applies on unplanned breakdowns.
       repairCostMultiplier = 1.2 * delayPenaltyCost;
-      co2ImpactTons = 2;
       break;
     case 'Predictive':
-      downtimeHours = 8 + waitPenaltyHours; 
+      downtimeHours = 8 * delayPenaltyTime; // Planned intervention while running.
       repairCostMultiplier = 1.5 * delayPenaltyCost;
-      co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = 24 + waitPenaltyHours; 
+      downtimeHours = (24 + waitPenaltyHours) * delayPenaltyTime; // Unplanned breakdown forces asset offline while waiting for spares.
       repairCostMultiplier = 3.0 * delayPenaltyCost; 
-      co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = 72 + waitPenaltyHours; 
+      downtimeHours = (72 + waitPenaltyHours) * delayPenaltyTime; // Catastrophic failure forces asset offline while waiting for spares.
       repairCostMultiplier = 10.0 * delayPenaltyCost; 
-      co2ImpactTons = 15; 
       break;
   }
 
