@@ -131,34 +131,34 @@ interface DashboardState {
 
 const initialMachines: MachineState[] = [
   { 
-    id: 'crusher', name: 'Crusher', health: 91, availability: 98, utilization: 75, efficiency: 96, risk: 'Low', power: 835,
+    id: 'crusher', name: 'Crusher', health: 91, availability: 98, utilization: 85, efficiency: 96, risk: 'Low', power: 835,
     operatingHours: 4200, rpm: 750, torqueNm: 12500, loadFactor: 0.85, wearAccumulation: 0.8, baseEta: 18000, beta: 2.5,
     vibrationRms: 2.2, vibrationZone: 'A', temperatureC: 45.0, failureProb: 4.5, failureProbLower: 4.0, failureProbUpper: 5.0, throughputCapacity: 600
   },
   { 
-    id: 'rawmill', name: 'Raw Mill', health: 88, availability: 95, utilization: 90, efficiency: 90, risk: 'Low', power: 1700,
+    id: 'rawmill', name: 'Raw Mill', health: 88, availability: 95, utilization: 82, efficiency: 90, risk: 'Low', power: 1700,
     operatingHours: 6500, rpm: 900, torqueNm: 22000, loadFactor: 0.82, wearAccumulation: 1.1, baseEta: 25000, beta: 2.0,
     vibrationRms: 2.4, vibrationZone: 'A', temperatureC: 52.0, failureProb: 6.5, failureProbLower: 5.9, failureProbUpper: 7.1, throughputCapacity: 500
   },
   { 
-    id: 'kiln', name: 'Kiln', health: 95, availability: 99, utilization: 90, efficiency: 92, risk: 'Low', power: 295,
+    id: 'kiln', name: 'Kiln', health: 95, availability: 99, utilization: 95, efficiency: 92, risk: 'Low', power: 295,
     operatingHours: 8200, rpm: 3.5, torqueNm: 850000, loadFactor: 0.95, wearAccumulation: 0.5, baseEta: 40000, beta: 1.8,
-    vibrationRms: 2.0, vibrationZone: 'A', temperatureC: 65.0, failureProb: 4.2, failureProbLower: 3.9, failureProbUpper: 4.5, throughputCapacity: 500
+    vibrationRms: 2.0, vibrationZone: 'A', temperatureC: 65.0, failureProb: 4.2, failureProbLower: 3.9, failureProbUpper: 4.5, throughputCapacity: 450
   },
   { 
     id: 'cooler', name: 'Cooler', health: 85, availability: 97, utilization: 90, efficiency: 88, risk: 'Low', power: 56,
     operatingHours: 6000, rpm: 120, torqueNm: 5000, loadFactor: 0.90, wearAccumulation: 0.9, baseEta: 22000, beta: 2.2,
-    vibrationRms: 2.3, vibrationZone: 'A', temperatureC: 48.0, failureProb: 5.8, failureProbLower: 5.2, failureProbUpper: 6.4, throughputCapacity: 500
+    vibrationRms: 2.3, vibrationZone: 'A', temperatureC: 48.0, failureProb: 5.8, failureProbLower: 5.2, failureProbUpper: 6.4, throughputCapacity: 450
   },
   { 
-    id: 'cementmill', name: 'Cement Mill', health: 92, availability: 96, utilization: 90, efficiency: 94, risk: 'Low', power: 1950,
+    id: 'cementmill', name: 'Cement Mill', health: 92, availability: 96, utilization: 88, efficiency: 94, risk: 'Low', power: 1950,
     operatingHours: 4200, rpm: 900, torqueNm: 24000, loadFactor: 0.88, wearAccumulation: 0.6, baseEta: 25000, beta: 2.0,
-    vibrationRms: 2.1, vibrationZone: 'A', temperatureC: 46.0, failureProb: 3.8, failureProbLower: 3.4, failureProbUpper: 4.2, throughputCapacity: 500
+    vibrationRms: 2.1, vibrationZone: 'A', temperatureC: 46.0, failureProb: 3.8, failureProbLower: 3.4, failureProbUpper: 4.2, throughputCapacity: 520
   },
   { 
     id: 'packing', name: 'Packing', health: 98, availability: 99, utilization: 75, efficiency: 98, risk: 'Low', power: 94,
     operatingHours: 1100, rpm: 1500, torqueNm: 800, loadFactor: 0.75, wearAccumulation: 0.2, baseEta: 30000, beta: 1.5,
-    vibrationRms: 1.7, vibrationZone: 'A', temperatureC: 38.0, failureProb: 1.0, failureProbLower: 0.9, failureProbUpper: 1.1, throughputCapacity: 600
+    vibrationRms: 1.7, vibrationZone: 'A', temperatureC: 38.0, failureProb: 1.0, failureProbLower: 0.9, failureProbUpper: 1.1, throughputCapacity: 650
   },
 ];
 
@@ -173,7 +173,7 @@ export const useStore = create<DashboardState>((set, get) => {
     const sineVariation = Math.sin(t * 0.5) * 2; // Deterministic small fluctuation
     warmupHistory.push({
       time: t,
-      throughput: 450 + sineVariation * 3, // ~444 to 456
+      throughput: 440 + sineVariation * 3, // ~434 to 446
       oee: 92 + sineVariation, // ~90 to 94
       health: 93 - (30 - i) * 0.05,
       failureProb: 8 + (30 - i) * 0.1,
@@ -199,8 +199,8 @@ export const useStore = create<DashboardState>((set, get) => {
   dtClock: 32, // Start at 08:00 (32 * 15m)
   dtIsRunning: false,
   dtThroughputNominal: 450, 
-  dtThroughputCurrent: 450,
-  dtThroughputEfficiency: 100,
+  dtThroughputCurrent: 427,
+  dtThroughputEfficiency: 95,
   dtEnergyTarget: 4.1,
   dtEnergyCurrent: 4.2,
   dtCO2Target: 810,
@@ -371,8 +371,8 @@ export const useStore = create<DashboardState>((set, get) => {
       dtIsRunning: false,
       dtClock: 32,
       dtMachines: JSON.parse(JSON.stringify(initialMachines)), 
-      dtThroughputCurrent: 450,
-      dtThroughputEfficiency: 100,
+      dtThroughputCurrent: 427,
+      dtThroughputEfficiency: 95,
       dtEnergyCurrent: 4.2,
       dtCO2Current: 815,
       dtEvents: [{ id: '1', time: '08:00', category: 'Information', code: 'OPS-087', message: 'Simulation reset. Baseline calculations initialized.' }],

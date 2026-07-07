@@ -16,21 +16,6 @@ export function TabStrategyPlanner() {
   const dtMachines = useStore(s => s.dtMachines);
   const targetMachine = dtMachines.find(m => m.id === targetId) || dtMachines[0];
 
-  React.useEffect(() => {
-    const worst = dtMachines.reduce((max, m) => m.failureProb > max.failureProb ? m : max, dtMachines[0]);
-    if (worst && worst.id !== targetId) {
-      setTargetId(worst.id);
-    }
-  }, [dtMachines]);
-
-  React.useEffect(() => {
-    if (targetMachine) {
-      if (targetMachine.failureProb >= 60 || targetMachine.risk === 'Critical') setPriority('Critical');
-      else if (targetMachine.failureProb >= 30 || targetMachine.risk === 'High') setPriority('Urgent');
-      else setPriority('Standard');
-    }
-  }, [targetMachine]);
-
   // Project failure probability forward using real Weibull equation
   // (non-linear — follows the curve, not a linear estimate)
   const currentHours  = targetMachine.operatingHours;
@@ -150,12 +135,12 @@ export function TabStrategyPlanner() {
           <h2 className="text-lg font-bold">Strategy Impact Estimation</h2>
         </div>
 
-        {/* Spares Lead Time Alert for Degraded Equipment */}
-        {sparesLeadTime > 0 && projectedProb >= 50 && (
+        {/* New warning about waiting for spares while plant is down */}
+        {delayDays === 0 && sparesLeadTime > 0 && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
             <p className="text-muted-foreground">
-              <strong className="text-orange-500">Spares Risk Alert:</strong> Equipment failure probability ({projectedProb.toFixed(1)}%) requires urgent component replacement. A {sparesLeadTime}-day spares lead time adds up to {sparesLeadTime * 24} hours of idle downtime (NGN {formatNaira(sparesLeadTime * 24 * 54000000, true)} revenue exposure) if emergency seizure occurs.
+              <strong className="text-orange-500">Warning:</strong> Initiating maintenance immediately without spares on-site will force a {sparesLeadTime}-day production halt while waiting for parts.
             </p>
           </div>
         )}
@@ -205,9 +190,7 @@ export function TabStrategyPlanner() {
           <TrendingUp className="h-5 w-5 text-primary shrink-0" />
           <p className="text-muted-foreground">
             <strong className="text-foreground">Strategy Recommendation</strong><br/>
-            {targetMachine.risk === 'Low' || currentP < 15
-              ? `Equipment operating normally within baseline parameters (P(f) = ${(currentP).toFixed(1)}%). No immediate intervention required; continue standard inspection cadence.`
-              : delayDays === 0 
+            {delayDays === 0 
               ? `Immediate maintenance eliminates the current ${(currentP).toFixed(1)}% failure risk at a planned cost of ${formatNaira(plannedCost, true)}. This is the recommended path if spares are available.`
               : `Delaying ${delayDays} days escalates Weibull-projected failure probability to ${(projectedProb).toFixed(1)}%, driving estimated exposure to ${formatNaira(emergencyCostM, true)}. Urgent priority maintenance is advised before this threshold is reached.`
             }

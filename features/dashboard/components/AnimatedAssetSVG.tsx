@@ -1,8 +1,8 @@
 import React, { useId } from 'react';
 import { cn } from "@/lib/utils";
-import { useStore } from "@/lib/store";
+import { useStore, MachineState } from "@/lib/store";
 
-export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: any; className?: string }) {
+export const AnimatedAssetSVG = React.memo(function AnimatedAssetSVG({ machine, className }: { machine: MachineState; className?: string }) {
   const isCritical = machine.risk === 'Critical';
   const isWarning = machine.risk === 'High' || machine.risk === 'Medium';
   const isLive = useStore(s => s.dtClock > 32);
