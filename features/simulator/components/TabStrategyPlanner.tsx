@@ -150,12 +150,12 @@ export function TabStrategyPlanner() {
           <h2 className="text-lg font-bold">Strategy Impact Estimation</h2>
         </div>
 
-        {/* New warning about waiting for spares while plant is down */}
-        {delayDays === 0 && sparesLeadTime > 0 && (
+        {/* Spares Lead Time Alert for Degraded Equipment */}
+        {sparesLeadTime > 0 && projectedProb >= 50 && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
             <p className="text-muted-foreground">
-              <strong className="text-orange-500">Warning:</strong> Initiating maintenance immediately without spares on-site will force a {sparesLeadTime}-day production halt while waiting for parts.
+              <strong className="text-orange-500">Spares Risk Alert:</strong> Equipment failure probability ({projectedProb.toFixed(1)}%) requires urgent component replacement. A {sparesLeadTime}-day spares lead time adds up to {sparesLeadTime * 24} hours of idle downtime (NGN {formatNaira(sparesLeadTime * 24 * 54000000, true)} revenue exposure) if emergency seizure occurs.
             </p>
           </div>
         )}

@@ -26,9 +26,6 @@ export function calculateBusinessImpact(
   let repairCostMultiplier = 1.0;
   let co2ImpactTons = 0;
 
-  const waitPenaltyDays = Math.max(0, sparesLeadTimeDays - plannedDelayDays);
-  const waitPenaltyHours = waitPenaltyDays * 24;
-
   // Continuous degradation penalty: Operating a degraded machine causes secondary damage.
   // We model a 15% repair cost penalty and 10% downtime penalty for every 30 days of delay.
   const delayPenaltyCost = 1.0 + (plannedDelayDays / 30) * 0.15;
@@ -37,27 +34,29 @@ export function calculateBusinessImpact(
   // Impact varies heavily by strategy (RCM principle)
   switch (strategy) {
     case 'Preventive':
-      downtimeHours = 2; // Strictly 2 hours. You don't take the machine offline while waiting for spares in a preventive scenario.
+      downtimeHours = 2 * delayPenaltyTime; // Strictly planned routine maintenance
       repairCostMultiplier = 1.0 * delayPenaltyCost;
       co2ImpactTons = 0; 
       break;
     case 'Condition-Based':
-      downtimeHours = 4 + waitPenaltyHours;
+      downtimeHours = 4 * delayPenaltyTime;
       repairCostMultiplier = 1.2 * delayPenaltyCost;
       co2ImpactTons = 2;
       break;
     case 'Predictive':
-      downtimeHours = 8 + waitPenaltyHours; 
+      downtimeHours = 8 * delayPenaltyTime; 
       repairCostMultiplier = 1.5 * delayPenaltyCost;
       co2ImpactTons = 5;
       break;
     case 'Corrective':
-      downtimeHours = 24 + waitPenaltyHours; 
+      // High risk of failure during repair prep; lack of spares adds lead time risk
+      downtimeHours = (24 * delayPenaltyTime) + (sparesLeadTimeDays * 8); 
       repairCostMultiplier = 3.0 * delayPenaltyCost; 
       co2ImpactTons = 10;
       break;
     case 'Emergency':
-      downtimeHours = 72 + waitPenaltyHours; 
+      // Unplanned breakdown: machine is shut down immediately waiting for spares
+      downtimeHours = (72 * delayPenaltyTime) + (sparesLeadTimeDays * 24); 
       repairCostMultiplier = 10.0 * delayPenaltyCost; 
       co2ImpactTons = 15; 
       break;
