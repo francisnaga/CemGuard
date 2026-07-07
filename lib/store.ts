@@ -139,17 +139,17 @@ const initialMachines: MachineState[] = [
   { 
     id: 'rawmill', name: 'Raw Mill', health: 88, availability: 95, utilization: 82, efficiency: 90, risk: 'Low', power: 1700,
     operatingHours: 6500, rpm: 900, torqueNm: 22000, loadFactor: 0.82, wearAccumulation: 1.1, baseEta: 25000, beta: 2.0,
-    vibrationRms: 2.4, vibrationZone: 'A', temperatureC: 52.0, failureProb: 6.5, failureProbLower: 5.9, failureProbUpper: 7.1, throughputCapacity: 500
+    vibrationRms: 2.4, vibrationZone: 'A', temperatureC: 52.0, failureProb: 6.5, failureProbLower: 5.9, failureProbUpper: 7.1, throughputCapacity: 550
   },
   { 
     id: 'kiln', name: 'Kiln', health: 95, availability: 99, utilization: 95, efficiency: 92, risk: 'Low', power: 295,
     operatingHours: 8200, rpm: 3.5, torqueNm: 850000, loadFactor: 0.95, wearAccumulation: 0.5, baseEta: 40000, beta: 1.8,
-    vibrationRms: 2.0, vibrationZone: 'A', temperatureC: 65.0, failureProb: 4.2, failureProbLower: 3.9, failureProbUpper: 4.5, throughputCapacity: 450
+    vibrationRms: 2.0, vibrationZone: 'A', temperatureC: 65.0, failureProb: 4.2, failureProbLower: 3.9, failureProbUpper: 4.5, throughputCapacity: 480
   },
   { 
     id: 'cooler', name: 'Cooler', health: 85, availability: 97, utilization: 90, efficiency: 88, risk: 'Low', power: 56,
     operatingHours: 6000, rpm: 120, torqueNm: 5000, loadFactor: 0.90, wearAccumulation: 0.9, baseEta: 22000, beta: 2.2,
-    vibrationRms: 2.3, vibrationZone: 'A', temperatureC: 48.0, failureProb: 5.8, failureProbLower: 5.2, failureProbUpper: 6.4, throughputCapacity: 450
+    vibrationRms: 2.3, vibrationZone: 'A', temperatureC: 48.0, failureProb: 5.8, failureProbLower: 5.2, failureProbUpper: 6.4, throughputCapacity: 500
   },
   { 
     id: 'cementmill', name: 'Cement Mill', health: 92, availability: 96, utilization: 88, efficiency: 94, risk: 'Low', power: 1950,
@@ -241,6 +241,8 @@ export const useStore = create<DashboardState>((set, get) => {
       if (rawmill) {
         rawmill.wearAccumulation += 3.5;
         rawmill.operatingHours += 2500;
+        rawmill.utilization = 75;
+        rawmill.loadFactor = 0.75;
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '11:15', category: 'Warning', code: 'WEAR-022', message: 'Raw Mill showing progressive wear patterns in main drive.' });
       }
       if (kiln) {
@@ -254,10 +256,12 @@ export const useStore = create<DashboardState>((set, get) => {
       if (kiln) {
         kiln.wearAccumulation += 5.5;
         kiln.operatingHours += 4000;
+        kiln.utilization = 68;
+        kiln.loadFactor = 0.68;
         newEvents.unshift({ id: Math.random().toString(36).substring(2, 11), time: '12:30', category: 'Critical', code: 'VIB-101', message: 'Kiln support roller RMS Vibration rapidly increasing.' });
       }
-      if (cooler) cooler.loadFactor = 0.8; // Unstable clinker flow
-      if (rawmill) rawmill.loadFactor = 0.8; // Silo backing up
+      if (cooler) { cooler.loadFactor = 0.8; cooler.utilization = 80; } // Unstable clinker flow
+      if (rawmill) { rawmill.loadFactor = 0.8; rawmill.utilization = 80; } // Silo backing up
     } else if (scenario === 'Emergency Shutdown') {
       newClock = 52;
       const cementmill = newMachines.find((m: any) => m.id === 'cementmill');
