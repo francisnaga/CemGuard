@@ -30,23 +30,26 @@ export function TabStrategyPlanner() {
     : baseEta;
 
   const projectedHours = delayDays * 24;
-  const projectedProb  = projectFailureProbability(currentHours, projectedHours, effectiveEta, beta);
+  let projectedProb  = projectFailureProbability(currentHours, projectedHours, effectiveEta, beta);
+  if (delayDays === 0) projectedProb = 5; // Post-maintenance baseline (immediate preventive intervention)
 
   // Real math: time to 80% failure probability = eta * (-ln(0.2))^(1/beta)
   const t80 = effectiveEta * Math.pow(-Math.log(1 - 0.8), 1 / beta);
   const remainingLifeHours = Math.max(0, t80 - currentHours); // Do NOT subtract projectedHours here, RUL is physical current state
   const remainingLifeDays = Math.round(remainingLifeHours / 24);
 
+  const currentStrategy = delayDays === 0 ? 'Preventive' : determineMaintenanceStrategy(projectedProb, delayDays);
+
   // Use the exact same unified business impact function as the rest of the app, 
   // enforcing strict React reactivity with useMemo to prevent stale state bugs.
   const { totalRiskExposure, downtimeHours: downtimeEst } = React.useMemo(() => {
     return calculateBusinessImpact(
-      determineMaintenanceStrategy(projectedProb, delayDays),
+      currentStrategy,
       targetMachine.name,
       sparesLeadTime,
       delayDays
     );
-  }, [projectedProb, delayDays, targetMachine.name, sparesLeadTime]);
+  }, [currentStrategy, targetMachine.name, sparesLeadTime, delayDays]);
 
   const plannedCost = React.useMemo(() => {
     return calculateBusinessImpact('Preventive', targetMachine.name, sparesLeadTime, delayDays).totalRiskExposure / 1_000_000;
@@ -135,18 +138,28 @@ export function TabStrategyPlanner() {
           <h2 className="text-lg font-bold">Strategy Impact Estimation</h2>
         </div>
 
-        {/* Logistics protocol notice for planned preventive maintenance */}
-        {delayDays === 0 && sparesLeadTime > 0 && (
+        {/* Logistics protocol notice for planned preventive/condition-based maintenance */}
+        {(currentStrategy === 'Preventive' || currentStrategy === 'Condition-Based' || currentStrategy === 'Predictive') && delayDays === 0 && sparesLeadTime > 0 && (
           <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <Info className="h-5 w-5 text-blue-500 shrink-0" />
             <p className="text-muted-foreground">
-              <strong className="text-blue-500">Logistics Protocol:</strong> Spares require a {sparesLeadTime}-day lead time. For planned preventive maintenance, parts are ordered immediately while the machine continues operating safely. Zero wait penalty is incurred; standard 2.0 hr shutdown applies upon arrival.
+              <strong className="text-blue-500">Logistics Protocol:</strong> Spares require a {sparesLeadTime}-day lead time. Because the asset is operating safely under planned <strong>{currentStrategy}</strong> thresholds, parts are ordered immediately while production continues without interruption. Zero wait penalty is incurred; standard planned shutdown applies upon arrival.
             </p>
           </div>
         )}
 
-        {/* Warning when delaying maintenance exceeds spares lead time */}
-        {delayDays > 0 && sparesLeadTime > delayDays && (
+        {/* Breakdown logistics notice for Emergency/Corrective state */}
+        {(currentStrategy === 'Emergency' || currentStrategy === 'Corrective') && sparesLeadTime > delayDays && (
+          <div className="bg-destructive/10 border border-destructive/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
+            <ShieldAlert className="h-5 w-5 text-destructive shrink-0" />
+            <p className="text-muted-foreground">
+              <strong className="text-destructive">Critical Breakdown Logistics:</strong> The asset has reached an urgent <strong>{currentStrategy}</strong> breakdown state (Weibull P(f) = {projectedProb.toFixed(1)}%). It cannot continue operating while waiting for spares. The machine is forced offline for the entire {sparesLeadTime}-day logistics lead time ({sparesLeadTime * 24} hrs wait penalty) plus standard repair duration.
+            </p>
+          </div>
+        )}
+
+        {/* Warning when delaying maintenance exceeds spares lead time on non-breakdown state */}
+        {(currentStrategy !== 'Emergency' && currentStrategy !== 'Corrective') && delayDays > 0 && sparesLeadTime > delayDays && (
           <div className="bg-orange-500/10 border border-orange-500/30 p-4 rounded-lg flex items-start space-x-3 text-sm">
             <ShieldAlert className="h-5 w-5 text-orange-500 shrink-0" />
             <p className="text-muted-foreground">

@@ -60,30 +60,20 @@ export default function AboutPage() {
 
           <section className="bg-muted/30 border border-border rounded-xl p-6">
             <h2 className="text-sm font-bold uppercase tracking-widest mb-4 flex items-center border-b border-border pb-2">
-              Project Scope
+              Roadmap & Pilot Details (180-Day Rollout)
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div className="space-y-4 text-sm text-muted-foreground">
               <div>
-                <h3 className="font-bold text-success flex items-center mb-3">
-                  <CheckCircle2 className="h-4 w-4 mr-2" /> Current Prototype
-                </h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>✔ Predictive maintenance simulation</li>
-                  <li>✔ Business impact modelling</li>
-                  <li>✔ Scenario analysis & Digital Twin</li>
-                  <li>✔ Executive Decision support</li>
-                </ul>
+                <strong className="text-foreground">Immediate (0–30 days):</strong> Deploy vibration/thermal sensors on Rotary Kiln Line 1, Obajana. Confirm DCS/SCADA access. Baseline Weibull/HI parameters.
               </div>
               <div>
-                <h3 className="font-bold text-destructive flex items-center mb-3">
-                  <X className="h-4 w-4 mr-2" /> Not Included
-                </h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>✖ Live PLC integration</li>
-                  <li>✖ Real industrial SCADA connectivity</li>
-                  <li>✖ Production scheduling</li>
-                  <li>✖ Real sensor acquisition</li>
-                </ul>
+                <strong className="text-foreground">Short-term (30–90 days):</strong> Run in “Shadow Mode” against historical failure logs. Train reliability team; standardise “Ended” status workflow. Begin WhatsApp Business API alert beta.
+              </div>
+              <div>
+                <strong className="text-foreground">Medium-term (90–180 days):</strong> Full control-room integration. Track pre-empted failures vs. a 90-day control period. Plan scaling to Ibese, Gboko, Okpella.
+              </div>
+              <div className="bg-primary/10 border border-primary/20 p-3 rounded-lg text-primary text-xs mt-3">
+                <strong>Pilot Ask:</strong> A 90-day pilot covering Phases 1–2 above at Obajana / Rotary Kiln Line 1 before a Phase 3 scaling decision. This is a subset of the 180-day rollout, not a competing timeline.
               </div>
             </div>
           </section>
@@ -94,10 +84,26 @@ export default function AboutPage() {
         <div className="space-y-6">
           <div className="bg-card border border-border p-6 rounded-xl">
             <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 flex items-center">
-              <Layers className="h-4 w-4 mr-2" /> Tech Stack
+              <Layers className="h-4 w-4 mr-2" /> Project & Tech Stack
             </h3>
             <ul className="space-y-3">
               <li className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-foreground">Institution</span>
+                <span className="text-muted-foreground">Nigerian Maritime University</span>
+              </li>
+              <li className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-foreground">Track</span>
+                <span className="text-muted-foreground">Track 2 (Predictive Maint.)</span>
+              </li>
+              <li className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-foreground">Pilot Asset</span>
+                <span className="text-muted-foreground">Obajana, Kiln Line 1</span>
+              </li>
+              <li className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-foreground">Scaling Targets</span>
+                <span className="text-muted-foreground">Ibese, Gboko, Okpella</span>
+              </li>
+              <li className="flex items-center justify-between text-sm pt-2 border-t border-border">
                 <span className="font-semibold text-foreground">Frontend</span>
                 <span className="text-muted-foreground">Next.js 15 (React)</span>
               </li>
@@ -107,7 +113,7 @@ export default function AboutPage() {
               </li>
               <li className="flex items-center justify-between text-sm">
                 <span className="font-semibold text-foreground">State / Physics</span>
-                <span className="text-muted-foreground">Zustand</span>
+                <span className="text-muted-foreground">Zustand (Single Store)</span>
               </li>
               <li className="flex items-center justify-between text-sm">
                 <span className="font-semibold text-foreground">Database</span>
@@ -118,14 +124,14 @@ export default function AboutPage() {
 
           <div className="bg-card border border-border p-6 rounded-xl">
             <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4 flex items-center">
-              <FileCode2 className="h-4 w-4 mr-2" /> Prototype Status
+              <FileCode2 className="h-4 w-4 mr-2" /> Data Disclosure
             </h3>
             <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-              <p>
-                <strong>Note:</strong> This application is a research prototype developed for the Dangote Cement engineering competition.
+              <p className="italic font-medium text-foreground">
+                “Due to a lack of live plant data, CemGuard operates on a deterministic physics engine simulating real-world telemetry.”
               </p>
-              <p>
-                The engineering thresholds, equipment baselines, and financial values are demonstrative and not derived from proprietary Dangote operational data.
+              <p className="text-xs">
+                Developed for the Dangote Cement engineering competition.
               </p>
             </div>
           </div>

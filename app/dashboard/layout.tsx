@@ -183,9 +183,9 @@ export default function DashboardLayout({
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="fixed bottom-0 w-full border-t border-border bg-background/80 backdrop-blur-md z-40">
         <div className="max-w-[1600px] mx-auto px-6 h-8 flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-          <div className="flex gap-4">
-            <span>Models: Weibull • ISO 20816 • Archard Wear Law • RCM • Theory of Constraints</span>
-            <span className="hidden sm:inline-block">Data: Representative engineering parameters — not proprietary Dangote operational data</span>
+          <div className="flex gap-4 items-center">
+            <span className="text-foreground font-bold">NMU • Track 2</span>
+            <span className="hidden sm:inline-block">Due to a lack of live plant data, CemGuard operates on a deterministic physics engine simulating real-world telemetry.</span>
           </div>
           <div className="flex items-center gap-4">
             <AssumptionsPanel />
